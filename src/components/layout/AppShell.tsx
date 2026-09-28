@@ -3,7 +3,7 @@ import { Link, useLocation, useNavigate } from 'react-router-dom'
 import * as Dialog from '@radix-ui/react-dialog'
 import {
   Home, CalendarCheck, Package, User, Plus, X,
-  LogOut, Shield, ChevronRight, Menu,
+  LogOut, Shield, ChevronRight,
 } from 'lucide-react'
 import { useIntl } from 'react-intl'
 import { useAuthContext } from '../../context/AuthContext'
@@ -195,8 +195,7 @@ function TabletTopNav({ onMenuOpen }: { onMenuOpen: () => void }) {
 }
 
 // ─── Mobile top bar ───────────────────────────────────────────────────────────
-function MobileTopBar({ onMenuOpen }: { onMenuOpen: () => void }) {
-  const intl = useIntl()
+function MobileTopBar() {
   return (
     <header
       className="md:hidden sticky top-0 z-30 flex items-center justify-between px-4 border-b"
@@ -207,9 +206,7 @@ function MobileTopBar({ onMenuOpen }: { onMenuOpen: () => void }) {
         borderColor: 'var(--border)',
       }}
     >
-      <button type="button" onClick={onMenuOpen} className="iconbtn tap" aria-label={intl.formatMessage({ id: 'nav.openMenu' })}>
-        <Menu style={{ width: 22, height: 22 }} />
-      </button>
+      <div className="w-10" />
       <MerckLogo width={44} height={21} />
       <div className="flex items-center gap-1">
         <ThemeToggle variant="icon" />
@@ -328,7 +325,7 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
 
       {/* Content column */}
       <div className="flex-1 flex flex-col min-w-0">
-        <MobileTopBar onMenuOpen={() => setDrawerOpen(true)} />
+        <MobileTopBar />
         <TabletTopNav onMenuOpen={() => setDrawerOpen(true)} />
 
         {/* Desktop notification bell (sidebar doesn't have one) */}
