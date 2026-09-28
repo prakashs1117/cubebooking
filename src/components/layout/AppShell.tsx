@@ -136,7 +136,7 @@ function TabletTopNav({ onMenuOpen }: { onMenuOpen: () => void }) {
       className="hidden md:flex lg:hidden sticky top-0 z-30 items-center border-b px-4"
       style={{
         height: 56,
-        background: 'rgba(255,255,255,0.96)',
+        background: 'var(--surface-glass)',
         backdropFilter: 'blur(12px)',
         borderColor: 'var(--border)',
       }}
@@ -193,7 +193,7 @@ function MobileTopBar({ onMenuOpen }: { onMenuOpen: () => void }) {
       className="md:hidden sticky top-0 z-30 flex items-center justify-between px-4 border-b"
       style={{
         height: 52,
-        background: 'rgba(255,255,255,0.96)',
+        background: 'var(--surface-glass)',
         backdropFilter: 'blur(12px)',
         borderColor: 'var(--border)',
       }}
@@ -216,7 +216,7 @@ function MobileTabBar({ currentPath }: { currentPath: string }) {
     <nav
       className="md:hidden fixed bottom-0 left-0 right-0 z-30 border-t"
       style={{
-        background: 'rgba(255,255,255,0.96)',
+        background: 'var(--surface-glass)',
         backdropFilter: 'blur(16px)',
         borderColor: 'var(--border)',
         paddingBottom: 'env(safe-area-inset-bottom, 0px)',
