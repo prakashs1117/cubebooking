@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+Display:wght@500;600;700;800&family=Noto+Sans:wght@400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500&family=Noto+Sans+Display:wght@500;600;700;800&display=swap');
 @import "tailwindcss";
 
 /* ─── Liquid Carbon design tokens ─────────────────────────────────────────── */
@@ -45,8 +45,8 @@
   --brand-orange: #de7b22;
 
   /* Typography */
-  --font-sans: "Noto Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
-  --font-display: "Noto Sans Display", "Noto Sans", system-ui, sans-serif;
+  --font-sans: "Poppins", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-display: "Noto Sans Display", "Poppins", system-ui, sans-serif;
 
   /* Spacing scale */
   --space-1: 4px;
@@ -168,6 +168,23 @@
   }
 }
 
+/* ─── Poppins utility classes ──────────────────────────────────────────────── */
+.poppins-light {
+  font-family: "Poppins", sans-serif;
+  font-weight: 300;
+  font-style: normal;
+}
+.poppins-regular {
+  font-family: "Poppins", sans-serif;
+  font-weight: 400;
+  font-style: normal;
+}
+.poppins-medium {
+  font-family: "Poppins", sans-serif;
+  font-weight: 500;
+  font-style: normal;
+}
+
 /* ─── Tailwind theme bridge ────────────────────────────────────────────────── */
 @theme {
   --color-primary: var(--primary);
@@ -190,8 +207,8 @@
   --color-accent: var(--accent);
   --color-border: var(--border);
   --color-destructive: var(--destructive);
-  --font-sans: var(--font-sans);
-  --font-display: var(--font-display);
+  --font-sans: "Poppins", system-ui, sans-serif;
+  --font-display: "Noto Sans Display", "Poppins", system-ui, sans-serif;
   --radius-sm: var(--radius-sm);
   --radius-md: var(--radius-md);
   --radius-lg: var(--radius-lg);
@@ -210,7 +227,7 @@ body {
   padding: 0;
   background: var(--app-ground);
   color: var(--foreground);
-  font-family: var(--font-sans);
+  font-family: "Poppins", system-ui, -apple-system, sans-serif;
   font-size: 16px;
   font-weight: 400;
   min-height: 100%;
@@ -263,5 +280,5 @@ body {
 :focus-visible { outline: 2px solid var(--ring); outline-offset: 2px; }
 
 input, select, textarea, button {
-  font-family: var(--font-sans);
+  font-family: "Poppins", system-ui, -apple-system, sans-serif;
 }
