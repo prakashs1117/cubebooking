@@ -97,7 +97,8 @@ export default function ReviewPage() {
         grade: classDetails.grade,
         studentCount: classDetails.studentCount,
         accessNeeds: classDetails.accessNeeds,
-        status: 'confirmed',
+        // Onsite visits confirm instantly; TOAD requires Merck approval
+        status: visitType === 'toad' ? 'pending' : 'confirmed',
         bookingCode,
         createdAt: serverTimestamp(),
       })

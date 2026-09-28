@@ -54,14 +54,32 @@ service cloud.firestore {
     }
 
     // ── Bookings ───────────────────────────────────────────────────────────
-    // Teachers read their own bookings; admins read all.
-    // Creates go through Cloud Functions to enforce seat hold + transaction.
+    // Onsite visits (type == 'onsite') are auto-confirmed by the teacher.
+    // TOAD visits (type == 'toad') require Merck admin approval.
     match /bookings/{bookingId} {
       allow read: if isSignedIn() && (
         resource.data.teacherId == request.auth.uid || isAdmin()
       );
+
+      // Onsite: teacher creates with status 'confirmed'
       allow create: if isSignedIn()
-        && request.resource.data.teacherId == request.auth.uid;
+        && request.resource.data.teacherId == request.auth.uid
+        && request.resource.data.type == 'onsite'
+        && request.resource.data.status == 'confirmed';
+
+      // TOAD: teacher creates with status 'pending' only
+      allow create: if isSignedIn()
+        && request.resource.data.teacherId == request.auth.uid
+        && request.resource.data.type == 'toad'
+        && request.resource.data.status == 'pending';
+
+      // Teachers can cancel their own bookings (status → 'cancelled')
+      allow update: if isSignedIn()
+        && resource.data.teacherId == request.auth.uid
+        && request.resource.data.status == 'cancelled'
+        && request.resource.data.teacherId == resource.data.teacherId;
+
+      // Admins can update/delete any booking
       allow update: if isAdmin();
       allow delete: if isAdmin();
     }
