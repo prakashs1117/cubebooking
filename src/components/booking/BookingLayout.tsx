@@ -1,5 +1,6 @@
 import { useNavigate } from 'react-router-dom'
 import { X, ChevronLeft } from 'lucide-react'
+import { useIntl } from 'react-intl'
 
 interface BookingLayoutProps {
   title: string
@@ -21,6 +22,7 @@ export default function BookingLayout({
   footer,
 }: BookingLayoutProps) {
   const navigate = useNavigate()
+  const intl = useIntl()
 
   const handleBack = () => {
     if (!onBack) return
@@ -37,11 +39,11 @@ export default function BookingLayout({
       <header className="flex flex-col gap-3 px-3 pt-4 pb-3">
         <div className="flex items-center gap-1">
           {onBack ? (
-            <button type="button" onClick={handleBack} className="iconbtn tap" aria-label="Back">
+            <button type="button" onClick={handleBack} className="iconbtn tap" aria-label={intl.formatMessage({ id: 'bookingLayout.back' })}>
               <ChevronLeft className="i" />
             </button>
           ) : (
-            <button type="button" onClick={() => navigate(onClose)} className="iconbtn tap" aria-label="Close">
+            <button type="button" onClick={() => navigate(onClose)} className="iconbtn tap" aria-label={intl.formatMessage({ id: 'bookingLayout.close' })}>
               <X className="i" />
             </button>
           )}
@@ -49,7 +51,7 @@ export default function BookingLayout({
           <span className="flex-1 text-center text-[15px] font-semibold">{title}</span>
 
           {onBack ? (
-            <button type="button" onClick={() => navigate(onClose)} className="iconbtn tap" aria-label="Close">
+            <button type="button" onClick={() => navigate(onClose)} className="iconbtn tap" aria-label={intl.formatMessage({ id: 'bookingLayout.close' })}>
               <X className="i" />
             </button>
           ) : (
@@ -95,13 +97,14 @@ export function ContinueButton({
   disabled,
   loading,
   onClick,
-  children = 'Continue',
+  children,
 }: {
   disabled?: boolean
   loading?: boolean
   onClick?: () => void
   children?: React.ReactNode
 }) {
+  const intl = useIntl()
   return (
     <button
       type="button"
@@ -112,7 +115,7 @@ export function ContinueButton({
     >
       {loading ? (
         <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-      ) : children}
+      ) : (children ?? intl.formatMessage({ id: 'bookingLayout.continue' }))}
     </button>
   )
 }

@@ -1,62 +1,69 @@
 import { useNavigate } from 'react-router-dom'
 import { useEffect } from 'react'
 import { Building2, Truck } from 'lucide-react'
+import { useIntl } from 'react-intl'
 import BookingLayout, { ContinueButton } from './BookingLayout'
 import { useBookingStore, type VisitType } from '../../stores/bookingStore'
 import { trackBookingInitiated, trackImpressionView } from '../../services/analyticsService'
 
-const VISIT_TYPES = [
-  {
-    id: 'onsite' as VisitType,
-    label: 'Onsite STEM visit',
-    sub: 'Your class visits Merck in Darmstadt',
-    tag: 'Confirmed instantly',
-    tagColor: 'var(--brand-green)',
-    tagBg: 'rgba(1,136,76,0.1)',
-    headerBg: 'var(--brand-mint)',
-    accentCircle1: { bg: 'var(--brand-yellow)', w: 160, h: 160, r: -30, t: 20 },
-    accentCircle2: { bg: 'var(--brand-lime)', w: 70, h: 70, l: 140, t: -20 },
-    icon: Building2,
-  },
-  {
-    id: 'toad' as VisitType,
-    label: 'TOAD truck visit',
-    sub: 'The mobile lab comes to your school',
-    tag: 'Subject to approval',
-    tagColor: 'var(--brand-magenta)',
-    tagBg: 'rgba(235,60,150,0.1)',
-    headerBg: 'var(--brand-magenta)',
-    accentCircle1: { bg: 'var(--brand-purple)', w: 160, h: 160, r: -30, t: 20 },
-    accentCircle2: { bg: 'var(--brand-yellow)', w: 70, h: 70, l: 140, t: -20 },
-    icon: Truck,
-  },
-] as const
+function useVisitTypes() {
+  const intl = useIntl()
+  return [
+    {
+      id: 'onsite' as VisitType,
+      label: intl.formatMessage({ id: 'book.type.onsite.label' }),
+      sub: intl.formatMessage({ id: 'book.type.onsite.sub' }),
+      tag: intl.formatMessage({ id: 'book.type.onsite.tag' }),
+      tagColor: 'var(--brand-green)',
+      tagBg: 'rgba(1,136,76,0.1)',
+      headerBg: 'var(--brand-mint)',
+      accentCircle1: { bg: 'var(--brand-yellow)', w: 160, h: 160, r: -30, t: 20 },
+      accentCircle2: { bg: 'var(--brand-lime)', w: 70, h: 70, l: 140, t: -20 },
+      icon: Building2,
+    },
+    {
+      id: 'toad' as VisitType,
+      label: intl.formatMessage({ id: 'book.type.toad.label' }),
+      sub: intl.formatMessage({ id: 'book.type.toad.sub' }),
+      tag: intl.formatMessage({ id: 'book.type.toad.tag' }),
+      tagColor: 'var(--brand-magenta)',
+      tagBg: 'rgba(235,60,150,0.1)',
+      headerBg: 'var(--brand-magenta)',
+      accentCircle1: { bg: 'var(--brand-purple)', w: 160, h: 160, r: -30, t: 20 },
+      accentCircle2: { bg: 'var(--brand-yellow)', w: 70, h: 70, l: 140, t: -20 },
+      icon: Truck,
+    },
+  ] as const
+}
 
 export default function BookPage() {
   const navigate = useNavigate()
+  const intl = useIntl()
+  const visitTypes = useVisitTypes()
   const { visitType, setVisitType } = useBookingStore()
 
   useEffect(() => {
     trackBookingInitiated('booking_funnel_start', 'Booking Funnel')
-    VISIT_TYPES.forEach(vt => {
+    visitTypes.forEach(vt => {
       trackImpressionView(vt.id, 'visit_type', vt.label)
     })
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
   const handleContinue = () => {
     if (visitType === 'onsite') {
-      trackImpressionView('onsite', 'visit_type', 'Onsite STEM visit')
+      trackImpressionView('onsite', 'visit_type', intl.formatMessage({ id: 'book.type.onsite.label' }))
       navigate('/book/programs')
     }
     else if (visitType === 'toad') {
-      trackImpressionView('toad', 'visit_type', 'TOAD truck visit')
+      trackImpressionView('toad', 'visit_type', intl.formatMessage({ id: 'book.type.toad.label' }))
       navigate('/toad')
     }
   }
 
   return (
     <BookingLayout
-      title="Book a visit"
+      title={intl.formatMessage({ id: 'book.title' })}
       step={1}
       totalSteps={4}
       onClose="/home"
@@ -64,15 +71,15 @@ export default function BookPage() {
     >
       <div className="rise">
         <h1 className="m-0 text-[28px] font-extrabold leading-[34px] tracking-tight" style={{ fontFamily: 'var(--font-display)' }}>
-          How would you like to visit?
+          {intl.formatMessage({ id: 'book.heading' })}
         </h1>
         <p className="mt-1.5 text-[15px] leading-[22px]" style={{ color: 'var(--muted-foreground)' }}>
-          Choose where the science happens.
+          {intl.formatMessage({ id: 'book.sub' })}
         </p>
       </div>
 
       <div className="rise-2 flex flex-col gap-3">
-        {VISIT_TYPES.map((vt) => {
+        {visitTypes.map((vt) => {
           const selected = visitType === vt.id
           return (
             <button

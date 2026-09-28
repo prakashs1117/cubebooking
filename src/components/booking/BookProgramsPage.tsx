@@ -1,47 +1,39 @@
 import { useNavigate } from 'react-router-dom'
 import { useEffect } from 'react'
+import { useIntl } from 'react-intl'
 import BookingLayout, { ContinueButton } from './BookingLayout'
 import { useBookingStore, type ProgramSelection, type ProgramOrder } from '../../stores/bookingStore'
 import { trackProgramSelected, trackImpressionView } from '../../services/analyticsService'
 
-const OPTIONS: { id: ProgramSelection; title: string; sub: string; swatch: string }[] = [
-  {
-    id: 'cube',
-    title: 'Curiosity Cube',
-    sub: '45 min · hands-on science exhibits',
-    swatch: 'var(--brand-mint)',
-  },
-  {
-    id: 'lab',
-    title: 'Curiosity Lab',
-    sub: '45 min · guided lab experiments',
-    swatch: 'var(--brand-yellow)',
-  },
-  {
-    id: 'both',
-    title: 'Cube + Lab',
-    sub: '90 min total · two back-to-back sessions',
-    swatch: 'linear-gradient(135deg, var(--brand-mint) 50%, var(--brand-yellow) 50%)',
-  },
-]
-
-const ORDER_OPTIONS: { id: ProgramOrder; label: string; sub: string }[] = [
-  { id: 'cube-first', label: 'Cube first, then Lab', sub: 'Cube 09:00 → Lab 09:45' },
-  { id: 'lab-first', label: 'Lab first, then Cube', sub: 'Lab 09:00 → Cube 09:45' },
-]
+function useBookProgramOptions() {
+  const intl = useIntl()
+  const options: { id: ProgramSelection; title: string; sub: string; swatch: string }[] = [
+    { id: 'cube', title: intl.formatMessage({ id: 'bookPrograms.cube.title' }), sub: intl.formatMessage({ id: 'bookPrograms.cube.sub' }), swatch: 'var(--brand-mint)' },
+    { id: 'lab',  title: intl.formatMessage({ id: 'bookPrograms.lab.title' }),  sub: intl.formatMessage({ id: 'bookPrograms.lab.sub' }),  swatch: 'var(--brand-yellow)' },
+    { id: 'both', title: intl.formatMessage({ id: 'bookPrograms.both.title' }), sub: intl.formatMessage({ id: 'bookPrograms.both.sub' }), swatch: 'linear-gradient(135deg, var(--brand-mint) 50%, var(--brand-yellow) 50%)' },
+  ]
+  const orderOptions: { id: ProgramOrder; label: string; sub: string }[] = [
+    { id: 'cube-first', label: intl.formatMessage({ id: 'bookPrograms.order.cubeFirst.label' }), sub: 'Cube 09:00 → Lab 09:45' },
+    { id: 'lab-first',  label: intl.formatMessage({ id: 'bookPrograms.order.labFirst.label' }),  sub: 'Lab 09:00 → Cube 09:45' },
+  ]
+  return { options, orderOptions }
+}
 
 export default function BookProgramsPage() {
   const navigate = useNavigate()
+  const intl = useIntl()
+  const { options, orderOptions } = useBookProgramOptions()
   const { programSelection, programOrder, setProgramSelection, setProgramOrder } = useBookingStore()
 
   useEffect(() => {
-    OPTIONS.forEach(option => {
+    options.forEach(option => {
       trackImpressionView(option.id, 'program', option.title)
     })
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
   const handleSelectProgram = (programId: ProgramSelection) => {
-    const program = OPTIONS.find(o => o.id === programId)
+    const program = options.find(o => o.id === programId)
     if (program) {
       trackProgramSelected(program.id, program.title)
     }
@@ -54,7 +46,7 @@ export default function BookProgramsPage() {
 
   return (
     <BookingLayout
-      title="Onsite STEM visit"
+      title={intl.formatMessage({ id: 'bookPrograms.title' })}
       step={2}
       totalSteps={4}
       onBack="/book"
@@ -66,12 +58,12 @@ export default function BookProgramsPage() {
       }
     >
       <h1 className="m-0 rise text-[28px] font-extrabold leading-[34px] tracking-tight" style={{ fontFamily: 'var(--font-display)' }}>
-        Choose your programs
+        {intl.formatMessage({ id: 'bookPrograms.heading' })}
       </h1>
 
       {/* Program radio group */}
       <div className="rise-2 flex flex-col gap-2.5" role="radiogroup" aria-label="Programs">
-        {OPTIONS.map((opt) => {
+        {options.map((opt) => {
           const selected = programSelection === opt.id
           return (
             <button
@@ -107,13 +99,13 @@ export default function BookProgramsPage() {
       {programSelection === 'both' && (
         <section className="rise flex flex-col gap-3">
           <div className="flex flex-col gap-1">
-            <h2 className="m-0 text-base font-bold">Which order?</h2>
+            <h2 className="m-0 text-base font-bold">{intl.formatMessage({ id: 'bookPrograms.order.heading' })}</h2>
             <p className="m-0 text-[13px]" style={{ color: 'var(--muted-foreground)' }}>
-              The second session starts right when the first ends.
+              {intl.formatMessage({ id: 'bookPrograms.order.sub' })}
             </p>
           </div>
           <div className="flex flex-col gap-2" role="radiogroup" aria-label="Session order">
-            {ORDER_OPTIONS.map((o) => {
+            {orderOptions.map((o) => {
               const sel = programOrder === o.id
               return (
                 <button
