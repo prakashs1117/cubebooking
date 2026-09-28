@@ -17,13 +17,29 @@ export function useLocale(): LocaleContextValue {
   return ctx
 }
 
+/** Detect browser/OS language and map to a supported locale. */
+function detectLocale(): Locale {
+  // navigator.languages is an ordered priority list; fall back to navigator.language
+  const langs = (navigator.languages?.length ? navigator.languages : [navigator.language]) ?? []
+  for (const lang of langs) {
+    const primary = lang.split('-')[0].toLowerCase()
+    if (primary === 'de') return 'de'
+    if (primary === 'en') return 'en'
+  }
+  // Default: German (app is based in Darmstadt, Germany)
+  return 'de'
+}
+
 export default function LocaleProvider({ children }: { children: ReactNode }) {
   const [locale, setLocaleState] = useState<Locale>(() => {
+    // 1. Respect an explicit user choice stored in localStorage
     try {
       const stored = localStorage.getItem(STORAGE_KEY)
       if (stored === 'en' || stored === 'de') return stored
     } catch { /* noop */ }
-    return 'de'
+
+    // 2. Auto-detect from browser / system language
+    return detectLocale()
   })
 
   const setLocale = useCallback((l: Locale) => {
