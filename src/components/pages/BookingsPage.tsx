@@ -36,6 +36,19 @@ function BookingCard({ booking }: { booking: BookingDoc }) {
     return ''
   })()
 
+  const timeLabel = (() => {
+    try {
+      const firstSeg = booking.segments?.[0] as unknown as { start?: Timestamp }
+      const lastSeg = booking.segments?.[booking.segments.length - 1] as unknown as { end?: Timestamp }
+      if (firstSeg?.start && lastSeg?.end) {
+        const startTime = format(firstSeg.start.toDate(), 'HH:mm')
+        const endTime = format(lastSeg.end.toDate(), 'HH:mm')
+        return `${startTime}–${endTime}`
+      }
+    } catch { /* noop */ }
+    return ''
+  })()
+
   const statusColor = booking.status === 'confirmed' ? 'var(--brand-green)' : booking.status === 'pending' ? 'var(--brand-orange)' : 'var(--muted-foreground)'
   const statusLabel = booking.status === 'confirmed' ? 'Confirmed' : booking.status === 'pending' ? 'Pending' : booking.status
 
@@ -64,7 +77,12 @@ function BookingCard({ booking }: { booking: BookingDoc }) {
           <span className="text-sm font-bold truncate">{label}</span>
           <span className="text-xs font-semibold flex-none" style={{ color: statusColor }}>{statusLabel}</span>
         </div>
-        {dateLabel && <div className="text-xs" style={{ color: 'var(--muted-foreground)' }}>{dateLabel}</div>}
+        {dateLabel && (
+          <div className="flex items-center gap-2 text-xs" style={{ color: 'var(--muted-foreground)' }}>
+            <span>{dateLabel}</span>
+            {timeLabel && <span>· {timeLabel}</span>}
+          </div>
+        )}
         <div className="text-xs" style={{ color: 'var(--muted-foreground)' }}>
           {booking.studentCount} students · Grade {booking.grade}
         </div>
