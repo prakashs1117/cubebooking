@@ -21,17 +21,29 @@ import { fileURLToPath } from 'url'
 
 const __dirname = dirname(fileURLToPath(import.meta.url))
 
-const [,, uid, role] = process.argv
+const VALID_ROLES = ['teacher', 'coordinator', 'admin', 'volunteer', 'null']
 
-if (!uid || !role) {
+// Accept either order: <uid> <role>  OR  <role> <uid>
+let [,, arg1, arg2] = process.argv
+if (!arg1 || !arg2) {
   console.error('\nUsage: node scripts/set-user-role.mjs <uid> <role>')
-  console.error('Roles: teacher | coordinator | admin | volunteer | null\n')
+  console.error('       node scripts/set-user-role.mjs <role> <uid>  (either order works)')
+  console.error('\nRoles: teacher | coordinator | admin | volunteer | null')
+  console.error('Example: node scripts/set-user-role.mjs HJCsgUeKC6crVtP2EBO338A6Ao12 admin\n')
   process.exit(1)
 }
 
-const VALID_ROLES = ['teacher', 'coordinator', 'admin', 'volunteer', 'null']
-if (!VALID_ROLES.includes(role)) {
-  console.error(`\nInvalid role "${role}". Valid roles: ${VALID_ROLES.join(', ')}\n`)
+// Figure out which arg is the role and which is the UID
+let uid, role
+if (VALID_ROLES.includes(arg1) && !VALID_ROLES.includes(arg2)) {
+  role = arg1; uid = arg2   // <role> <uid>
+} else if (VALID_ROLES.includes(arg2) && !VALID_ROLES.includes(arg1)) {
+  uid = arg1; role = arg2   // <uid> <role>
+} else {
+  console.error(`\n❌  Could not determine which argument is the role.`)
+  console.error(`    "${arg1}" and "${arg2}" — one must be a valid role.`)
+  console.error(`\nValid roles: ${VALID_ROLES.join(', ')}`)
+  console.error(`Example:  node scripts/set-user-role.mjs HJCsgUeKC6crVtP2EBO338A6Ao12 admin\n`)
   process.exit(1)
 }
 
