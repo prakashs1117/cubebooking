@@ -11,6 +11,7 @@ export interface AppUser {
   photoURL?: string
   role: UserRole | null
   schoolId?: string
+  schoolName?: string
   language: 'de' | 'en'
   createdAt?: Timestamp
   updatedAt?: Timestamp

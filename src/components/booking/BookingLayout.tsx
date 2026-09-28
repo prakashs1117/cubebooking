@@ -48,9 +48,13 @@ export default function BookingLayout({
 
           <span className="flex-1 text-center text-[15px] font-semibold">{title}</span>
 
-          <span className="w-11 text-right text-xs font-semibold" style={{ color: 'var(--muted-foreground)' }}>
-            {step} / {totalSteps}
-          </span>
+          {onBack ? (
+            <button type="button" onClick={() => navigate(onClose)} className="iconbtn tap" aria-label="Close">
+              <X className="i" />
+            </button>
+          ) : (
+            <span className="w-11" />
+          )}
         </div>
 
         {/* Progress bar */}

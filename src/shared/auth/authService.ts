@@ -8,10 +8,11 @@ import {
   signInWithEmailLink,
   GoogleAuthProvider,
   onAuthStateChanged,
+  updateProfile as firebaseUpdateProfile,
   type User,
   type Unsubscribe,
 } from 'firebase/auth'
-import { doc, getDoc, setDoc, onSnapshot, serverTimestamp } from 'firebase/firestore'
+import { doc, getDoc, setDoc, updateDoc, onSnapshot, serverTimestamp } from 'firebase/firestore'
 import { auth, db } from '../firebase'
 import { authErrorMessage } from '../lib/authErrors'
 import type { AppUser } from '../types'
@@ -107,6 +108,19 @@ export async function resetPassword(email: string): Promise<void> {
   }
 }
 
+export async function updateUserProfile(
+  user: User,
+  fields: { displayName?: string; schoolName?: string },
+): Promise<void> {
+  const updates: Record<string, unknown> = { updatedAt: serverTimestamp() }
+  if (fields.displayName !== undefined) {
+    updates.displayName = fields.displayName
+    await firebaseUpdateProfile(user, { displayName: fields.displayName })
+  }
+  if (fields.schoolName !== undefined) updates.schoolName = fields.schoolName
+  await updateDoc(doc(db, 'users', user.uid), updates)
+}
+
 export async function signOut(): Promise<void> {
   await firebaseSignOut(auth)
 }
@@ -137,6 +151,7 @@ export function subscribeToUserProfile(
         photoURL: data.photoURL ?? undefined,
         role: data.role ?? null,
         schoolId: data.schoolId ?? undefined,
+        schoolName: data.schoolName ?? undefined,
         language: data.language ?? 'de',
         createdAt: data.createdAt,
         updatedAt: data.updatedAt,

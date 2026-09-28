@@ -254,6 +254,23 @@ body {
   flex-direction: column;
 }
 
+/* Segmented tab trigger — adapts to light and dark mode */
+.tab-trigger {
+  padding: 0.5rem 0;
+  border-radius: var(--radius-lg);
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--muted-foreground);
+  background: transparent;
+  border: 0;
+  transition: background-color 0.15s, color 0.15s;
+}
+.tab-trigger[data-state="active"] {
+  background: var(--background);
+  color: var(--foreground);
+  box-shadow: var(--shadow-xs);
+}
+
 /* Scrollbar */
 .scroll { overflow-y: auto; scrollbar-width: none; }
 .scroll::-webkit-scrollbar { display: none; }

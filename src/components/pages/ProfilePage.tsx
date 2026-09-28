@@ -1,5 +1,5 @@
-import { useState } from 'react'
-import { Shield, Globe, Trash2, Download, ChevronRight, Edit3, Check, Palette } from 'lucide-react'
+import { useRef, useState } from 'react'
+import { Shield, Globe, Trash2, Download, ChevronRight, Check, Palette, Pencil, X, Loader2 } from 'lucide-react'
 import { useAuthContext } from '../../context/AuthContext'
 import ThemeToggle from '../ui/ThemeToggle'
 
@@ -15,10 +15,42 @@ function InitialsAvatar({ name, size = 56 }: { name: string; size?: number }) {
   )
 }
 
+type EditField = 'name' | 'school' | null
+
 export default function ProfilePage() {
-  const { user, profile, logout, resetPassword } = useAuthContext()
+  const { user, profile, logout, resetPassword, updateProfile } = useAuthContext()
   const [language, setLanguage] = useState<'de' | 'en'>(profile?.language ?? 'de')
   const [passwordSent, setPasswordSent] = useState(false)
+  const [editing, setEditing] = useState<EditField>(null)
+  const [draft, setDraft] = useState('')
+  const [saving, setSaving] = useState(false)
+  const [saveError, setSaveError] = useState<string | null>(null)
+  const inputRef = useRef<HTMLInputElement>(null)
+
+  const startEdit = (field: EditField) => {
+    if (!field) return
+    setDraft(field === 'name' ? (profile?.displayName ?? '') : (profile?.schoolName ?? ''))
+    setSaveError(null)
+    setEditing(field)
+    setTimeout(() => inputRef.current?.focus(), 0)
+  }
+
+  const cancelEdit = () => { setEditing(null); setSaveError(null) }
+
+  const saveEdit = async () => {
+    if (!editing) return
+    setSaving(true)
+    setSaveError(null)
+    try {
+      if (editing === 'name') await updateProfile({ displayName: draft.trim() })
+      else await updateProfile({ schoolName: draft.trim() })
+      setEditing(null)
+    } catch (e) {
+      setSaveError(e instanceof Error ? e.message : 'Save failed.')
+    } finally {
+      setSaving(false)
+    }
+  }
 
   const handleResetPassword = async () => {
     if (!user?.email) return
@@ -26,18 +58,57 @@ export default function ProfilePage() {
     setPasswordSent(true)
   }
 
-  const rows: { label: string; value: string; placeholder?: string }[] = [
-    { label: 'Name', value: profile?.displayName ?? '', placeholder: 'Your name' },
-    { label: 'Email', value: user?.email ?? '' },
-    { label: 'School', value: '', placeholder: 'Your school name' },
-  ]
+  const editableRow = (field: EditField, label: string, value: string, placeholder: string) => {
+    const isEditing = editing === field
+    return (
+      <div className="flex items-center min-h-[52px] px-4 gap-3 border-b last:border-b-0" style={{ borderColor: 'var(--border)' }}>
+        <span className="w-20 text-xs flex-none" style={{ color: 'var(--muted-foreground)' }}>{label}</span>
+        {isEditing ? (
+          <input
+            ref={inputRef}
+            value={draft}
+            onChange={(e) => setDraft(e.target.value)}
+            onKeyDown={(e) => { if (e.key === 'Enter') saveEdit(); if (e.key === 'Escape') cancelEdit() }}
+            className="flex-1 text-sm bg-transparent outline-none border-b-2 py-0.5"
+            style={{ borderColor: 'var(--primary)', color: 'var(--foreground)' }}
+            placeholder={placeholder}
+          />
+        ) : (
+          <span className="flex-1 text-sm font-medium truncate" style={{ color: value ? 'var(--foreground)' : 'var(--muted-foreground)' }}>
+            {value || placeholder}
+          </span>
+        )}
+        {isEditing ? (
+          <div className="flex items-center gap-1 flex-none">
+            <button
+              type="button"
+              onClick={saveEdit}
+              disabled={saving}
+              aria-label="Save"
+              className="tap iconbtn"
+              style={{ color: 'var(--primary)' }}
+            >
+              {saving ? <Loader2 className="i i-sm animate-spin" /> : <Check className="i i-sm" />}
+            </button>
+            <button type="button" onClick={cancelEdit} aria-label="Cancel" className="tap iconbtn" style={{ color: 'var(--muted-foreground)' }}>
+              <X className="i i-sm" />
+            </button>
+          </div>
+        ) : (
+          <button type="button" onClick={() => startEdit(field)} aria-label={`Edit ${label}`} className="tap iconbtn flex-none" style={{ color: 'var(--muted-foreground)' }}>
+            <Pencil className="i i-sm" />
+          </button>
+        )}
+      </div>
+    )
+  }
 
   return (
     <div
-      className="min-h-screen flex flex-col max-w-2xl lg:max-w-3xl mx-auto w-full"
+      className="min-h-dvh flex flex-col max-w-2xl lg:max-w-3xl mx-auto w-full"
       style={{ background: 'var(--app-ground)', fontFamily: 'var(--font-sans)', color: 'var(--foreground)' }}
     >
-      <main className="flex-1 scroll overflow-y-auto px-5 pt-12 lg:pt-6 pb-24 lg:pb-6 flex flex-col gap-4">
+      <main className="flex-1 scroll overflow-y-auto px-5 pt-6 pb-24 lg:pb-6 flex flex-col gap-4">
         <h1 className="m-0 text-3xl font-extrabold tracking-tight" style={{ fontFamily: 'var(--font-display)' }}>
           Profile
         </h1>
@@ -61,24 +132,22 @@ export default function ProfilePage() {
               </div>
             )}
           </div>
-          <button type="button" className="tap flex-none iconbtn" aria-label="Edit profile">
-            <Edit3 className="i i-sm" />
-          </button>
         </section>
+
+        {saveError && (
+          <div className="px-4 py-3 rounded-xl text-sm font-medium" style={{ background: 'var(--tint-red)', color: 'var(--destructive)' }}>
+            {saveError}
+          </div>
+        )}
 
         {/* Profile fields */}
         <section className="rise-2 rounded-2xl border overflow-hidden" style={{ background: 'var(--card)', borderColor: 'var(--border)' }}>
-          {rows.map((row, i) => (
-            <div key={i} className="flex items-center min-h-[52px] px-4 gap-3 border-b last:border-b-0" style={{ borderColor: 'var(--border)' }}>
-              <span className="w-20 text-xs flex-none" style={{ color: 'var(--muted-foreground)' }}>{row.label}</span>
-              <span className="flex-1 text-sm font-medium truncate" style={{ color: row.value ? 'var(--foreground)' : 'var(--muted-foreground)' }}>
-                {row.value || row.placeholder}
-              </span>
-              {row.label !== 'Email' && (
-                <ChevronRight className="w-4 h-4 flex-none" style={{ color: 'var(--muted-foreground)' }} />
-              )}
-            </div>
-          ))}
+          {editableRow('name', 'Name', profile?.displayName ?? '', 'Your name')}
+          <div className="flex items-center min-h-[52px] px-4 gap-3 border-b last:border-b-0" style={{ borderColor: 'var(--border)' }}>
+            <span className="w-20 text-xs flex-none" style={{ color: 'var(--muted-foreground)' }}>Email</span>
+            <span className="flex-1 text-sm font-medium truncate" style={{ color: 'var(--muted-foreground)' }}>{user?.email}</span>
+          </div>
+          {editableRow('school', 'School', profile?.schoolName ?? '', 'Your school name')}
         </section>
 
         {/* Language toggle */}

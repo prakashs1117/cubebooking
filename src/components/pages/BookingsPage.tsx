@@ -112,18 +112,10 @@ export default function BookingsPage() {
             className="grid grid-cols-2 p-1 rounded-xl"
             style={{ background: 'var(--muted)' }}
           >
-            <Tabs.Trigger
-              value="upcoming"
-              className="tap py-2 rounded-lg text-sm font-semibold data-[state=active]:bg-white transition-colors"
-              style={{ color: 'var(--foreground)' }}
-            >
+            <Tabs.Trigger value="upcoming" className="tab-trigger tap">
               Upcoming · {upcoming.length}
             </Tabs.Trigger>
-            <Tabs.Trigger
-              value="past"
-              className="tap py-2 rounded-lg text-sm font-semibold data-[state=active]:bg-white transition-colors"
-              style={{ color: 'var(--foreground)' }}
-            >
+            <Tabs.Trigger value="past" className="tab-trigger tap">
               Past
             </Tabs.Trigger>
           </Tabs.List>

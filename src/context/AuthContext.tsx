@@ -6,6 +6,7 @@ import {
   sendMagicLink as svcSendMagicLink,
   completeMagicLinkSignIn as svcCompleteMagicLink,
   resetPassword as svcResetPassword,
+  updateUserProfile as svcUpdateUserProfile,
   signOut as svcSignOut,
   subscribeToAuthUser,
   subscribeToUserProfile,
@@ -23,6 +24,7 @@ interface AuthContextValue {
   sendMagicLink: (email: string) => Promise<void>
   completeMagicLinkSignIn: (href: string) => Promise<boolean>
   resetPassword: (email: string) => Promise<void>
+  updateProfile: (fields: { displayName?: string; schoolName?: string }) => Promise<void>
   logout: () => Promise<void>
 }
 
@@ -100,6 +102,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     await svcResetPassword(email)
   }, [])
 
+  const updateProfile = useCallback(async (fields: { displayName?: string; schoolName?: string }) => {
+    if (!user) throw new Error('Not signed in')
+    await svcUpdateUserProfile(user, fields)
+  }, [user])
+
   const logout = useCallback(async () => {
     await svcSignOut()
   }, [])
@@ -115,9 +122,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       sendMagicLink,
       completeMagicLinkSignIn,
       resetPassword,
+      updateProfile,
       logout,
     }),
-    [user, profile, loading, signIn, signInWithGoogle, sendMagicLink, completeMagicLinkSignIn, resetPassword, logout],
+    [user, profile, loading, signIn, signInWithGoogle, sendMagicLink, completeMagicLinkSignIn, resetPassword, updateProfile, logout],
   )
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>

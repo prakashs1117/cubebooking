@@ -1,7 +1,7 @@
-import { useState, useMemo } from 'react'
+import { useState, useMemo, useRef } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { ChevronLeft, ChevronRight } from 'lucide-react'
-import { addDays, startOfWeek, format, isSameDay, isToday, addWeeks } from 'date-fns'
+import { ChevronLeft, ChevronRight, AlertCircle } from 'lucide-react'
+import { addDays, startOfWeek, format, isSameDay, addWeeks } from 'date-fns'
 import BookingLayout, { ContinueButton } from './BookingLayout'
 import { useBookingStore } from '../../stores/bookingStore'
 import { useSessionsForWeek } from '../../hooks/queries/useSessions'
@@ -26,38 +26,55 @@ function getStepTitle(selection: string | null, order: string) {
 
 type SessionDoc = Session & { id: string }
 
+function toDate(val: unknown): Date {
+  return (val as Timestamp).toDate()
+}
+
 export default function BookTimePage() {
   const navigate = useNavigate()
   const { programSelection, programOrder, selectedDate, slots, setSelectedDate, setSlots, startHold } = useBookingStore()
 
   const [weekOffset, setWeekOffset] = useState(0)
-  const today = new Date()
+
+  // Stable "today at midnight" reference — never re-creates during the session
+  const todayRef = useRef<Date>((() => {
+    const d = new Date()
+    d.setHours(0, 0, 0, 0)
+    return d
+  })())
+  const today = todayRef.current
+
+  // Monday of the displayed week
   const baseWeek = useMemo(() => {
     const mon = startOfWeek(today, { weekStartsOn: 1 })
-    return addWeeks(mon, weekOffset)
+    const result = addWeeks(mon, weekOffset)
+    result.setHours(0, 0, 0, 0)
+    return result
   }, [weekOffset, today])
 
   const weekDays = useMemo(() =>
     Array.from({ length: 5 }, (_, i) => addDays(baseWeek, i)),
-    [baseWeek]
+    [baseWeek],
   )
 
-  const weekEnd = addDays(baseWeek, 5)
+  // Give a full 7-day window to account for timezone offsets
+  const weekEnd = addDays(baseWeek, 7)
   const programIds = getProgramIds(programSelection, programOrder)
 
-  const { data: sessions = [], isLoading } = useSessionsForWeek(
+  const { data: sessions = [], isLoading, isError } = useSessionsForWeek(
     programIds,
     baseWeek,
     weekEnd,
     programIds.length > 0,
   )
 
-  // Group sessions by date string then by start time
+  // Group sessions by the LOCAL date string of their start time
   const sessionsByDay = useMemo(() => {
     const map: Record<string, SessionDoc[]> = {}
     for (const s of sessions) {
-      const start = (s.start as unknown as Timestamp).toDate()
-      const key = start.toDateString()
+      const start = toDate(s.start)
+      // Use local date string so IST/CET/etc. days match what the calendar shows
+      const key = new Date(start.getFullYear(), start.getMonth(), start.getDate()).toDateString()
       if (!map[key]) map[key] = []
       map[key].push(s as unknown as SessionDoc)
     }
@@ -66,42 +83,64 @@ export default function BookTimePage() {
 
   const availableTimes = useMemo(() => {
     if (!selectedDate) return []
-    const key = selectedDate.toDateString()
+    const key = new Date(selectedDate.getFullYear(), selectedDate.getMonth(), selectedDate.getDate()).toDateString()
     const daySessions = sessionsByDay[key] ?? []
 
     if (programSelection !== 'both') {
+      // Deduplicate by start time (seed may have created duplicates)
+      const seen = new Set<string>()
       return daySessions
-        .filter((s) => s.capacity - s.seatsTaken - s.seatsHeld > 0)
+        .filter((s) => {
+          const available = s.capacity - s.seatsTaken - s.seatsHeld
+          if (available <= 0) return false
+          const timeKey = toDate(s.start).getTime().toString()
+          if (seen.has(timeKey)) return false
+          seen.add(timeKey)
+          return true
+        })
+        .sort((a, b) => toDate(a.start).getTime() - toDate(b.start).getTime())
         .map((s) => ({
-          label: format((s.start as unknown as Timestamp).toDate(), 'HH:mm'),
+          label: format(toDate(s.start), 'HH:mm'),
+          endLabel: format(toDate(s.end), 'HH:mm'),
           slots: [s],
         }))
     }
 
-    // For "both": find pairs where second starts exactly when first ends
+    // "Both" — find pairs where second starts exactly when first ends
     const firstProg = programIds[0]
     const secondProg = programIds[1]
-    const firsts = daySessions.filter((s) => s.programId === firstProg && s.capacity - s.seatsTaken - s.seatsHeld > 0)
-    const seconds = daySessions.filter((s) => s.programId === secondProg && s.capacity - s.seatsTaken - s.seatsHeld > 0)
+    const firsts = daySessions
+      .filter((s) => s.programId === firstProg && s.capacity - s.seatsTaken - s.seatsHeld > 0)
+      .sort((a, b) => toDate(a.start).getTime() - toDate(b.start).getTime())
 
+    const seen = new Set<string>()
     return firsts.flatMap((first) => {
-      const firstEnd = (first.end as unknown as Timestamp).toDate().getTime()
-      const match = seconds.find((s) => (s.start as unknown as Timestamp).toDate().getTime() === firstEnd)
+      const firstEnd = toDate(first.end).getTime()
+      const match = daySessions.find(
+        (s) => s.programId === secondProg
+          && toDate(s.start).getTime() === firstEnd
+          && s.capacity - s.seatsTaken - s.seatsHeld > 0,
+      )
       if (!match) return []
-      const startTime = format((first.start as unknown as Timestamp).toDate(), 'HH:mm')
-      const endTime = format((match.end as unknown as Timestamp).toDate(), 'HH:mm')
-      return [{ label: `${startTime} – ${endTime}`, slots: [first, match] }]
+      const key = `${first.id}-${match.id}`
+      if (seen.has(key)) return []
+      seen.add(key)
+      return [{
+        label: format(toDate(first.start), 'HH:mm'),
+        endLabel: format(toDate(match.end), 'HH:mm'),
+        slots: [first, match],
+      }]
     })
   }, [selectedDate, sessionsByDay, programSelection, programIds])
 
-  const selectedSlotKey = slots.length ? (slots[0].start as Date).toISOString() : null
+  const selectedSlotKey = slots.length > 0 ? slots[0].sessionId : null
 
   const handleSelectTime = (slotDocs: SessionDoc[]) => {
     setSlots(slotDocs.map((s) => ({
       sessionId: s.id,
       programId: s.programId,
-      start: (s.start as unknown as Timestamp).toDate(),
-      end: (s.end as unknown as Timestamp).toDate(),
+      start: toDate(s.start),
+      end: toDate(s.end),
     })))
   }
 
@@ -118,11 +157,9 @@ export default function BookTimePage() {
       step={3}
       totalSteps={4}
       onBack="/book/programs"
-      footer={
-        <ContinueButton disabled={slots.length === 0} onClick={handleContinue} />
-      }
+      footer={<ContinueButton disabled={slots.length === 0} onClick={handleContinue} />}
     >
-      {/* Month nav */}
+      {/* Month + week nav */}
       <div className="flex items-center justify-between">
         <h1 className="m-0 text-[28px] font-extrabold tracking-tight" style={{ fontFamily: 'var(--font-display)' }}>
           {monthLabel}
@@ -150,14 +187,25 @@ export default function BookTimePage() {
         </div>
       </div>
 
+      {/* Connection error banner */}
+      {isError && (
+        <div className="flex items-center gap-2 px-4 py-3 rounded-xl text-sm" style={{ background: 'var(--tint-yellow)' }}>
+          <AlertCircle className="w-4 h-4 flex-none" style={{ color: 'var(--brand-orange)' }} />
+          <span>Could not load availability. Check your connection and try again.</span>
+        </div>
+      )}
+
       {/* 5-day week grid */}
       <div className="grid gap-2" style={{ gridTemplateColumns: 'repeat(5, minmax(0, 1fr))' }}>
         {weekDays.map((day, i) => {
-          const key = day.toDateString()
+          const dayMidnight = new Date(day.getFullYear(), day.getMonth(), day.getDate())
+          const key = dayMidnight.toDateString()
           const hasSessions = (sessionsByDay[key]?.length ?? 0) > 0
-          const isPast = day < today && !isToday(day)
+          // A day is "past" only if its midnight is strictly before today midnight
+          const isPast = dayMidnight < today
           const isSel = selectedDate ? isSameDay(day, selectedDate) : false
-          const closed = isPast || (!isLoading && !hasSessions)
+          // Only mark closed if load is complete (not loading, no error) and genuinely no sessions
+          const closed = isPast || (!isLoading && !isError && !hasSessions)
 
           return (
             <button
@@ -166,29 +214,34 @@ export default function BookTimePage() {
               disabled={closed}
               aria-pressed={isSel}
               onClick={() => { setSelectedDate(day); setSlots([]) }}
-              className="tap flex flex-col items-center justify-center gap-0.5 rounded-[18px] border h-[84px]"
+              className="tap flex flex-col items-center justify-center gap-0.5 rounded-[18px] border h-[84px] transition-colors"
               style={{
-                background: isSel ? 'var(--primary)' : closed ? 'var(--muted)' : 'var(--card)',
+                background: isSel ? 'var(--primary)' : closed ? 'transparent' : 'var(--card)',
                 color: isSel ? '#fff' : closed ? 'var(--muted-foreground)' : 'var(--foreground)',
-                borderColor: isSel ? 'var(--primary)' : 'var(--border)',
+                borderColor: isSel ? 'var(--primary)' : closed ? 'var(--border)' : 'var(--border)',
                 boxShadow: isSel ? 'var(--shadow-float)' : 'var(--shadow-xs)',
-                cursor: closed ? 'not-allowed' : 'pointer',
-                opacity: closed ? 0.5 : 1,
+                cursor: closed ? 'default' : 'pointer',
+                opacity: closed ? 0.4 : 1,
               }}
             >
               <span className="text-xs font-semibold">{DOW_LABELS[i]}</span>
               <span className="text-2xl font-extrabold leading-none" style={{ fontFamily: 'var(--font-display)' }}>
                 {format(day, 'd')}
               </span>
+              {/* Green dot = sessions available */}
               {!closed && !isSel && (
                 <span className="w-1.5 h-1.5 rounded-full" style={{ background: 'var(--primary)' }} />
+              )}
+              {/* Loading shimmer */}
+              {isLoading && !isPast && (
+                <span className="w-4 h-1 rounded-full animate-pulse mt-0.5" style={{ background: 'var(--muted)' }} />
               )}
             </button>
           )
         })}
       </div>
 
-      {/* Time slots */}
+      {/* Time slots for selected day */}
       {selectedDate && (
         <div className="rise flex flex-col gap-2">
           <h2 className="text-sm font-semibold" style={{ color: 'var(--muted-foreground)' }}>
@@ -202,14 +255,13 @@ export default function BookTimePage() {
               ))}
             </div>
           ) : availableTimes.length === 0 ? (
-            <p className="text-sm py-4 text-center" style={{ color: 'var(--muted-foreground)' }}>
+            <p className="text-sm py-6 text-center" style={{ color: 'var(--muted-foreground)' }}>
               No available times on this day.
             </p>
           ) : (
             <div className="flex flex-col gap-2">
-              {availableTimes.map(({ label, slots: slotDocs }) => {
-                const isSel = selectedSlotKey === slotDocs[0].start?.toString() ||
-                  (slots.length > 0 && slots[0].sessionId === slotDocs[0].id)
+              {availableTimes.map(({ label, endLabel, slots: slotDocs }) => {
+                const isSel = selectedSlotKey === slotDocs[0].id
                 return (
                   <button
                     key={label}
@@ -222,9 +274,9 @@ export default function BookTimePage() {
                       color: 'var(--foreground)',
                     }}
                   >
-                    <span>{label}</span>
+                    <span>{label} – {endLabel}</span>
                     <span
-                      className="w-5 h-5 rounded-full box-border"
+                      className="w-5 h-5 rounded-full box-border flex-none transition-all"
                       style={{ border: isSel ? '6px solid var(--primary)' : '2px solid var(--border)' }}
                     />
                   </button>
