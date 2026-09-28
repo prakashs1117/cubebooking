@@ -5,18 +5,22 @@ import {
   Home, CalendarCheck, Package, User, Plus, X,
   LogOut, Shield, ChevronRight, Menu,
 } from 'lucide-react'
+import { useIntl } from 'react-intl'
 import { useAuthContext } from '../../context/AuthContext'
 import MerckLogo from '../auth/MerckLogo'
 import NotificationPopover from './NotificationPopover'
 import ThemeToggle from '../ui/ThemeToggle'
 
-// ─── Nav items shared across all breakpoints ──────────────────────────────────
-const NAV = [
-  { label: 'Home',     href: '/home',     icon: Home },
-  { label: 'Bookings', href: '/bookings', icon: CalendarCheck },
-  { label: 'Kit',      href: '/kit',      icon: Package },
-  { label: 'Profile',  href: '/profile',  icon: User },
-]
+// ─── Nav hook — returns translated items on each render ──────────────────────
+function useNav() {
+  const intl = useIntl()
+  return [
+    { label: intl.formatMessage({ id: 'nav.home' }),     href: '/home',     icon: Home },
+    { label: intl.formatMessage({ id: 'nav.bookings' }), href: '/bookings', icon: CalendarCheck },
+    { label: intl.formatMessage({ id: 'nav.kit' }),      href: '/kit',      icon: Package },
+    { label: intl.formatMessage({ id: 'nav.profile' }),  href: '/profile',  icon: User },
+  ]
+}
 
 function isActive(href: string, path: string) {
   return path === href || (href !== '/home' && path.startsWith(href + '/'))
@@ -27,6 +31,8 @@ function Sidebar({ onClose }: { onClose?: () => void }) {
   const { profile, logout } = useAuthContext()
   const navigate = useNavigate()
   const location = useLocation()
+  const intl = useIntl()
+  const nav = useNav()
 
   const handleLogout = async () => {
     onClose?.()
@@ -47,7 +53,7 @@ function Sidebar({ onClose }: { onClose?: () => void }) {
         <div className="relative flex items-start justify-between">
           <MerckLogo width={52} height={25} />
           {onClose && (
-            <button type="button" onClick={onClose} className="iconbtn tap" aria-label="Close" style={{ color: '#fff', marginRight: -8 }}>
+            <button type="button" onClick={onClose} className="iconbtn tap" aria-label={intl.formatMessage({ id: 'nav.closeMenu' })} style={{ color: '#fff', marginRight: -8 }}>
               <X style={{ width: 20, height: 20 }} />
             </button>
           )}
@@ -69,14 +75,14 @@ function Sidebar({ onClose }: { onClose?: () => void }) {
         {profile?.schoolId && (
           <div className="relative inline-flex items-center gap-1 self-start px-2 py-0.5 rounded-full text-xs font-medium" style={{ background: 'rgba(255,255,255,0.15)' }}>
             <Shield style={{ width: 11, height: 11 }} />
-            School approved
+            {intl.formatMessage({ id: 'nav.schoolApproved' })}
           </div>
         )}
       </div>
 
       {/* Nav links */}
       <nav className="flex-1 overflow-y-auto p-3 flex flex-col gap-0.5" style={{ background: 'var(--background)' }}>
-        {NAV.map((item) => {
+        {nav.map((item) => {
           const active = isActive(item.href, location.pathname)
           return (
             <Link
@@ -107,7 +113,7 @@ function Sidebar({ onClose }: { onClose?: () => void }) {
           style={{ textDecoration: 'none', background: 'var(--primary)', color: '#fff' }}
         >
           <Plus style={{ width: 18, height: 18, flexShrink: 0 }} />
-          Book a visit
+          {intl.formatMessage({ id: 'nav.book' })}
         </Link>
       </nav>
 
@@ -121,7 +127,7 @@ function Sidebar({ onClose }: { onClose?: () => void }) {
           style={{ background: 'transparent', border: 'none', color: 'var(--destructive)', cursor: 'pointer', fontFamily: 'inherit' }}
         >
           <LogOut style={{ width: 18, height: 18, flexShrink: 0 }} />
-          Sign out
+          {intl.formatMessage({ id: 'nav.signOut' })}
         </button>
       </div>
     </div>
@@ -131,6 +137,8 @@ function Sidebar({ onClose }: { onClose?: () => void }) {
 // ─── Tablet top nav bar ───────────────────────────────────────────────────────
 function TabletTopNav({ onMenuOpen }: { onMenuOpen: () => void }) {
   const location = useLocation()
+  const intl = useIntl()
+  const nav = useNav()
   return (
     <header
       className="hidden md:flex lg:hidden sticky top-0 z-30 items-center border-b px-4"
@@ -148,7 +156,7 @@ function TabletTopNav({ onMenuOpen }: { onMenuOpen: () => void }) {
 
       {/* Tab links */}
       <nav className="flex items-center gap-1 flex-1">
-        {NAV.map((item) => {
+        {nav.map((item) => {
           const active = isActive(item.href, location.pathname)
           return (
             <Link
@@ -177,7 +185,7 @@ function TabletTopNav({ onMenuOpen }: { onMenuOpen: () => void }) {
           style={{ textDecoration: 'none', background: 'var(--primary)', color: '#fff' }}
         >
           <Plus style={{ width: 15, height: 15 }} />
-          Book
+          {intl.formatMessage({ id: 'nav.bookShort' })}
         </Link>
         <ThemeToggle variant="icon" />
         <NotificationPopover />
@@ -188,6 +196,7 @@ function TabletTopNav({ onMenuOpen }: { onMenuOpen: () => void }) {
 
 // ─── Mobile top bar ───────────────────────────────────────────────────────────
 function MobileTopBar({ onMenuOpen }: { onMenuOpen: () => void }) {
+  const intl = useIntl()
   return (
     <header
       className="md:hidden sticky top-0 z-30 flex items-center justify-between px-4 border-b"
@@ -198,7 +207,7 @@ function MobileTopBar({ onMenuOpen }: { onMenuOpen: () => void }) {
         borderColor: 'var(--border)',
       }}
     >
-      <button type="button" onClick={onMenuOpen} className="iconbtn tap" aria-label="Open menu">
+      <button type="button" onClick={onMenuOpen} className="iconbtn tap" aria-label={intl.formatMessage({ id: 'nav.openMenu' })}>
         <Menu style={{ width: 22, height: 22 }} />
       </button>
       <MerckLogo width={44} height={21} />
@@ -212,9 +221,10 @@ function MobileTopBar({ onMenuOpen }: { onMenuOpen: () => void }) {
 
 // ─── Mobile bottom tab bar ────────────────────────────────────────────────────
 function MobileTabBar({ currentPath }: { currentPath: string }) {
-  // Split NAV into left 2 and right 2, with Book FAB in centre
-  const left  = NAV.slice(0, 2)   // Home, Bookings
-  const right = NAV.slice(2)      // Kit, Profile
+  const nav = useNav()
+  // Split nav into left 2 and right 2, with Book FAB in centre
+  const left  = nav.slice(0, 2)   // Home, Bookings
+  const right = nav.slice(2)      // Kit, Profile
 
   return (
     <nav
