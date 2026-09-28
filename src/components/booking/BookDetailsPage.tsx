@@ -1,12 +1,49 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useState, forwardRef } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { Timer, Minus, Plus } from 'lucide-react'
+import { ChevronDownIcon, ChevronUpIcon, CheckIcon } from '@radix-ui/react-icons'
+import * as Select from '@radix-ui/react-select'
 import { format } from 'date-fns'
 import BookingLayout, { ContinueButton } from './BookingLayout'
 import { useBookingStore } from '../../stores/bookingStore'
 
 const GRADES = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12']
 const MAX_STUDENTS = 30
+
+// ─── Radix Select item ────────────────────────────────────────────────────────
+const GradeSelectItem = forwardRef<
+  HTMLDivElement,
+  { value: string; children: React.ReactNode }
+>(({ value, children, ...props }, ref) => (
+  <Select.Item
+    value={value}
+    ref={ref}
+    {...props}
+    className="tap"
+    style={{
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'space-between',
+      padding: '10px 14px',
+      borderRadius: 8,
+      fontSize: 14,
+      fontWeight: 500,
+      cursor: 'pointer',
+      outline: 'none',
+      color: 'var(--foreground)',
+      userSelect: 'none',
+    }}
+    onMouseEnter={(e) => (e.currentTarget.style.background = 'var(--accent)')}
+    onMouseLeave={(e) => (e.currentTarget.style.background = 'transparent')}
+    onFocus={(e) => (e.currentTarget.style.background = 'var(--accent)')}
+    onBlur={(e) => (e.currentTarget.style.background = 'transparent')}
+  >
+    <Select.ItemText>{children}</Select.ItemText>
+    <Select.ItemIndicator>
+      <CheckIcon style={{ color: 'var(--primary)', width: 16, height: 16 }} />
+    </Select.ItemIndicator>
+  </Select.Item>
+))
 
 function useCountdown(expiresAt: Date | null) {
   // Initialise to actual remaining time — not 0 — so mount check doesn't false-fire
@@ -93,27 +130,78 @@ export default function BookDetailsPage() {
         Tell us about your class
       </h1>
 
-      {/* Grade */}
+      {/* Grade — Radix UI Select */}
       <div className="flex flex-col gap-2">
-        <label htmlFor="grade" className="text-sm font-medium">Grade</label>
-        <div className="relative">
-          <select
-            id="grade"
-            value={classDetails.grade}
-            onChange={(e) => setClassDetails({ grade: e.target.value })}
-            className="w-full h-11 pl-3 pr-8 rounded-xl border appearance-none text-sm"
+        <label className="text-sm font-medium" style={{ color: 'var(--foreground)' }}>Grade</label>
+        <Select.Root value={classDetails.grade} onValueChange={(v) => setClassDetails({ grade: v })}>
+          <Select.Trigger
+            aria-label="Select grade"
             style={{
-              borderColor: 'var(--input)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              width: '100%',
+              height: 44,
+              padding: '0 12px',
+              borderRadius: 12,
+              border: '1px solid var(--input)',
               background: 'var(--input-surface)',
               color: 'var(--foreground)',
+              fontSize: 14,
+              fontWeight: 500,
+              cursor: 'pointer',
+              outline: 'none',
+              fontFamily: 'inherit',
+              boxShadow: 'var(--shadow-xs)',
             }}
+            onFocus={(e) => (e.currentTarget.style.borderColor = 'var(--primary)')}
+            onBlur={(e) => (e.currentTarget.style.borderColor = 'var(--input)')}
           >
-            {GRADES.map((g) => (
-              <option key={g} value={g}>Grade {g}</option>
-            ))}
-          </select>
-          <span className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2" style={{ color: 'var(--muted-foreground)' }}>▾</span>
-        </div>
+            <Select.Value placeholder="Select grade…" />
+            <Select.Icon>
+              <ChevronDownIcon style={{ color: 'var(--muted-foreground)', width: 16, height: 16 }} />
+            </Select.Icon>
+          </Select.Trigger>
+
+          <Select.Portal>
+            <Select.Content
+              position="popper"
+              sideOffset={6}
+              style={{
+                zIndex: 100,
+                background: 'var(--background)',
+                border: '1px solid var(--border)',
+                borderRadius: 14,
+                boxShadow: 'var(--shadow-float)',
+                padding: '6px',
+                minWidth: 'var(--radix-select-trigger-width)',
+                maxHeight: 280,
+                overflowY: 'auto',
+              }}
+            >
+              <Select.ScrollUpButton style={{ display: 'flex', justifyContent: 'center', padding: '4px', color: 'var(--muted-foreground)' }}>
+                <ChevronUpIcon />
+              </Select.ScrollUpButton>
+
+              <Select.Viewport>
+                <Select.Group>
+                  <Select.Label style={{ padding: '4px 14px 6px', fontSize: 11, fontWeight: 600, letterSpacing: '0.1em', textTransform: 'uppercase', color: 'var(--muted-foreground)' }}>
+                    School Grade
+                  </Select.Label>
+                  {GRADES.map((g) => (
+                    <GradeSelectItem key={g} value={g}>
+                      Grade {g}
+                    </GradeSelectItem>
+                  ))}
+                </Select.Group>
+              </Select.Viewport>
+
+              <Select.ScrollDownButton style={{ display: 'flex', justifyContent: 'center', padding: '4px', color: 'var(--muted-foreground)' }}>
+                <ChevronDownIcon />
+              </Select.ScrollDownButton>
+            </Select.Content>
+          </Select.Portal>
+        </Select.Root>
       </div>
 
       {/* Student count stepper */}
