@@ -2,6 +2,7 @@ import { BrowserRouter as Router, Routes, Route, Navigate, useLocation } from 'r
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { AuthProvider, useAuthContext } from './context/AuthContext'
 import ProtectedRoute from './components/ProtectedRoute'
+import AppShell from './components/layout/AppShell'
 import SignInPage from './components/auth/SignInPage'
 import ForgotPasswordPage from './components/auth/ForgotPasswordPage'
 import HomePage from './components/pages/HomePage'
@@ -11,6 +12,10 @@ import BookTimePage from './components/booking/BookTimePage'
 import BookDetailsPage from './components/booking/BookDetailsPage'
 import ReviewPage from './components/booking/ReviewPage'
 import ConfirmedPage from './components/booking/ConfirmedPage'
+import BookingsPage from './components/pages/BookingsPage'
+import BookingDetailPage from './components/pages/BookingDetailPage'
+import KitPage from './components/pages/KitPage'
+import ProfilePage from './components/pages/ProfilePage'
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -26,17 +31,30 @@ function GuestOnly({ children }: { children: React.ReactNode }) {
   return <>{children}</>
 }
 
+/** Wraps a page in the AppShell (sidebar + tab bar) */
+function ShellRoute({ element }: { element: React.ReactNode }) {
+  return (
+    <ProtectedRoute>
+      <AppShell>{element}</AppShell>
+    </ProtectedRoute>
+  )
+}
+
 function AppRoutes() {
   return (
     <Routes>
-      {/* Auth */}
+      {/* Auth — no shell */}
       <Route path="/signin" element={<GuestOnly><SignInPage /></GuestOnly>} />
       <Route path="/forgot-password" element={<ForgotPasswordPage />} />
 
-      {/* Home */}
-      <Route path="/home" element={<ProtectedRoute><HomePage /></ProtectedRoute>} />
+      {/* Shell pages */}
+      <Route path="/home" element={<ShellRoute element={<HomePage />} />} />
+      <Route path="/bookings" element={<ShellRoute element={<BookingsPage />} />} />
+      <Route path="/bookings/:id" element={<ShellRoute element={<BookingDetailPage />} />} />
+      <Route path="/kit" element={<ShellRoute element={<KitPage />} />} />
+      <Route path="/profile" element={<ShellRoute element={<ProfilePage />} />} />
 
-      {/* Onsite booking funnel */}
+      {/* Booking funnel — no shell (full-screen flow) */}
       <Route path="/book" element={<ProtectedRoute><BookPage /></ProtectedRoute>} />
       <Route path="/book/programs" element={<ProtectedRoute><BookProgramsPage /></ProtectedRoute>} />
       <Route path="/book/time" element={<ProtectedRoute><BookTimePage /></ProtectedRoute>} />
@@ -46,11 +64,7 @@ function AppRoutes() {
 
       {/* Future routes */}
       {/* <Route path="/toad" element={<ProtectedRoute><ToadRequestPage /></ProtectedRoute>} /> */}
-      {/* <Route path="/bookings" element={<ProtectedRoute><BookingsPage /></ProtectedRoute>} /> */}
-      {/* <Route path="/bookings/:id" element={<ProtectedRoute><BookingDetailPage /></ProtectedRoute>} /> */}
-      {/* <Route path="/kit" element={<ProtectedRoute><KitPage /></ProtectedRoute>} /> */}
-      {/* <Route path="/profile" element={<ProtectedRoute><ProfilePage /></ProtectedRoute>} /> */}
-      {/* <Route path="/admin" element={<ProtectedRoute requireAdmin><AdminHomePage /></ProtectedRoute>} /> */}
+      {/* <Route path="/admin" element={<ShellRoute element={<AdminHomePage />} />} /> */}
 
       <Route path="/" element={<Navigate to="/home" replace />} />
       <Route path="*" element={<Navigate to="/home" replace />} />
