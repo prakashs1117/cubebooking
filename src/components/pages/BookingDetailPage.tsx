@@ -1,6 +1,6 @@
 import { useParams, useNavigate } from 'react-router-dom'
 import { ChevronLeft, Share2, CalendarPlus, XCircle, MapPin, Clock, Users, GraduationCap } from 'lucide-react'
-import { format } from 'date-fns'
+import { useIntl } from 'react-intl'
 import { useBooking, useBookingTimes } from '../../hooks/queries/useBookings'
 
 function makeCalendarUrl(title: string, start: Date, end: Date, details = '') {
@@ -18,6 +18,7 @@ function makeCalendarUrl(title: string, start: Date, end: Date, details = '') {
 export default function BookingDetailPage() {
   const { id } = useParams<{ id: string }>()
   const navigate = useNavigate()
+  const intl = useIntl()
   const { data: booking, isLoading, error } = useBooking(id)
 
   // ALL hooks must be called before any early return — Rules of Hooks
@@ -32,9 +33,11 @@ export default function BookingDetailPage() {
 
   if (error || !booking) return (
     <div className="min-h-screen flex flex-col items-center justify-center gap-3 px-5" style={{ background: 'var(--app-ground)' }}>
-      <p className="text-sm" style={{ color: 'var(--muted-foreground)' }}>Booking not found.</p>
+      <p className="text-sm" style={{ color: 'var(--muted-foreground)' }}>
+        {intl.formatMessage({ id: 'bookingDetail.notFound' })}
+      </p>
       <button type="button" onClick={() => navigate('/bookings')} className="tap text-sm font-semibold" style={{ color: 'var(--primary)' }}>
-        Back to bookings
+        {intl.formatMessage({ id: 'bookingDetail.backToBookings' })}
       </button>
     </div>
   )
@@ -47,17 +50,22 @@ export default function BookingDetailPage() {
   const startDate = times?.startDate ?? null
   const endDate   = times?.endDate   ?? null
 
-  const statusLabel = booking.status === 'confirmed' ? 'Confirmed'
-    : booking.status === 'pending' ? 'Pending approval'
-    : booking.status === 'cancelled' ? 'Cancelled'
-    : booking.status
+  const statusLabel = booking.status === 'confirmed'
+    ? intl.formatMessage({ id: 'bookingDetail.status.confirmed' })
+    : booking.status === 'pending'
+    ? intl.formatMessage({ id: 'bookingDetail.status.pending' })
+    : intl.formatMessage({ id: 'bookingDetail.status.cancelled' })
 
   const rows = [
-    ...(startDate ? [{ icon: Clock, label: 'Date & time', value: `${format(startDate, 'EEEE, d MMMM yyyy')} · ${format(startDate, 'HH:mm')}–${endDate ? format(endDate, 'HH:mm') : ''}` }] : []),
-    { icon: MapPin, label: 'Location', value: 'Merck KGaA, Frankfurter Str. 250, Darmstadt' },
-    { icon: GraduationCap, label: 'Grade', value: `Grade ${booking.grade}` },
-    { icon: Users, label: 'Students', value: `${booking.studentCount} students` },
-    ...(booking.accessNeeds ? [{ icon: Users, label: 'Access needs', value: booking.accessNeeds }] : []),
+    ...(startDate ? [{
+      icon: Clock,
+      label: intl.formatMessage({ id: 'bookingDetail.row.dateTime' }),
+      value: `${intl.formatDate(startDate, { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })} · ${intl.formatDate(startDate, { hour: '2-digit', minute: '2-digit', hour12: false })}–${endDate ? intl.formatDate(endDate, { hour: '2-digit', minute: '2-digit', hour12: false }) : ''}`,
+    }] : []),
+    { icon: MapPin, label: intl.formatMessage({ id: 'bookingDetail.row.location' }), value: intl.formatMessage({ id: 'bookingDetail.location.value' }) },
+    { icon: GraduationCap, label: intl.formatMessage({ id: 'bookingDetail.row.grade' }), value: intl.formatMessage({ id: 'bookingDetail.grade.value' }, { grade: booking.grade }) },
+    { icon: Users, label: intl.formatMessage({ id: 'bookingDetail.row.students' }), value: intl.formatMessage({ id: 'bookingDetail.students.value' }, { count: booking.studentCount }) },
+    ...(booking.accessNeeds ? [{ icon: Users, label: intl.formatMessage({ id: 'bookingDetail.row.access' }), value: booking.accessNeeds }] : []),
   ]
 
   return (
@@ -94,7 +102,7 @@ export default function BookingDetailPage() {
           </h1>
           {startDate && (
             <div className="text-sm font-medium" style={{ color: isBoth ? 'rgba(255,255,255,0.85)' : 'var(--muted-foreground)' }}>
-              {format(startDate, 'EEEE, d MMMM yyyy')}
+              {intl.formatDate(startDate, { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })}
             </div>
           )}
         </div>
@@ -120,7 +128,7 @@ export default function BookingDetailPage() {
                 `Curiosity ${programTitle} – Class ${booking.grade}`,
                 startDate,
                 endDate,
-                `${booking.studentCount} students · Grade ${booking.grade} · ${format(startDate, 'HH:mm')}–${format(endDate, 'HH:mm')}`,
+                `${booking.studentCount} students · Grade ${booking.grade} · ${intl.formatDate(startDate, { hour: '2-digit', minute: '2-digit', hour12: false })}–${intl.formatDate(endDate, { hour: '2-digit', minute: '2-digit', hour12: false })}`,
               )}
               target="_blank"
               rel="noopener noreferrer"
@@ -128,7 +136,7 @@ export default function BookingDetailPage() {
               style={{ background: 'var(--primary)', color: '#fff', textDecoration: 'none' }}
             >
               <CalendarPlus className="w-4 h-4" />
-              Add to calendar
+              {intl.formatMessage({ id: 'bookingDetail.addToCalendar' })}
             </a>
           )}
           {booking.status !== 'cancelled' && (
@@ -138,7 +146,7 @@ export default function BookingDetailPage() {
               style={{ background: 'var(--tint-red)', color: 'var(--destructive)' }}
             >
               <XCircle className="w-4 h-4" />
-              Cancel booking
+              {intl.formatMessage({ id: 'bookingDetail.cancel' })}
             </button>
           )}
         </div>
