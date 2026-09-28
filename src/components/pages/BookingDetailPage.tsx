@@ -1,14 +1,15 @@
 import { useParams, useNavigate } from 'react-router-dom'
 import { ChevronLeft, Share2, CalendarPlus, XCircle, MapPin, Clock, Users, GraduationCap } from 'lucide-react'
 import { format } from 'date-fns'
-import { useBooking } from '../../hooks/queries/useBookings'
-import type { Timestamp } from 'firebase/firestore'
+import { useBooking, useBookingTimes } from '../../hooks/queries/useBookings'
 
-function makeCalendarUrl(title: string, start: Date, end: Date) {
+function makeCalendarUrl(title: string, start: Date, end: Date, details = '') {
   const fmt = (d: Date) => d.toISOString().replace(/[-:]/g, '').replace('.000', '')
   const params = new URLSearchParams({
-    action: 'TEMPLATE', text: title,
+    action: 'TEMPLATE',
+    text: title,
     dates: `${fmt(start)}/${fmt(end)}`,
+    details,
     location: 'Merck KGaA, Frankfurter Str. 250, 64293 Darmstadt',
   })
   return `https://calendar.google.com/calendar/render?${params}`
@@ -39,10 +40,11 @@ export default function BookingDetailPage() {
   const headerBg = isBoth ? 'var(--brand-purple)' : ids[0] === 'cube' ? 'var(--brand-mint)' : ids[0] === 'lab' ? 'var(--brand-yellow)' : 'var(--brand-magenta)'
   const programTitle = isBoth ? 'Cube + Lab visit' : ids[0] === 'cube' ? 'Curiosity Cube' : ids[0] === 'lab' ? 'Curiosity Lab' : 'TOAD Truck'
 
-  const firstSeg = booking.segments?.[0] as unknown as { start?: Timestamp; end?: Timestamp }
-  const lastSeg = booking.segments?.[booking.segments.length - 1] as unknown as { end?: Timestamp }
-  const startDate = firstSeg?.start?.toDate()
-  const endDate = lastSeg?.end?.toDate()
+  // Fetch actual session times from the sessions collection
+  const sessionIds = (booking.segments ?? []).map((s) => s.sessionId).filter(Boolean)
+  const { data: times } = useBookingTimes(sessionIds)
+  const startDate = times?.startDate ?? null
+  const endDate   = times?.endDate   ?? null
 
   const statusLabel = booking.status === 'confirmed' ? 'Confirmed'
     : booking.status === 'pending' ? 'Pending approval'
@@ -113,11 +115,16 @@ export default function BookingDetailPage() {
         <div className="flex flex-col gap-2.5">
           {startDate && endDate && (
             <a
-              href={makeCalendarUrl(programTitle, startDate, endDate)}
+              href={makeCalendarUrl(
+                `Curiosity ${programTitle} – Class ${booking.grade}`,
+                startDate,
+                endDate,
+                `${booking.studentCount} students · Grade ${booking.grade} · ${format(startDate, 'HH:mm')}–${format(endDate, 'HH:mm')}`,
+              )}
               target="_blank"
               rel="noopener noreferrer"
-              className="tap w-full h-11 rounded-xl flex items-center justify-center gap-2 text-sm font-semibold border"
-              style={{ borderColor: 'var(--border)', background: 'var(--card)', color: 'var(--foreground)', textDecoration: 'none' }}
+              className="tap w-full h-12 rounded-xl flex items-center justify-center gap-2 text-sm font-semibold"
+              style={{ background: 'var(--primary)', color: '#fff', textDecoration: 'none' }}
             >
               <CalendarPlus className="w-4 h-4" />
               Add to calendar

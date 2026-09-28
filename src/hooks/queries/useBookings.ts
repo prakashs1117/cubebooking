@@ -5,6 +5,26 @@ import type { Booking } from '../../shared/types'
 import { useAuthContext } from '../../context/AuthContext'
 import type { Timestamp } from 'firebase/firestore'
 
+/** Fetch start/end times for a booking by looking up its session IDs. */
+export function useBookingTimes(sessionIds: string[]) {
+  return useQuery({
+    queryKey: ['session-times', sessionIds.join(',')],
+    enabled: sessionIds.length > 0,
+    queryFn: async () => {
+      const snaps = await Promise.all(sessionIds.map((id) => getDoc(doc(db, 'sessions', id))))
+      const docs = snaps.filter((s) => s.exists()).map((s) => s.data())
+      if (!docs.length) return { startDate: null, endDate: null }
+      const starts = docs.map((d) => (d.start as Timestamp).toDate())
+      const ends   = docs.map((d) => (d.end   as Timestamp).toDate())
+      return {
+        startDate: new Date(Math.min(...starts.map((d) => d.getTime()))),
+        endDate:   new Date(Math.max(...ends.map((d)   => d.getTime()))),
+      }
+    },
+    staleTime: 5 * 60_000,
+  })
+}
+
 export type BookingDoc = Booking & { id: string }
 
 export function useMyBookings() {
