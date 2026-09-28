@@ -27,7 +27,7 @@ function toAppUser(firebaseUser: User, role: AppUser['role'] = null, schoolId?: 
     photoURL: firebaseUser.photoURL ?? undefined,
     role,
     schoolId,
-    language: 'de',
+    language: 'en',
   }
 }
 

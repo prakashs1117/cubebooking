@@ -19,15 +19,8 @@ export function useLocale(): LocaleContextValue {
 
 /** Detect browser/OS language and map to a supported locale. */
 function detectLocale(): Locale {
-  // navigator.languages is an ordered priority list; fall back to navigator.language
-  const langs = (navigator.languages?.length ? navigator.languages : [navigator.language]) ?? []
-  for (const lang of langs) {
-    const primary = lang.split('-')[0].toLowerCase()
-    if (primary === 'de') return 'de'
-    if (primary === 'en') return 'en'
-  }
-  // Default: German (app is based in Darmstadt, Germany)
-  return 'de'
+  // Default to English for now
+  return 'en'
 }
 
 export default function LocaleProvider({ children }: { children: ReactNode }) {
@@ -52,7 +45,7 @@ export default function LocaleProvider({ children }: { children: ReactNode }) {
       <IntlProvider
         locale={locale}
         messages={messages[locale]}
-        defaultLocale="de"
+        defaultLocale="en"
         onError={import.meta.env.PROD ? () => {} : undefined}
       >
         {children}
