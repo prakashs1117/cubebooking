@@ -3,6 +3,7 @@ import { createRoot } from 'react-dom/client'
 import './index.css'
 import App from './App.tsx'
 import { ThemeProvider } from './context/ThemeContext.tsx'
+import LocaleProvider from './context/LocaleContext.tsx'
 
 // Apply stored theme immediately before first paint to avoid flash
 ;(() => {
@@ -18,7 +19,9 @@ import { ThemeProvider } from './context/ThemeContext.tsx'
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
     <ThemeProvider>
-      <App />
+      <LocaleProvider>
+        <App />
+      </LocaleProvider>
     </ThemeProvider>
   </StrictMode>,
 )

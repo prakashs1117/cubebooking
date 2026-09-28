@@ -1,5 +1,6 @@
 import { createContext, useContext, useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import type { User } from 'firebase/auth'
+import { useLocale } from './LocaleContext'
 import {
   signIn as svcSignIn,
   signInWithGoogle as svcSignInWithGoogle,
@@ -36,6 +37,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [loading, setLoading] = useState(true)
   const profileUnsub = useRef<(() => void) | null>(null)
   const backfillAttempted = useRef<string | null>(null)
+
+  const { setLocale } = useLocale()
+
+  useEffect(() => {
+    if (profile?.language) setLocale(profile.language)
+  }, [profile?.language, setLocale])
 
   useEffect(() => {
     const unsubscribe = subscribeToAuthUser((nextUser) => {
