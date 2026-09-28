@@ -20,6 +20,10 @@ export default function BookingDetailPage() {
   const navigate = useNavigate()
   const { data: booking, isLoading, error } = useBooking(id)
 
+  // ALL hooks must be called before any early return — Rules of Hooks
+  const sessionIds = (booking?.segments ?? []).map((s) => s.sessionId).filter(Boolean)
+  const { data: times } = useBookingTimes(sessionIds)
+
   if (isLoading) return (
     <div className="min-h-screen flex items-center justify-center" style={{ background: 'var(--app-ground)' }}>
       <div className="w-8 h-8 rounded-full border-2 animate-spin" style={{ borderColor: 'var(--border)', borderTopColor: 'var(--primary)' }} />
@@ -40,9 +44,6 @@ export default function BookingDetailPage() {
   const headerBg = isBoth ? 'var(--brand-purple)' : ids[0] === 'cube' ? 'var(--brand-mint)' : ids[0] === 'lab' ? 'var(--brand-yellow)' : 'var(--brand-magenta)'
   const programTitle = isBoth ? 'Cube + Lab visit' : ids[0] === 'cube' ? 'Curiosity Cube' : ids[0] === 'lab' ? 'Curiosity Lab' : 'TOAD Truck'
 
-  // Fetch actual session times from the sessions collection
-  const sessionIds = (booking.segments ?? []).map((s) => s.sessionId).filter(Boolean)
-  const { data: times } = useBookingTimes(sessionIds)
   const startDate = times?.startDate ?? null
   const endDate   = times?.endDate   ?? null
 
