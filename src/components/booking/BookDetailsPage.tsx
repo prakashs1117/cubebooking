@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import { Timer, Minus, Plus } from 'lucide-react'
 import { ChevronDownIcon, ChevronUpIcon, CheckIcon } from '@radix-ui/react-icons'
 import * as Select from '@radix-ui/react-select'
-import { format } from 'date-fns'
+import { useIntl } from 'react-intl'
 import BookingLayout, { ContinueButton } from './BookingLayout'
 import { useBookingStore } from '../../stores/bookingStore'
 
@@ -66,6 +66,7 @@ function useCountdown(expiresAt: Date | null) {
 
 export default function BookDetailsPage() {
   const navigate = useNavigate()
+  const intl = useIntl()
   const { slots, holdExpiresAt, classDetails, setClassDetails, reset } = useBookingStore()
   const { remaining, label: timerLabel } = useCountdown(holdExpiresAt)
 
@@ -78,18 +79,22 @@ export default function BookDetailsPage() {
   }, [remaining, holdExpiresAt, reset, navigate])
 
   const slotSummary = slots.length > 0
-    ? slots.map((s) => `${s.programId.charAt(0).toUpperCase() + s.programId.slice(1)} ${format(s.start, 'HH:mm')}`).join(' → ')
+    ? slots.map((s) => {
+        const programName = intl.formatMessage({ id: `program.${s.programId}` })
+        const time = intl.formatDate(s.start, { hour: '2-digit', minute: '2-digit', hour12: false })
+        return `${programName} ${time}`
+      }).join(' → ')
     : ''
 
   const dateSummary = slots.length > 0
-    ? format(slots[0].start, 'EEE, d MMM')
+    ? intl.formatDate(slots[0].start, { weekday: 'short', day: 'numeric', month: 'short' })
     : ''
 
   const isValid = classDetails.grade && classDetails.studentCount >= 1
 
   return (
     <BookingLayout
-      title="Class details"
+      title={intl.formatMessage({ id: 'bookDetails.title' })}
       step={4}
       totalSteps={4}
       onBack="/book/time"
@@ -107,7 +112,7 @@ export default function BookDetailsPage() {
             <Timer className="i" />
           </span>
           <div className="flex-1 flex flex-col">
-            <span className="text-sm font-semibold">Your sessions are held</span>
+            <span className="text-sm font-semibold">{intl.formatMessage({ id: 'bookDetails.timer.held' })}</span>
             {dateSummary && slotSummary && (
               <span className="text-xs" style={{ color: 'var(--foreground)' }}>
                 {dateSummary} · {slotSummary}
@@ -127,12 +132,12 @@ export default function BookDetailsPage() {
       )}
 
       <h1 className="m-0 text-[28px] font-extrabold leading-[34px] tracking-tight" style={{ fontFamily: 'var(--font-display)' }}>
-        Tell us about your class
+        {intl.formatMessage({ id: 'bookDetails.heading' })}
       </h1>
 
       {/* Grade — Radix UI Select */}
       <div className="flex flex-col gap-2">
-        <label className="text-sm font-medium" style={{ color: 'var(--foreground)' }}>Grade</label>
+        <label className="text-sm font-medium" style={{ color: 'var(--foreground)' }}>{intl.formatMessage({ id: 'bookDetails.grade.label' })}</label>
         <Select.Root value={classDetails.grade} onValueChange={(v) => setClassDetails({ grade: v })}>
           <Select.Trigger
             aria-label="Select grade"
@@ -186,11 +191,11 @@ export default function BookDetailsPage() {
               <Select.Viewport>
                 <Select.Group>
                   <Select.Label style={{ padding: '4px 14px 6px', fontSize: 11, fontWeight: 600, letterSpacing: '0.1em', textTransform: 'uppercase', color: 'var(--muted-foreground)' }}>
-                    School Grade
+                    {intl.formatMessage({ id: 'bookDetails.grade.label' })}
                   </Select.Label>
                   {GRADES.map((g) => (
                     <GradeSelectItem key={g} value={g}>
-                      Grade {g}
+                      {intl.formatMessage({ id: 'bookDetails.grade.option' }, { grade: g })}
                     </GradeSelectItem>
                   ))}
                 </Select.Group>
@@ -207,13 +212,13 @@ export default function BookDetailsPage() {
       {/* Student count stepper */}
       <div className="flex flex-col gap-2">
         <div className="flex justify-between items-center">
-          <span id="count-label" className="text-sm font-medium">Number of students</span>
-          <span className="text-xs" style={{ color: 'var(--muted-foreground)' }}>max {MAX_STUDENTS}</span>
+          <span id="count-label" className="text-sm font-medium">{intl.formatMessage({ id: 'bookDetails.students.label' })}</span>
+          <span className="text-xs" style={{ color: 'var(--muted-foreground)' }}>{intl.formatMessage({ id: 'bookDetails.students.max' }, { max: MAX_STUDENTS })}</span>
         </div>
         <div className="flex items-center gap-3">
           <button
             type="button"
-            aria-label="Remove student"
+            aria-label={intl.formatMessage({ id: 'bookDetails.students.remove' })}
             onClick={() => setClassDetails({ studentCount: Math.max(1, classDetails.studentCount - 1) })}
             disabled={classDetails.studentCount <= 1}
             className="tap flex-none grid place-items-center w-11 h-11 rounded-xl border disabled:opacity-40"
@@ -231,7 +236,7 @@ export default function BookDetailsPage() {
           </div>
           <button
             type="button"
-            aria-label="Add student"
+            aria-label={intl.formatMessage({ id: 'bookDetails.students.add' })}
             onClick={() => setClassDetails({ studentCount: Math.min(MAX_STUDENTS, classDetails.studentCount + 1) })}
             disabled={classDetails.studentCount >= MAX_STUDENTS}
             className="tap flex-none grid place-items-center w-11 h-11 rounded-xl border disabled:opacity-40"
@@ -245,12 +250,12 @@ export default function BookDetailsPage() {
       {/* Accessibility needs */}
       <div className="flex flex-col gap-2">
         <label htmlFor="access" className="text-sm font-medium">
-          Accessibility or mobility needs <span style={{ color: 'var(--muted-foreground)', fontWeight: 400 }}>(optional)</span>
+          {intl.formatMessage({ id: 'bookDetails.access.label' })} <span style={{ color: 'var(--muted-foreground)', fontWeight: 400 }}>{intl.formatMessage({ id: 'bookDetails.access.optional' })}</span>
         </label>
         <textarea
           id="access"
           rows={3}
-          placeholder="e.g. wheelchair access needed, hearing loop required…"
+          placeholder={intl.formatMessage({ id: 'bookDetails.access.placeholder' })}
           value={classDetails.accessNeeds}
           onChange={(e) => setClassDetails({ accessNeeds: e.target.value })}
           className="w-full px-3 py-2.5 rounded-xl border resize-none text-sm leading-relaxed"

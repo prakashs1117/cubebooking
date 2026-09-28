@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import { useNavigate, Link } from 'react-router-dom'
 import { Timer, ShieldCheck } from 'lucide-react'
-import { format } from 'date-fns'
+import { useIntl } from 'react-intl'
 import { collection, addDoc, serverTimestamp } from 'firebase/firestore'
 import { db } from '../../shared/firebase'
 import { useAuthContext } from '../../context/AuthContext'
@@ -25,10 +25,10 @@ function useCountdown(expiresAt: Date | null) {
   return { remaining, label: `${mins}:${secs.toString().padStart(2, '0')}` }
 }
 
-function programLabel(id: string) {
-  if (id === 'cube') return 'Curiosity Cube'
-  if (id === 'lab') return 'Curiosity Lab'
-  return 'TOAD Truck'
+function programLabel(id: string, intl: ReturnType<typeof useIntl>): string {
+  if (id === 'cube') return intl.formatMessage({ id: 'program.cube' })
+  if (id === 'lab')  return intl.formatMessage({ id: 'program.lab' })
+  return intl.formatMessage({ id: 'program.toad' })
 }
 
 function makeBookingCode() {
@@ -38,6 +38,7 @@ function makeBookingCode() {
 
 export default function ReviewPage() {
   const navigate = useNavigate()
+  const intl = useIntl()
   const { user, profile } = useAuthContext()
   const { visitType, programSelection, slots, holdExpiresAt, classDetails, reset } = useBookingStore()
   const pushNotification = useNotificationStore((s) => s.push)
@@ -59,10 +60,11 @@ export default function ReviewPage() {
 
   const firstSlot = slots[0]
   const lastSlot = slots[slots.length - 1]
-  const dateStr = format(firstSlot.start, 'EEEE, d MMMM yyyy')
-  const timeRange = `${format(firstSlot.start, 'HH:mm')}–${format(lastSlot.end, 'HH:mm')}`
-  const programTitle = programSelection === 'both' ? 'Cube + Lab'
-    : programLabel(firstSlot.programId)
+  const dateStr = intl.formatDate(firstSlot.start, { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })
+  const timeRange = `${intl.formatDate(firstSlot.start, { hour: '2-digit', minute: '2-digit', hour12: false })}–${intl.formatDate(lastSlot.end, { hour: '2-digit', minute: '2-digit', hour12: false })}`
+  const programTitle = programSelection === 'both'
+    ? intl.formatMessage({ id: 'program.both' })
+    : programLabel(firstSlot.programId, intl)
   const programColors = programSelection === 'both'
     ? ['var(--brand-mint)', 'var(--brand-yellow)']
     : firstSlot.programId === 'cube'
@@ -70,11 +72,11 @@ export default function ReviewPage() {
     : ['var(--brand-yellow)']
 
   const rows = [
-    { k: 'Date', v: dateStr, href: '/book/time' },
-    { k: 'Time', v: timeRange, href: '/book/time' },
-    { k: 'Grade', v: `Grade ${classDetails.grade}`, href: '/book/details' },
-    { k: 'Students', v: String(classDetails.studentCount), href: '/book/details' },
-    ...(classDetails.accessNeeds ? [{ k: 'Access needs', v: classDetails.accessNeeds, href: '/book/details' }] : []),
+    { k: intl.formatMessage({ id: 'review.row.date' }),     v: dateStr, href: '/book/time' },
+    { k: intl.formatMessage({ id: 'review.row.time' }),     v: timeRange, href: '/book/time' },
+    { k: intl.formatMessage({ id: 'review.row.grade' }),    v: `${intl.formatMessage({ id: 'review.row.grade' })} ${classDetails.grade}`, href: '/book/details' },
+    { k: intl.formatMessage({ id: 'review.row.students' }), v: String(classDetails.studentCount), href: '/book/details' },
+    ...(classDetails.accessNeeds ? [{ k: intl.formatMessage({ id: 'review.row.access' }), v: classDetails.accessNeeds, href: '/book/details' }] : []),
   ]
 
   const handleConfirm = async () => {
@@ -117,7 +119,7 @@ export default function ReviewPage() {
       pushNotification({
         type: 'confirmed',
         title: '🎉 Booking confirmed!',
-        body: `${programTitle} · ${format(firstSlot.start, 'EEE d MMM')} · ${format(firstSlot.start, 'HH:mm')}–${format(lastSlot.end, 'HH:mm')} · Code ${bookingCode}`,
+        body: `${programTitle} · ${intl.formatDate(firstSlot.start, { weekday: 'short', day: 'numeric', month: 'short' })} · ${intl.formatDate(firstSlot.start, { hour: '2-digit', minute: '2-digit', hour12: false })}–${intl.formatDate(lastSlot.end, { hour: '2-digit', minute: '2-digit', hour12: false })} · Code ${bookingCode}`,
         calendarUrl,
         bookingId: bookingCode,
       })
@@ -133,13 +135,13 @@ export default function ReviewPage() {
 
   return (
     <BookingLayout
-      title="Review"
+      title={intl.formatMessage({ id: 'review.title' })}
       step={4}
       totalSteps={4}
       onBack="/book/details"
       footer={
         <ContinueButton loading={submitting} onClick={handleConfirm}>
-          Confirm booking
+          {intl.formatMessage({ id: 'review.confirm' })}
         </ContinueButton>
       }
     >
@@ -152,7 +154,7 @@ export default function ReviewPage() {
       )}
 
       <h1 className="rise m-0 text-[28px] font-extrabold leading-[34px] tracking-tight" style={{ fontFamily: 'var(--font-display)' }}>
-        Check and confirm
+        {intl.formatMessage({ id: 'review.heading' })}
       </h1>
 
       {/* Booking summary card */}
@@ -167,7 +169,7 @@ export default function ReviewPage() {
         {/* Header */}
         <div className="px-[18px] py-[18px] flex flex-col gap-1 border-b border-dashed" style={{ borderColor: 'var(--border)' }}>
           <span className="text-xs font-semibold uppercase tracking-widest" style={{ color: 'var(--muted-foreground)' }}>
-            Onsite STEM visit
+            {intl.formatMessage({ id: 'review.type' })}
           </span>
           <span className="text-[24px] font-extrabold leading-[30px]" style={{ fontFamily: 'var(--font-display)' }}>
             {programTitle}
@@ -182,7 +184,7 @@ export default function ReviewPage() {
               <span className="w-[110px] text-[13px]" style={{ color: 'var(--muted-foreground)' }}>{row.k}</span>
               <span className="flex-1 text-sm font-semibold">{row.v}</span>
               <Link to={row.href} className="text-[13px] font-medium min-h-[44px] inline-flex items-center" style={{ color: 'var(--primary)' }}>
-                Edit
+                {intl.formatMessage({ id: 'review.row.edit' })}
               </Link>
             </div>
           ))}
@@ -193,13 +195,13 @@ export default function ReviewPage() {
       <div className="rise-3 flex gap-2.5 items-start p-3.5 rounded-2xl" style={{ background: 'var(--muted)' }}>
         <ShieldCheck className="i i-sm flex-none mt-0.5" style={{ color: 'var(--muted-foreground)' }} />
         <p className="m-0 text-xs leading-relaxed" style={{ color: 'var(--muted-foreground)' }}>
-          No personal student data is stored — only class grade and count. Data is hosted in the EU and processed under GDPR.
+          {intl.formatMessage({ id: 'review.privacy' })}
         </p>
       </div>
 
       {error && (
         <div className="px-4 py-3 rounded-xl text-sm font-medium" style={{ background: 'var(--tint-red)', color: 'var(--destructive)' }}>
-          {error}
+          {intl.formatMessage({ id: 'review.error' })}
         </div>
       )}
     </BookingLayout>

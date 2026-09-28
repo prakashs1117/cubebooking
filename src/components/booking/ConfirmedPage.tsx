@@ -1,7 +1,7 @@
 import { useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { CalendarPlus, Home } from 'lucide-react'
-import { format } from 'date-fns'
+import { useIntl } from 'react-intl'
 import { useBookingStore } from '../../stores/bookingStore'
 import { useAuthContext } from '../../context/AuthContext'
 import { trackBookingConfirmed } from '../../services/analyticsService'
@@ -40,6 +40,7 @@ function makeCalendarUrl(title: string, start: Date, end: Date, desc = '') {
 
 export default function ConfirmedPage() {
   const navigate = useNavigate()
+  const intl = useIntl()
   const { slots, classDetails, programSelection, reset } = useBookingStore()
   const { profile } = useAuthContext()
 
@@ -58,10 +59,13 @@ export default function ConfirmedPage() {
 
   const firstSlot = slots[0]
   const lastSlot = slots[slots.length - 1]
-  const programTitle = programSelection === 'both' ? 'Cube + Lab'
-    : firstSlot.programId === 'cube' ? 'Curiosity Cube' : 'Curiosity Lab'
-  const dateLabel = format(firstSlot.start, 'EEE, d MMM yyyy')
-  const timeRange = `${format(firstSlot.start, 'HH:mm')}–${format(lastSlot.end, 'HH:mm')}`
+  const programTitle = programSelection === 'both'
+    ? intl.formatMessage({ id: 'program.both' })
+    : firstSlot.programId === 'cube'
+    ? intl.formatMessage({ id: 'program.cube' })
+    : intl.formatMessage({ id: 'program.lab' })
+  const dateLabel = intl.formatDate(firstSlot.start, { weekday: 'short', day: 'numeric', month: 'short', year: 'numeric' })
+  const timeRange = `${intl.formatDate(firstSlot.start, { hour: '2-digit', minute: '2-digit', hour12: false })}–${intl.formatDate(lastSlot.end, { hour: '2-digit', minute: '2-digit', hour12: false })}`
   const calUrl = makeCalendarUrl(
     `Curiosity ${programTitle} – Class ${classDetails.grade}`,
     firstSlot.start,
@@ -127,11 +131,10 @@ export default function ConfirmedPage() {
         </span>
 
         <h1 className="rise-2 m-2 text-[36px] font-extrabold leading-10 tracking-tight" style={{ fontFamily: 'var(--font-display)' }}>
-          You're booked!
+          {intl.formatMessage({ id: 'confirmed.heading' })}
         </h1>
         <p className="rise-3 m-0 text-base leading-6" style={{ color: 'rgba(255,255,255,0.88)' }}>
-          {programTitle} for class {classDetails.grade}<br />
-          {dateLabel} · {timeRange}
+          {intl.formatMessage({ id: 'confirmed.sub' }, { programTitle, grade: classDetails.grade, date: dateLabel, time: timeRange }).split('\n').map((line, i) => <span key={i}>{line}{i === 0 && <br />}</span>)}
         </p>
       </div>
 
@@ -150,11 +153,11 @@ export default function ConfirmedPage() {
           </svg>
         </div>
         <div className="flex flex-col gap-0.5">
-          <span className="text-xs" style={{ color: 'var(--muted-foreground)' }}>Booking code</span>
+          <span className="text-xs" style={{ color: 'var(--muted-foreground)' }}>{intl.formatMessage({ id: 'confirmed.code.label' })}</span>
           <span className="text-[22px] font-extrabold tracking-widest" style={{ fontFamily: 'var(--font-display)', letterSpacing: '0.04em' }}>
             {profile?.displayName ? `CC-${profile.displayName.slice(0, 2).toUpperCase()}${Math.floor(Math.random() * 9000 + 1000)}` : 'CC-1234'}
           </span>
-          <span className="text-xs" style={{ color: 'var(--muted-foreground)' }}>Show this on arrival</span>
+          <span className="text-xs" style={{ color: 'var(--muted-foreground)' }}>{intl.formatMessage({ id: 'confirmed.code.sub' })}</span>
         </div>
       </div>
 
@@ -168,7 +171,7 @@ export default function ConfirmedPage() {
           style={{ borderColor: 'rgba(255,255,255,0.4)', color: '#ffffff' }}
         >
           <CalendarPlus className="w-4 h-4" />
-          Add to calendar
+          {intl.formatMessage({ id: 'confirmed.addCalendar' })}
         </a>
 
         <button
@@ -178,7 +181,7 @@ export default function ConfirmedPage() {
           style={{ background: 'rgba(255,255,255,0.15)', color: '#ffffff' }}
         >
           <Home className="w-4 h-4" />
-          Back to home
+          {intl.formatMessage({ id: 'confirmed.backHome' })}
         </button>
       </div>
     </div>

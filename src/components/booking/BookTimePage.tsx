@@ -2,13 +2,12 @@ import { useState, useMemo, useRef, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { ChevronLeft, ChevronRight, AlertCircle } from 'lucide-react'
 import { addDays, startOfWeek, format, isSameDay, addWeeks } from 'date-fns'
+import { useIntl } from 'react-intl'
 import BookingLayout, { ContinueButton } from './BookingLayout'
 import { useBookingStore } from '../../stores/bookingStore'
 import { useSessionsForWeek } from '../../hooks/queries/useSessions'
 import type { ProgramId, Session } from '../../shared/types'
 import type { Timestamp } from 'firebase/firestore'
-
-const DOW_LABELS = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri']
 
 function getProgramIds(selection: string | null, order: string): ProgramId[] {
   if (selection === 'cube') return ['cube']
@@ -17,11 +16,11 @@ function getProgramIds(selection: string | null, order: string): ProgramId[] {
   return []
 }
 
-function getStepTitle(selection: string | null, order: string) {
-  if (selection === 'cube') return 'Curiosity Cube'
-  if (selection === 'lab') return 'Curiosity Lab'
-  if (selection === 'both') return `Cube + Lab · ${order === 'cube-first' ? 'Cube first' : 'Lab first'}`
-  return 'Choose time'
+function getStepTitle(selection: string | null, order: string, intl: ReturnType<typeof useIntl>): string {
+  if (selection === 'cube') return intl.formatMessage({ id: 'program.cube' })
+  if (selection === 'lab')  return intl.formatMessage({ id: 'program.lab' })
+  if (selection === 'both') return `${intl.formatMessage({ id: 'program.both' })} · ${order === 'cube-first' ? intl.formatMessage({ id: 'bookPrograms.order.cubeFirst.label' }) : intl.formatMessage({ id: 'bookPrograms.order.labFirst.label' })}`
+  return intl.formatMessage({ id: 'bookTime.title' })
 }
 
 type SessionDoc = Session & { id: string }
@@ -32,9 +31,18 @@ function toDate(val: unknown): Date {
 
 export default function BookTimePage() {
   const navigate = useNavigate()
+  const intl = useIntl()
   const { programSelection, programOrder, selectedDate, slots, setSelectedDate, setSlots, startHold } = useBookingStore()
 
   const [weekOffset, setWeekOffset] = useState(0)
+
+  const DOW_LABELS = [
+    intl.formatMessage({ id: 'bookTime.dow.mon' }),
+    intl.formatMessage({ id: 'bookTime.dow.tue' }),
+    intl.formatMessage({ id: 'bookTime.dow.wed' }),
+    intl.formatMessage({ id: 'bookTime.dow.thu' }),
+    intl.formatMessage({ id: 'bookTime.dow.fri' }),
+  ]
 
   // Stable reference: today midnight and tomorrow midnight
   const todayRef = useRef<Date>((() => { const d = new Date(); d.setHours(0,0,0,0); return d })())
@@ -156,11 +164,11 @@ export default function BookTimePage() {
     navigate('/book/details')
   }
 
-  const monthLabel = format(weekDays[0], 'MMMM yyyy')
+  const monthLabel = intl.formatDate(weekDays[0], { month: 'long', year: 'numeric' })
 
   return (
     <BookingLayout
-      title={getStepTitle(programSelection, programOrder)}
+      title={getStepTitle(programSelection, programOrder, intl)}
       step={3}
       totalSteps={4}
       onBack="/book/programs"
@@ -252,7 +260,7 @@ export default function BookTimePage() {
       {selectedDate && (
         <div className="rise flex flex-col gap-2">
           <h2 className="text-sm font-semibold" style={{ color: 'var(--muted-foreground)' }}>
-            {format(selectedDate, 'EEEE, d MMMM')}
+            {intl.formatDate(selectedDate, { weekday: 'long', day: 'numeric', month: 'long' })}
           </h2>
 
           {isLoading ? (
@@ -263,7 +271,7 @@ export default function BookTimePage() {
             </div>
           ) : availableTimes.length === 0 ? (
             <p className="text-sm py-6 text-center" style={{ color: 'var(--muted-foreground)' }}>
-              No available times on this day.
+              {intl.formatMessage({ id: 'bookTime.noSlots' })}
             </p>
           ) : (
             <div className="flex flex-col gap-2">
