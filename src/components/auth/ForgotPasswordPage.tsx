@@ -85,7 +85,7 @@ export default function ForgotPasswordPage() {
                     autoComplete="email"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
-                    placeholder="you@school.de"
+                    placeholder={intl.formatMessage({ id: 'auth.signIn.emailPlaceholder' })}
                     className="w-full h-11 pl-9 pr-4 rounded-xl border text-sm"
                     style={{
                       borderColor: 'var(--input)',

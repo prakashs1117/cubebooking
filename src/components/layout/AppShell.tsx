@@ -221,6 +221,7 @@ function MobileTopBar({ onMenuOpen }: { onMenuOpen: () => void }) {
 
 // ─── Mobile bottom tab bar ────────────────────────────────────────────────────
 function MobileTabBar({ currentPath }: { currentPath: string }) {
+  const intl = useIntl()
   const nav = useNav()
   // Split nav into left 2 and right 2, with Book FAB in centre
   const left  = nav.slice(0, 2)   // Home, Bookings
@@ -256,7 +257,7 @@ function MobileTabBar({ currentPath }: { currentPath: string }) {
         })}
 
         {/* Centre Book FAB */}
-        <Link to="/book" aria-label="Book a visit"
+        <Link to="/book" aria-label={intl.formatMessage({ id: 'nav.book' })}
           className="flex items-center justify-center tap"
           style={{ textDecoration: 'none' }}
         >
