@@ -1,0 +1,229 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    // Read the current user's roles array from their Firestore document.
+    // Falls back to checking the legacy `role` string field for old documents
+    // that haven't been migrated yet.
+    function currentRoles() {
+      let doc = isSignedIn()
+        && exists(/databases/$(database)/documents/users/$(request.auth.uid))
+        ? get(/databases/$(database)/documents/users/$(request.auth.uid)).data
+        : null;
+      return doc == null ? []
+        : doc.keys().hasAll(['roles']) ? doc.roles
+        : doc.keys().hasAll(['role']) ? [doc.role]
+        : [];
+    }
+
+    function isSuperAdmin() {
+      return currentRoles().hasAll(['super admin']);
+    }
+
+    function isAdmin() {
+      return currentRoles().hasAny(['admin', 'super admin']);
+    }
+
+    function isClubMember() {
+      return currentRoles().hasAny(['member', 'club member', 'admin', 'super admin']);
+    }
+
+    // Super admin can assign any role value. Regular admins can only assign
+    // guest / member / club member.
+    function canAssignRoles(newRoles) {
+      return isSuperAdmin()
+        || (isAdmin() && newRoles.hasOnly(['guest', 'member', 'club member']));
+    }
+
+    // Member profiles.
+    match /users/{userId} {
+      allow read: if isSignedIn() && (request.auth.uid == userId || isAdmin());
+
+      // New account creation — app writes roles: ['guest']
+      allow create: if isSignedIn()
+        && request.auth.uid == userId
+        && request.resource.data.uid == userId
+        && request.resource.data.roles is list
+        && request.resource.data.roles.hasOnly(['guest']);
+
+      // Own profile edits — user can update anything EXCEPT uid, email, roles
+      allow update: if isSignedIn()
+        && request.auth.uid == userId
+        && request.resource.data.roles == resource.data.roles
+        && request.resource.data.uid == resource.data.uid
+        && request.resource.data.email == resource.data.email;
+
+      // Role assignment by an admin — uid and email must stay stable;
+      // the new roles array must be within what the caller is allowed to assign.
+      allow update: if isAdmin()
+        && request.resource.data.uid == resource.data.uid
+        && request.resource.data.email == resource.data.email
+        && request.resource.data.roles is list
+        && canAssignRoles(request.resource.data.roles);
+
+      allow delete: if isAdmin();
+    }
+
+    // Public interest form. Anyone may submit; only admins may read.
+    match /toastmaster-onboarding/{docId} {
+      allow create: if true;
+      allow read, update, delete: if isAdmin();
+    }
+
+    // Club details — world-readable, admin-writable.
+    match /club-details/{docId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    // Legacy /meeting collection (same rules as /meetings below).
+    match /meeting/{docId} {
+      allow read: if isSignedIn();
+      allow write: if isClubMember();
+
+      match /roleSlots/{slotId} {
+        allow read: if isSignedIn();
+        allow create, delete: if isClubMember();
+        allow update: if isClubMember()
+          || (isSignedIn()
+              && request.resource.data.group == resource.data.group
+              && request.resource.data.role == resource.data.role
+              && request.resource.data.order == resource.data.order
+              && (
+                (resource.data.uid == null
+                  && request.resource.data.uid == request.auth.uid)
+                ||
+                (resource.data.uid == request.auth.uid
+                  && request.resource.data.uid == null)
+              ));
+      }
+
+      match /roleClaimEvents/{eventId} {
+        allow read: if isClubMember();
+        allow create: if isSignedIn() && request.resource.data.uid == request.auth.uid;
+        allow update, delete: if false;
+      }
+    }
+
+    // Multi-roster support.
+    match /meetings/{rosterId} {
+      allow read: if true;
+      allow create: if isAdmin();
+      allow update: if isClubMember();
+      allow delete: if isAdmin();
+
+      match /roleSlots/{slotId} {
+        allow read: if true;
+        allow create, delete: if isAdmin();
+        allow update: if isAdmin()
+          || (isSignedIn()
+              && request.resource.data.group == resource.data.group
+              && request.resource.data.role == resource.data.role
+              && request.resource.data.order == resource.data.order
+              && (
+                (resource.data.uid == null
+                  && request.resource.data.uid == request.auth.uid)
+                ||
+                (resource.data.uid == request.auth.uid
+                  && request.resource.data.uid == null)
+              ));
+      }
+
+      match /roleClaimEvents/{eventId} {
+        allow read: if isClubMember();
+        allow create: if isSignedIn() && request.resource.data.uid == request.auth.uid;
+        allow update, delete: if false;
+      }
+
+      match /voting/{docId} {
+        allow read: if true;
+        allow write: if isAdmin();
+      }
+
+      match /votes/{voterId} {
+        // Votes are keyed by a client-chosen id (auth uid for members, a
+        // name-derived localStorage key for anonymous guests). There is no
+        // server-verifiable identity for guests, so read access to a single
+        // vote doc is public, same tradeoff already made for /attendance.
+        allow read: if true;
+
+        // Anyone may cast/update votes before submitting.
+        // Once submittedAt is set on the document, the vote is locked —
+        // only admins can touch it after that point.
+        allow create: if !('submittedAt' in request.resource.data)
+          || request.resource.data.submittedAt == null;
+        allow update: if isAdmin()
+          || (!('submittedAt' in resource.data) || resource.data.submittedAt == null);
+
+        allow delete: if false;
+      }
+
+      // RSVP attendance — signed-in users write their own doc keyed by uid.
+      // Unauthenticated guests (from onboarding modal) write a doc keyed by
+      // their phone number with isGuest:true — no auth required for that path.
+      match /attendance/{uid} {
+        allow read: if true;
+        allow create, update: if isSignedIn()
+          && request.auth.uid == uid
+          && request.resource.data.uid == uid
+          && request.resource.data.status in ['attending', 'not-attending'];
+        // Guest RSVP from onboarding modal — unauthenticated, keyed by phone
+        allow create, update: if request.auth == null
+          && request.resource.data.isGuest == true
+          && request.resource.data.status == 'attending'
+          && request.resource.data.uid == uid;
+        // Admins mark a role-taker attending when assigning/overriding their role
+        allow create, update: if isAdmin()
+          && request.resource.data.uid == uid
+          && request.resource.data.status in ['attending', 'not-attending'];
+        allow delete: if isSignedIn() && request.auth.uid == uid;
+      }
+    }
+
+    // Community blog posts — public read, signed-in create (own posts only),
+    // owner or admin can update, admin-only delete.
+    match /posts/{postId} {
+      allow read: if true;
+      allow create: if isSignedIn()
+        && request.resource.data.uid == request.auth.uid;
+      allow update: if isSignedIn()
+        && (resource.data.uid == request.auth.uid || isAdmin());
+      allow delete: if isAdmin();
+
+      match /comments/{commentId} {
+        allow read: if true;
+        allow create: if isSignedIn()
+          && request.resource.data.uid == request.auth.uid;
+        allow update: if isSignedIn()
+          && resource.data.uid == request.auth.uid;
+        allow delete: if isAdmin();
+      }
+
+      // One reaction doc per user — keyed by uid.
+      match /reactions/{uid} {
+        allow read: if true;
+        allow write: if isSignedIn() && request.auth.uid == uid;
+      }
+    }
+
+    // Per-user bookmarks — only the owner can read or write.
+    match /userBookmarks/{uid}/saved/{postId} {
+      allow read, write: if isSignedIn() && request.auth.uid == uid;
+    }
+
+    // Feedback submissions — anyone can submit, only admins can read.
+    match /feedback/{docId} {
+      allow create: if true;
+      allow read, update, delete: if isAdmin();
+    }
+
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}
