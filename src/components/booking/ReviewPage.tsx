@@ -10,7 +10,9 @@ import { useNotificationStore } from '../../stores/notificationStore'
 import BookingLayout, { ContinueButton } from './BookingLayout'
 
 function useCountdown(expiresAt: Date | null) {
-  const [remaining, setRemaining] = useState(0)
+  const [remaining, setRemaining] = useState(() =>
+    expiresAt ? Math.max(0, Math.ceil((expiresAt.getTime() - Date.now()) / 1000)) : 600
+  )
   useEffect(() => {
     if (!expiresAt) return
     const tick = () => setRemaining(Math.max(0, Math.ceil((expiresAt.getTime() - Date.now()) / 1000)))
@@ -44,7 +46,7 @@ export default function ReviewPage() {
   const [error, setError] = useState<string | null>(null)
 
   useEffect(() => {
-    if (holdExpiresAt && remaining === 0) {
+    if (holdExpiresAt && remaining === 0 && holdExpiresAt.getTime() < Date.now()) {
       reset()
       navigate('/book', { replace: true })
     }

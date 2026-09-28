@@ -9,14 +9,14 @@ const GRADES = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12']
 const MAX_STUDENTS = 30
 
 function useCountdown(expiresAt: Date | null) {
-  const [remaining, setRemaining] = useState(0)
+  // Initialise to actual remaining time — not 0 — so mount check doesn't false-fire
+  const [remaining, setRemaining] = useState(() =>
+    expiresAt ? Math.max(0, Math.ceil((expiresAt.getTime() - Date.now()) / 1000)) : 600
+  )
 
   useEffect(() => {
     if (!expiresAt) return
-    const tick = () => {
-      const left = Math.max(0, expiresAt.getTime() - Date.now())
-      setRemaining(Math.ceil(left / 1000))
-    }
+    const tick = () => setRemaining(Math.max(0, Math.ceil((expiresAt.getTime() - Date.now()) / 1000)))
     tick()
     const id = setInterval(tick, 1000)
     return () => clearInterval(id)
@@ -32,9 +32,9 @@ export default function BookDetailsPage() {
   const { slots, holdExpiresAt, classDetails, setClassDetails, reset } = useBookingStore()
   const { remaining, label: timerLabel } = useCountdown(holdExpiresAt)
 
-  // Hold expired — reset and go back
+  // Hold expired — only redirect when the expiry time is genuinely in the past
   useEffect(() => {
-    if (holdExpiresAt && remaining === 0) {
+    if (holdExpiresAt && remaining === 0 && holdExpiresAt.getTime() < Date.now()) {
       reset()
       navigate('/book', { replace: true })
     }
