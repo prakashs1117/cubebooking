@@ -1,4 +1,4 @@
-import { useState, useMemo, useRef } from 'react'
+import { useState, useMemo, useRef, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { ChevronLeft, ChevronRight, AlertCircle } from 'lucide-react'
 import { addDays, startOfWeek, format, isSameDay, addWeeks } from 'date-fns'
@@ -36,20 +36,17 @@ export default function BookTimePage() {
 
   const [weekOffset, setWeekOffset] = useState(0)
 
-  // Stable "today at midnight" reference — never re-creates during the session
-  const todayRef = useRef<Date>((() => {
-    const d = new Date()
-    d.setHours(0, 0, 0, 0)
-    return d
-  })())
-  const today = todayRef.current
+  // Stable reference: today midnight and tomorrow midnight
+  const todayRef = useRef<Date>((() => { const d = new Date(); d.setHours(0,0,0,0); return d })())
+  const tomorrowRef = useRef<Date>((() => { const d = new Date(); d.setHours(0,0,0,0); d.setDate(d.getDate()+1); return d })())
+  const today    = todayRef.current
+  const tomorrow = tomorrowRef.current
 
-  // Monday of the displayed week
+  // Start on the week that contains tomorrow
   const baseWeek = useMemo(() => {
-    const mon = startOfWeek(today, { weekStartsOn: 1 })
-    const result = addWeeks(mon, weekOffset)
-    result.setHours(0, 0, 0, 0)
-    return result
+    const base = startOfWeek(addWeeks(today, weekOffset), { weekStartsOn: 1 })
+    base.setHours(0, 0, 0, 0)
+    return base
   }, [weekOffset, today])
 
   const weekDays = useMemo(() =>
@@ -133,6 +130,16 @@ export default function BookTimePage() {
     })
   }, [selectedDate, sessionsByDay, programSelection, programIds])
 
+  // Auto-select tomorrow when sessions first load and no date is chosen yet
+  useEffect(() => {
+    if (!selectedDate && !isLoading && sessions.length > 0) {
+      const tomorrowKey = new Date(tomorrow.getFullYear(), tomorrow.getMonth(), tomorrow.getDate()).toDateString()
+      if (sessionsByDay[tomorrowKey]?.length) {
+        setSelectedDate(new Date(tomorrow))
+      }
+    }
+  }, [isLoading, sessions.length, selectedDate, sessionsByDay, tomorrow, setSelectedDate])
+
   const selectedSlotKey = slots.length > 0 ? slots[0].sessionId : null
 
   const handleSelectTime = (slotDocs: SessionDoc[]) => {
@@ -201,8 +208,8 @@ export default function BookTimePage() {
           const dayMidnight = new Date(day.getFullYear(), day.getMonth(), day.getDate())
           const key = dayMidnight.toDateString()
           const hasSessions = (sessionsByDay[key]?.length ?? 0) > 0
-          // A day is "past" only if its midnight is strictly before today midnight
-          const isPast = dayMidnight < today
+          // Block today and past — earliest bookable day is tomorrow
+          const isPast = dayMidnight < tomorrow
           const isSel = selectedDate ? isSameDay(day, selectedDate) : false
           // Only mark closed if load is complete (not loading, no error) and genuinely no sessions
           const closed = isPast || (!isLoading && !isError && !hasSessions)
@@ -262,21 +269,40 @@ export default function BookTimePage() {
             <div className="flex flex-col gap-2">
               {availableTimes.map(({ label, endLabel, slots: slotDocs }) => {
                 const isSel = selectedSlotKey === slotDocs[0].id
+                // Calculate total duration in minutes across all segments
+                const startMs = toDate(slotDocs[0].start).getTime()
+                const endMs   = toDate(slotDocs[slotDocs.length - 1].end).getTime()
+                const mins    = Math.round((endMs - startMs) / 60000)
+                const durLabel = mins >= 60 ? `${mins / 60}h` : `${mins} min`
+
                 return (
                   <button
                     key={label}
                     type="button"
                     onClick={() => handleSelectTime(slotDocs as unknown as SessionDoc[])}
-                    className="tap flex items-center justify-between px-4 h-14 rounded-2xl border-2 text-sm font-semibold"
+                    className="tap flex items-center px-4 h-14 rounded-2xl border-2 text-sm"
                     style={{
                       background: isSel ? 'var(--tint-purple)' : 'var(--card)',
                       borderColor: isSel ? 'var(--primary)' : 'var(--border)',
                       color: 'var(--foreground)',
                     }}
                   >
-                    <span>{label} – {endLabel}</span>
+                    {/* Time range */}
+                    <span className="font-semibold">{label}</span>
+                    <span className="mx-1.5 opacity-40">–</span>
+                    <span className="font-semibold">{endLabel}</span>
+                    {/* Duration badge */}
                     <span
-                      className="w-5 h-5 rounded-full box-border flex-none transition-all"
+                      className="ml-2 px-2 py-0.5 rounded-full text-xs font-medium"
+                      style={{
+                        background: isSel ? 'rgba(80,50,145,0.12)' : 'var(--muted)',
+                        color: 'var(--muted-foreground)',
+                      }}
+                    >
+                      {durLabel}
+                    </span>
+                    {/* Radio indicator */}
+                    <span className="ml-auto w-5 h-5 rounded-full box-border flex-none transition-all"
                       style={{ border: isSel ? '6px solid var(--primary)' : '2px solid var(--border)' }}
                     />
                   </button>

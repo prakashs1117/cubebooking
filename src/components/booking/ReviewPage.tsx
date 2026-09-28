@@ -6,6 +6,7 @@ import { collection, addDoc, serverTimestamp } from 'firebase/firestore'
 import { db } from '../../shared/firebase'
 import { useAuthContext } from '../../context/AuthContext'
 import { useBookingStore } from '../../stores/bookingStore'
+import { useNotificationStore } from '../../stores/notificationStore'
 import BookingLayout, { ContinueButton } from './BookingLayout'
 
 function useCountdown(expiresAt: Date | null) {
@@ -37,6 +38,7 @@ export default function ReviewPage() {
   const navigate = useNavigate()
   const { user, profile } = useAuthContext()
   const { visitType, programSelection, slots, holdExpiresAt, classDetails, reset } = useBookingStore()
+  const pushNotification = useNotificationStore((s) => s.push)
   const { remaining, label: timerLabel } = useCountdown(holdExpiresAt)
   const [submitting, setSubmitting] = useState(false)
   const [error, setError] = useState<string | null>(null)
@@ -97,6 +99,26 @@ export default function ReviewPage() {
         bookingCode,
         createdAt: serverTimestamp(),
       })
+      // Build calendar URL
+      const calFmt = (d: Date) => d.toISOString().replace(/[-:]/g, '').replace('.000', '')
+      const calParams = new URLSearchParams({
+        action: 'TEMPLATE',
+        text: `Curiosity ${programTitle} – Class ${classDetails.grade}`,
+        dates: `${calFmt(firstSlot.start)}/${calFmt(lastSlot.end)}`,
+        details: `${classDetails.studentCount} students · Grade ${classDetails.grade} · Code: ${bookingCode}`,
+        location: 'Merck KGaA, Frankfurter Str. 250, 64293 Darmstadt',
+      })
+      const calendarUrl = `https://calendar.google.com/calendar/render?${calParams}`
+
+      // Push real notification
+      pushNotification({
+        type: 'confirmed',
+        title: '🎉 Booking confirmed!',
+        body: `${programTitle} · ${format(firstSlot.start, 'EEE d MMM')} · ${format(firstSlot.start, 'HH:mm')}–${format(lastSlot.end, 'HH:mm')} · Code ${bookingCode}`,
+        calendarUrl,
+        bookingId: bookingCode,
+      })
+
       navigate('/book/confirmed', { replace: true })
     } catch (err) {
       setError('Could not confirm your booking. Please try again.')
