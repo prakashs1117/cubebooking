@@ -1,11 +1,11 @@
 {
-  "name": "Dhwani Toastmasters",
-  "short_name": "Dhwani TM",
-  "description": "Meeting roster, awards & voting",
+  "name": "Curiosity Booking",
+  "short_name": "Curiosity",
+  "description": "Book the Curiosity Cube, Lab, or TOAD truck for your class",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#ffffff",
-  "theme_color": "#772432",
+  "theme_color": "#503291",
   "icons": [
     {
       "src": "/favicon.svg",
