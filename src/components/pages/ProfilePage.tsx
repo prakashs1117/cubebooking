@@ -1,6 +1,7 @@
 import { useState } from 'react'
-import { Shield, Globe, Trash2, Download, ChevronRight, Edit3, Check } from 'lucide-react'
+import { Shield, Globe, Trash2, Download, ChevronRight, Edit3, Check, Palette } from 'lucide-react'
 import { useAuthContext } from '../../context/AuthContext'
+import ThemeToggle from '../ui/ThemeToggle'
 
 function InitialsAvatar({ name, size = 56 }: { name: string; size?: number }) {
   const initials = name.split(' ').map((p) => p[0]).slice(0, 2).join('').toUpperCase()
@@ -111,6 +112,18 @@ export default function ProfilePage() {
                 </button>
               )
             })}
+          </div>
+        </section>
+
+        {/* Appearance */}
+        <section
+          className="flex items-center gap-3 p-4 rounded-2xl border"
+          style={{ background: 'var(--card)', borderColor: 'var(--border)' }}
+        >
+          <Palette className="w-5 h-5 flex-none" style={{ color: 'var(--muted-foreground)' }} />
+          <span className="text-sm font-medium flex-none">Theme</span>
+          <div className="flex-1">
+            <ThemeToggle variant="segmented" />
           </div>
         </section>
 

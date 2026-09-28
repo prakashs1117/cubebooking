@@ -8,6 +8,7 @@ import {
 import { useAuthContext } from '../../context/AuthContext'
 import MerckLogo from '../auth/MerckLogo'
 import NotificationPopover from './NotificationPopover'
+import ThemeToggle from '../ui/ThemeToggle'
 
 // ─── Nav items shared across all breakpoints ──────────────────────────────────
 const NAV = [
@@ -110,12 +111,13 @@ function Sidebar({ onClose }: { onClose?: () => void }) {
         </Link>
       </nav>
 
-      {/* Sign out */}
-      <div className="p-3 border-t flex-none" style={{ borderColor: 'var(--border)', background: 'var(--background)' }}>
+      {/* Theme + Sign out */}
+      <div className="p-3 border-t flex-none flex flex-col gap-1" style={{ borderColor: 'var(--border)', background: 'var(--background)' }}>
+        <ThemeToggle variant="segmented" />
         <button
           type="button"
           onClick={handleLogout}
-          className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm tap"
+          className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm tap mt-1"
           style={{ background: 'transparent', border: 'none', color: 'var(--destructive)', cursor: 'pointer', fontFamily: 'inherit' }}
         >
           <LogOut style={{ width: 18, height: 18, flexShrink: 0 }} />
@@ -167,7 +169,7 @@ function TabletTopNav({ onMenuOpen }: { onMenuOpen: () => void }) {
         })}
       </nav>
 
-      {/* Right: Book CTA + notification */}
+      {/* Right: Book CTA + theme toggle + notification */}
       <div className="flex items-center gap-2">
         <Link
           to="/book"
@@ -177,6 +179,7 @@ function TabletTopNav({ onMenuOpen }: { onMenuOpen: () => void }) {
           <Plus style={{ width: 15, height: 15 }} />
           Book
         </Link>
+        <ThemeToggle variant="icon" />
         <NotificationPopover />
       </div>
     </header>
@@ -199,7 +202,10 @@ function MobileTopBar({ onMenuOpen }: { onMenuOpen: () => void }) {
         <Menu style={{ width: 22, height: 22 }} />
       </button>
       <MerckLogo width={44} height={21} />
-      <NotificationPopover />
+      <div className="flex items-center gap-1">
+        <ThemeToggle variant="icon" />
+        <NotificationPopover />
+      </div>
     </header>
   )
 }

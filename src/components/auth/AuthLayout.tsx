@@ -9,18 +9,18 @@ interface AuthLayoutProps {
 export default function AuthLayout({ children, footer }: AuthLayoutProps) {
   return (
     <div
-      className="min-h-screen relative overflow-hidden flex flex-col items-center justify-center px-5 py-12"
+      className="min-h-dvh relative overflow-hidden flex flex-col items-center justify-center px-4 sm:px-6 py-10"
       style={{ background: 'var(--brand-purple)', fontFamily: 'var(--font-sans)', color: 'var(--foreground)' }}
     >
-      {/* Floating brand circles */}
-      <div className="float" style={{ position: 'absolute', width: 320, height: 320, borderRadius: '9999px', background: 'var(--brand-mint)', top: -120, right: -100, opacity: 0.9 }} />
-      <div className="float" style={{ position: 'absolute', width: 180, height: 180, borderRadius: '9999px', background: 'var(--brand-magenta)', top: 180, right: -50, animationDelay: '-2s', opacity: 0.9 }} />
-      <div style={{ position: 'absolute', width: 80, height: 80, borderRadius: '9999px', background: 'var(--brand-yellow)', top: 360, left: 240 }} />
-      <div style={{ position: 'absolute', width: 140, height: 140, borderRadius: '9999px', border: '20px solid var(--brand-lime)', boxSizing: 'border-box', top: 80, left: -60 }} />
-      <div className="float" style={{ position: 'absolute', width: 100, height: 100, borderRadius: '9999px', background: 'var(--brand-purple)', bottom: 80, left: -30, opacity: 0.5, animationDelay: '-3s' }} />
+      {/* Floating brand circles — clamped so they stay partially visible on any screen width */}
+      <div className="float" style={{ position: 'absolute', width: 'clamp(160px,45vw,320px)', height: 'clamp(160px,45vw,320px)', borderRadius: '9999px', background: 'var(--brand-mint)', top: '-15%', right: '-10%', opacity: 0.9 }} />
+      <div className="float" style={{ position: 'absolute', width: 'clamp(100px,25vw,180px)', height: 'clamp(100px,25vw,180px)', borderRadius: '9999px', background: 'var(--brand-magenta)', top: '30%', right: '-8%', animationDelay: '-2s', opacity: 0.9 }} />
+      <div style={{ position: 'absolute', width: 80, height: 80, borderRadius: '9999px', background: 'var(--brand-yellow)', top: '52%', left: 'clamp(200px,55%,280px)', opacity: 0.85 }} />
+      <div style={{ position: 'absolute', width: 140, height: 140, borderRadius: '9999px', border: '20px solid var(--brand-lime)', boxSizing: 'border-box', top: '10%', left: '-40px' }} />
+      <div className="float" style={{ position: 'absolute', width: 100, height: 100, borderRadius: '9999px', background: 'var(--brand-purple)', bottom: '8%', left: '-20px', opacity: 0.5, animationDelay: '-3s' }} />
 
       {/* Content card */}
-      <div className="relative w-full max-w-sm md:max-w-md lg:max-w-lg">
+      <div className="relative w-full max-w-sm sm:max-w-md lg:max-w-lg">
         {children}
       </div>
 
