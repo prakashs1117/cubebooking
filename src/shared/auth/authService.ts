@@ -12,7 +12,7 @@ import {
   type User,
   type Unsubscribe,
 } from 'firebase/auth'
-import { doc, getDoc, setDoc, updateDoc, onSnapshot, serverTimestamp } from 'firebase/firestore'
+import { doc, getDoc, setDoc, onSnapshot, serverTimestamp } from 'firebase/firestore'
 import { auth, db } from '../firebase'
 import { authErrorMessage } from '../lib/authErrors'
 import type { AppUser } from '../types'
