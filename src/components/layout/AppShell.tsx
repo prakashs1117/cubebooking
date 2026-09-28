@@ -3,112 +3,122 @@ import { Link, useLocation, useNavigate } from 'react-router-dom'
 import * as Dialog from '@radix-ui/react-dialog'
 import {
   Home, CalendarCheck, Package, User, Plus, X,
-  Menu, LogOut, Shield, ChevronRight,
+  LogOut, Shield, ChevronRight, Menu,
 } from 'lucide-react'
 import { useAuthContext } from '../../context/AuthContext'
 import MerckLogo from '../auth/MerckLogo'
 import NotificationPopover from './NotificationPopover'
 
-const NAV_ITEMS = [
-  { label: 'Home', href: '/home', icon: Home },
+// ─── Nav items shared across all breakpoints ──────────────────────────────────
+const NAV = [
+  { label: 'Home',     href: '/home',     icon: Home },
   { label: 'Bookings', href: '/bookings', icon: CalendarCheck },
-  { label: 'Pre-visit Kit', href: '/kit', icon: Package },
-  { label: 'Profile', href: '/profile', icon: User },
+  { label: 'Kit',      href: '/kit',      icon: Package },
+  { label: 'Profile',  href: '/profile',  icon: User },
 ]
 
-function SidebarContent({ onClose }: { onClose: () => void }) {
+function isActive(href: string, path: string) {
+  return path === href || (href !== '/home' && path.startsWith(href + '/'))
+}
+
+// ─── Desktop sidebar ──────────────────────────────────────────────────────────
+function Sidebar({ onClose }: { onClose?: () => void }) {
   const { profile, logout } = useAuthContext()
   const navigate = useNavigate()
   const location = useLocation()
 
   const handleLogout = async () => {
-    onClose()
+    onClose?.()
     await logout()
     navigate('/signin', { replace: true })
   }
 
   return (
-    <div className="flex flex-col h-full" style={{ fontFamily: 'var(--font-sans)' }}>
-      {/* Purple header with user info */}
+    <div className="flex flex-col h-full">
+      {/* Brand header */}
       <div
-        className="relative overflow-hidden flex flex-col gap-3.5 px-5 pb-5 pt-14"
-        style={{ background: 'var(--brand-purple)', color: '#ffffff' }}
+        className="relative overflow-hidden flex flex-col gap-4 px-5 pb-6 pt-12"
+        style={{ background: 'var(--brand-purple)', color: '#fff', flexShrink: 0 }}
       >
-        {/* Decorative circles */}
-        <div style={{ position: 'absolute', width: 150, height: 150, borderRadius: '9999px', background: 'var(--brand-magenta)', right: -50, top: -50 }} />
-        <div style={{ position: 'absolute', width: 60, height: 60, borderRadius: '9999px', background: 'var(--brand-yellow)', right: 70, top: 70 }} />
+        <div style={{ position: 'absolute', width: 140, height: 140, borderRadius: '9999px', background: 'var(--brand-magenta)', right: -40, top: -40, opacity: 0.85 }} />
+        <div style={{ position: 'absolute', width: 56, height: 56, borderRadius: '9999px', background: 'var(--brand-yellow)', right: 68, top: 72 }} />
 
-        <div className="relative flex justify-between items-start">
-          <MerckLogo width={48} height={23} />
-          <button type="button" onClick={onClose} className="iconbtn tap" aria-label="Close menu" style={{ color: '#fff' }}>
-            <X className="i" />
-          </button>
-        </div>
-
-        <div className="relative flex flex-col gap-0.5">
-          <div className="w-12 h-12 rounded-full flex items-center justify-center text-lg font-bold" style={{ background: 'rgba(255,255,255,0.2)' }}>
-            {(profile?.displayName || 'U').charAt(0).toUpperCase()}
-          </div>
-          <div className="text-base font-bold mt-2">{profile?.displayName || 'Teacher'}</div>
-          <div className="text-xs opacity-70">{profile?.email}</div>
-          {profile?.schoolId && (
-            <div className="flex items-center gap-1 mt-1 text-xs" style={{ color: 'rgba(255,255,255,0.8)' }}>
-              <Shield className="w-3 h-3" />
-              School approved
-            </div>
+        <div className="relative flex items-start justify-between">
+          <MerckLogo width={52} height={25} />
+          {onClose && (
+            <button type="button" onClick={onClose} className="iconbtn tap" aria-label="Close" style={{ color: '#fff', marginRight: -8 }}>
+              <X style={{ width: 20, height: 20 }} />
+            </button>
           )}
         </div>
-      </div>
 
-      {/* Nav items */}
-      <nav className="flex-1 overflow-y-auto p-3" style={{ background: 'var(--background)' }}>
-        <div className="flex flex-col gap-1">
-          {NAV_ITEMS.map((item) => {
-            const active = location.pathname === item.href
-            return (
-              <Link
-                key={item.href}
-                to={item.href}
-                onClick={onClose}
-                className="nav-item flex items-center gap-3 px-3 py-3 rounded-xl text-sm font-medium tap"
-                style={{
-                  background: active ? 'var(--tint-purple)' : 'transparent',
-                  color: active ? 'var(--brand-purple)' : 'var(--foreground)',
-                  textDecoration: 'none',
-                }}
-              >
-                <item.icon className="w-5 h-5 flex-none" />
-                <span className="flex-1">{item.label}</span>
-                {active && <ChevronRight className="w-4 h-4 opacity-50" />}
-              </Link>
-            )
-          })}
+        <div className="relative flex items-center gap-3">
+          <div
+            className="w-10 h-10 rounded-full grid place-items-center text-sm font-semibold flex-none"
+            style={{ background: 'rgba(255,255,255,0.18)' }}
+          >
+            {(profile?.displayName || profile?.email || 'U').charAt(0).toUpperCase()}
+          </div>
+          <div className="min-w-0">
+            <div className="text-sm font-semibold truncate">{profile?.displayName || 'Teacher'}</div>
+            <div className="text-xs truncate opacity-60">{profile?.email}</div>
+          </div>
         </div>
 
-        {/* Divider */}
-        <div className="my-3 h-px" style={{ background: 'var(--border)' }} />
+        {profile?.schoolId && (
+          <div className="relative inline-flex items-center gap-1 self-start px-2 py-0.5 rounded-full text-xs font-medium" style={{ background: 'rgba(255,255,255,0.15)' }}>
+            <Shield style={{ width: 11, height: 11 }} />
+            School approved
+          </div>
+        )}
+      </div>
 
-        {/* Book CTA */}
+      {/* Nav links */}
+      <nav className="flex-1 overflow-y-auto p-3 flex flex-col gap-0.5" style={{ background: 'var(--background)' }}>
+        {NAV.map((item) => {
+          const active = isActive(item.href, location.pathname)
+          return (
+            <Link
+              key={item.href}
+              to={item.href}
+              onClick={onClose}
+              className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium tap"
+              style={{
+                textDecoration: 'none',
+                background: active ? 'var(--tint-purple)' : 'transparent',
+                color: active ? 'var(--brand-purple)' : 'var(--foreground)',
+                fontWeight: active ? 600 : 400,
+              }}
+            >
+              <item.icon style={{ width: 18, height: 18, flexShrink: 0 }} />
+              <span className="flex-1">{item.label}</span>
+              {active && <ChevronRight style={{ width: 14, height: 14, opacity: 0.4 }} />}
+            </Link>
+          )
+        })}
+
+        <div className="h-px my-2" style={{ background: 'var(--border)' }} />
+
         <Link
           to="/book"
           onClick={onClose}
-          className="flex items-center gap-3 px-3 py-3 rounded-xl text-sm font-semibold tap"
-          style={{ background: 'var(--primary)', color: '#fff', textDecoration: 'none' }}
+          className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-semibold tap"
+          style={{ textDecoration: 'none', background: 'var(--primary)', color: '#fff' }}
         >
-          <Plus className="w-5 h-5 flex-none" />
+          <Plus style={{ width: 18, height: 18, flexShrink: 0 }} />
           Book a visit
         </Link>
       </nav>
 
       {/* Sign out */}
-      <div className="p-3 border-t" style={{ borderColor: 'var(--border)', background: 'var(--background)' }}>
+      <div className="p-3 border-t flex-none" style={{ borderColor: 'var(--border)', background: 'var(--background)' }}>
         <button
           type="button"
           onClick={handleLogout}
-          className="w-full flex items-center gap-3 px-3 py-3 rounded-xl text-sm font-medium tap"
-          style={{ color: 'var(--destructive)' }}
+          className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm tap"
+          style={{ background: 'transparent', border: 'none', color: 'var(--destructive)', cursor: 'pointer', fontFamily: 'inherit' }}
         >
-          <LogOut className="w-5 h-5 flex-none" />
+          <LogOut style={{ width: 18, height: 18, flexShrink: 0 }} />
           Sign out
         </button>
       </div>
@@ -116,143 +126,189 @@ function SidebarContent({ onClose }: { onClose: () => void }) {
   )
 }
 
-interface AppShellProps {
-  children: React.ReactNode
-}
-
-export default function AppShell({ children }: AppShellProps) {
-  const [sidebarOpen, setSidebarOpen] = useState(false)
+// ─── Tablet top nav bar ───────────────────────────────────────────────────────
+function TabletTopNav({ onMenuOpen }: { onMenuOpen: () => void }) {
   const location = useLocation()
-
   return (
-    <div className="min-h-screen flex" style={{ background: 'var(--app-ground)', fontFamily: 'var(--font-sans)' }}>
-      {/* Desktop sidebar */}
-      <aside
-        className="hidden lg:flex flex-col w-72 shrink-0 border-r sticky top-0 h-screen overflow-hidden"
-        style={{ borderColor: 'var(--border)', background: 'var(--background)' }}
-      >
-        <SidebarContent onClose={() => {}} />
-      </aside>
+    <header
+      className="hidden md:flex lg:hidden sticky top-0 z-30 items-center border-b px-4"
+      style={{
+        height: 56,
+        background: 'rgba(255,255,255,0.96)',
+        backdropFilter: 'blur(12px)',
+        borderColor: 'var(--border)',
+      }}
+    >
+      {/* Logo */}
+      <button type="button" onClick={onMenuOpen} className="flex items-center gap-2.5 tap mr-4" style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 0 }}>
+        <MerckLogo width={44} height={21} />
+      </button>
 
-      {/* Mobile/tablet sidebar — Radix Dialog used as drawer */}
-      <Dialog.Root open={sidebarOpen} onOpenChange={setSidebarOpen}>
-        <Dialog.Portal>
-          <Dialog.Overlay
-            className="fixed inset-0 z-40"
-            style={{ background: 'rgba(14,14,17,0.5)', backdropFilter: 'blur(3px)', animation: 'lcFade .25s ease both' }}
-          />
-          <Dialog.Content
-            className="fixed inset-y-0 left-0 z-50 w-[318px] max-w-[85vw] overflow-hidden focus:outline-none"
-            style={{
-              background: 'var(--background)',
-              borderRadius: '0 28px 28px 0',
-              boxShadow: '12px 0 40px -12px rgba(14,14,17,0.4)',
-              animation: 'lcSlideIn .38s cubic-bezier(.2,.8,.2,1) both',
-            }}
-            aria-label="Navigation menu"
-          >
-            <SidebarContent onClose={() => setSidebarOpen(false)} />
-          </Dialog.Content>
-        </Dialog.Portal>
-      </Dialog.Root>
+      {/* Tab links */}
+      <nav className="flex items-center gap-1 flex-1">
+        {NAV.map((item) => {
+          const active = isActive(item.href, location.pathname)
+          return (
+            <Link
+              key={item.href}
+              to={item.href}
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm tap"
+              style={{
+                textDecoration: 'none',
+                fontWeight: active ? 600 : 400,
+                color: active ? 'var(--brand-purple)' : 'var(--muted-foreground)',
+                background: active ? 'var(--tint-purple)' : 'transparent',
+              }}
+            >
+              <item.icon style={{ width: 16, height: 16, flexShrink: 0 }} />
+              {item.label}
+            </Link>
+          )
+        })}
+      </nav>
 
-      {/* Main content area */}
-      <div className="flex-1 flex flex-col min-w-0">
-        {/* Top header — shown on mobile/tablet, hidden on desktop (sidebar handles it) */}
-        <header
-          className="lg:hidden sticky top-0 z-30 flex items-center justify-between px-4 h-14 border-b"
-          style={{ background: 'var(--background)', borderColor: 'var(--border)' }}
+      {/* Right: Book CTA + notification */}
+      <div className="flex items-center gap-2">
+        <Link
+          to="/book"
+          className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-semibold tap"
+          style={{ textDecoration: 'none', background: 'var(--primary)', color: '#fff' }}
         >
-          <button
-            type="button"
-            onClick={() => setSidebarOpen(true)}
-            className="iconbtn tap"
-            aria-label="Open menu"
-          >
-            <Menu className="i i-lg" />
-          </button>
-
-          <MerckLogo width={48} height={23} />
-
-          <NotificationPopover />
-        </header>
-
-        {/* Page content */}
-        <main className="flex-1">
-          {children}
-        </main>
-
-        {/* Bottom tab bar — mobile only, hidden on desktop */}
-        <BottomTabBar currentPath={location.pathname} />
+          <Plus style={{ width: 15, height: 15 }} />
+          Book
+        </Link>
+        <NotificationPopover />
       </div>
-    </div>
+    </header>
   )
 }
 
-function BottomTabBar({ currentPath }: { currentPath: string }) {
-  const tabs = [
-    { label: 'Home', href: '/home', icon: Home },
-    { label: 'Bookings', href: '/bookings', icon: CalendarCheck },
-    { label: 'Book', href: '/book', icon: Plus, fab: true },
-    { label: 'Kit', href: '/kit', icon: Package },
-    { label: 'Profile', href: '/profile', icon: User },
-  ]
+// ─── Mobile top bar ───────────────────────────────────────────────────────────
+function MobileTopBar({ onMenuOpen }: { onMenuOpen: () => void }) {
+  return (
+    <header
+      className="md:hidden sticky top-0 z-30 flex items-center justify-between px-4 border-b"
+      style={{
+        height: 52,
+        background: 'rgba(255,255,255,0.96)',
+        backdropFilter: 'blur(12px)',
+        borderColor: 'var(--border)',
+      }}
+    >
+      <button type="button" onClick={onMenuOpen} className="iconbtn tap" aria-label="Open menu">
+        <Menu style={{ width: 22, height: 22 }} />
+      </button>
+      <MerckLogo width={44} height={21} />
+      <NotificationPopover />
+    </header>
+  )
+}
 
+// ─── Mobile bottom tab bar ────────────────────────────────────────────────────
+function MobileTabBar({ currentPath }: { currentPath: string }) {
   return (
     <nav
-      className="lg:hidden sticky bottom-0 z-30 border-t"
+      className="md:hidden fixed bottom-0 left-0 right-0 z-30 border-t"
       style={{
-        background: 'rgba(255,255,255,0.94)',
+        background: 'rgba(255,255,255,0.96)',
         backdropFilter: 'blur(16px)',
         borderColor: 'var(--border)',
         paddingBottom: 'env(safe-area-inset-bottom, 0px)',
       }}
       aria-label="Main navigation"
     >
-      <div className="grid h-14" style={{ gridTemplateColumns: 'repeat(5, minmax(0,1fr))' }}>
-        {tabs.map((tab) => {
-          const active = currentPath === tab.href || currentPath.startsWith(tab.href + '/')
-          if (tab.fab) {
-            return (
-              <Link
-                key={tab.href}
-                to={tab.href}
-                className="flex items-center justify-center tap"
-                aria-label="Book a visit"
-                style={{ textDecoration: 'none' }}
-              >
-                <span
-                  className="grid place-items-center w-14 h-9 rounded-full"
-                  style={{ background: 'var(--primary)', color: '#fff' }}
-                >
-                  <tab.icon className="w-5 h-5" />
-                </span>
-              </Link>
-            )
-          }
+      <div className="grid" style={{ gridTemplateColumns: 'repeat(4, 1fr)', height: 56 }}>
+        {NAV.map((item) => {
+          const active = isActive(item.href, currentPath)
           return (
             <Link
-              key={tab.href}
-              to={tab.href}
+              key={item.href}
+              to={item.href}
               className="flex flex-col items-center justify-center gap-0.5 tap"
               style={{
-                color: active ? 'var(--primary)' : 'var(--muted-foreground)',
                 textDecoration: 'none',
-                fontSize: 11,
+                color: active ? 'var(--brand-purple)' : 'var(--muted-foreground)',
+                fontSize: 10,
                 fontWeight: active ? 600 : 400,
+                letterSpacing: '0.01em',
               }}
             >
+              {/* Active indicator dot above icon */}
               <span
-                className="grid place-items-center w-13 h-8 rounded-full transition-colors"
-                style={{ background: active ? 'var(--tint-purple)' : 'transparent', width: 52 }}
+                className="grid place-items-center rounded-full transition-all duration-200"
+                style={{
+                  width: 40,
+                  height: 28,
+                  background: active ? 'var(--tint-purple)' : 'transparent',
+                }}
               >
-                <tab.icon style={{ width: 22, height: 22 }} />
+                <item.icon style={{ width: 20, height: 20 }} />
               </span>
-              {tab.label}
+              {item.label}
             </Link>
           )
         })}
       </div>
     </nav>
+  )
+}
+
+// ─── App shell ────────────────────────────────────────────────────────────────
+export default function AppShell({ children }: { children: React.ReactNode }) {
+  const [drawerOpen, setDrawerOpen] = useState(false)
+  const location = useLocation()
+
+  return (
+    <div className="min-h-screen flex" style={{ background: 'var(--app-ground)' }}>
+
+      {/* Desktop: persistent sidebar */}
+      <aside
+        className="hidden lg:flex flex-col w-64 xl:w-72 shrink-0 border-r sticky top-0 h-screen overflow-hidden"
+        style={{ borderColor: 'var(--border)', background: 'var(--background)' }}
+      >
+        <Sidebar />
+      </aside>
+
+      {/* Mobile + tablet: slide-in drawer */}
+      <Dialog.Root open={drawerOpen} onOpenChange={setDrawerOpen}>
+        <Dialog.Portal>
+          <Dialog.Overlay
+            className="fixed inset-0 z-40 lg:hidden"
+            style={{ background: 'rgba(14,14,17,0.45)', backdropFilter: 'blur(2px)', animation: 'lcFade .2s ease both' }}
+          />
+          <Dialog.Content
+            className="fixed inset-y-0 left-0 z-50 w-72 max-w-[82vw] lg:hidden overflow-hidden focus:outline-none"
+            style={{
+              background: 'var(--background)',
+              borderRadius: '0 24px 24px 0',
+              boxShadow: '8px 0 32px -8px rgba(14,14,17,0.35)',
+              animation: 'lcSlideIn .32s cubic-bezier(.2,.8,.2,1) both',
+            }}
+            aria-label="Navigation"
+          >
+            <Sidebar onClose={() => setDrawerOpen(false)} />
+          </Dialog.Content>
+        </Dialog.Portal>
+      </Dialog.Root>
+
+      {/* Content column */}
+      <div className="flex-1 flex flex-col min-w-0">
+        <MobileTopBar onMenuOpen={() => setDrawerOpen(true)} />
+        <TabletTopNav onMenuOpen={() => setDrawerOpen(true)} />
+
+        {/* Desktop notification bell (sidebar doesn't have one) */}
+        <div className="hidden lg:flex absolute top-3 right-4 z-20">
+          <NotificationPopover />
+        </div>
+
+        {/* Page scroll area — leave room for mobile bottom bar */}
+        <div className="flex-1 md:pb-0 pb-14">
+          {children}
+        </div>
+      </div>
+
+      {/* Mobile bottom bar */}
+      <MobileTabBar currentPath={location.pathname} />
+    </div>
   )
 }

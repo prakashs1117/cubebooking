@@ -30,11 +30,11 @@ export default function BookingLayout({
 
   return (
     <div
-      className="min-h-screen flex flex-col max-w-lg mx-auto md:max-w-2xl lg:max-w-3xl"
+      className="min-h-dvh flex flex-col w-full max-w-lg mx-auto md:max-w-2xl lg:max-w-3xl"
       style={{ background: 'var(--app-ground)', fontFamily: 'var(--font-sans)', color: 'var(--foreground)' }}
     >
       {/* Header */}
-      <header className="flex flex-col gap-3 px-3 pt-12 pb-3 md:pt-6">
+      <header className="flex flex-col gap-3 px-3 pt-4 pb-3">
         <div className="flex items-center gap-1">
           {onBack ? (
             <button type="button" onClick={handleBack} className="iconbtn tap" aria-label="Back">
@@ -73,8 +73,12 @@ export default function BookingLayout({
       {/* Sticky footer CTA */}
       {footer && (
         <div
-          className="sticky bottom-0 px-5 pb-8 pt-4 border-t"
-          style={{ background: 'var(--app-ground)', borderColor: 'var(--border)' }}
+          className="sticky bottom-0 px-5 pt-4 border-t"
+          style={{
+            background: 'var(--app-ground)',
+            borderColor: 'var(--border)',
+            paddingBottom: 'max(2rem, env(safe-area-inset-bottom))',
+          }}
         >
           {footer}
         </div>
