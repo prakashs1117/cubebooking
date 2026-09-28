@@ -26,7 +26,7 @@ interface AuthContextValue {
   sendMagicLink: (email: string) => Promise<void>
   completeMagicLinkSignIn: (href: string) => Promise<boolean>
   resetPassword: (email: string) => Promise<void>
-  updateProfile: (fields: { displayName?: string; schoolName?: string }) => Promise<void>
+  updateProfile: (fields: { displayName?: string; schoolName?: string; language?: string }) => Promise<void>
   logout: () => Promise<void>
 }
 

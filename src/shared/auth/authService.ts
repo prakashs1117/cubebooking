@@ -110,15 +110,18 @@ export async function resetPassword(email: string): Promise<void> {
 
 export async function updateUserProfile(
   user: User,
-  fields: { displayName?: string; schoolName?: string },
+  fields: { displayName?: string; schoolName?: string; language?: string },
 ): Promise<void> {
-  const updates: Record<string, unknown> = { updatedAt: serverTimestamp() }
+  // Map frontend field names to Firestore
+  const firestoreFields: any = {}
   if (fields.displayName !== undefined) {
-    updates.displayName = fields.displayName
+    firestoreFields.displayName = fields.displayName
     await firebaseUpdateProfile(user, { displayName: fields.displayName })
   }
-  if (fields.schoolName !== undefined) updates.schoolName = fields.schoolName
-  await updateDoc(doc(db, 'users', user.uid), updates)
+  if (fields.schoolName !== undefined) firestoreFields.schoolName = fields.schoolName
+  if ('language' in fields) firestoreFields.language = fields.language
+  firestoreFields.updatedAt = serverTimestamp()
+  await setDoc(doc(db, 'users', user.uid), firestoreFields, { merge: true })
 }
 
 export async function signOut(): Promise<void> {

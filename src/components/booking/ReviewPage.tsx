@@ -74,7 +74,7 @@ export default function ReviewPage() {
   const rows = [
     { k: intl.formatMessage({ id: 'review.row.date' }),     v: dateStr, href: '/book/time' },
     { k: intl.formatMessage({ id: 'review.row.time' }),     v: timeRange, href: '/book/time' },
-    { k: intl.formatMessage({ id: 'review.row.grade' }),    v: `${intl.formatMessage({ id: 'review.row.grade' })} ${classDetails.grade}`, href: '/book/details' },
+    { k: intl.formatMessage({ id: 'review.row.grade' }),    v: String(classDetails.grade), href: '/book/details' },
     { k: intl.formatMessage({ id: 'review.row.students' }), v: String(classDetails.studentCount), href: '/book/details' },
     ...(classDetails.accessNeeds ? [{ k: intl.formatMessage({ id: 'review.row.access' }), v: classDetails.accessNeeds, href: '/book/details' }] : []),
   ]

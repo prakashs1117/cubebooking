@@ -140,7 +140,7 @@ export default function BookDetailsPage() {
         <label className="text-sm font-medium" style={{ color: 'var(--foreground)' }}>{intl.formatMessage({ id: 'bookDetails.grade.label' })}</label>
         <Select.Root value={classDetails.grade} onValueChange={(v) => setClassDetails({ grade: v })}>
           <Select.Trigger
-            aria-label="Select grade"
+            aria-label={intl.formatMessage({ id: 'bookDetails.grade.selectLabel' })}
             style={{
               display: 'flex',
               alignItems: 'center',
@@ -162,7 +162,7 @@ export default function BookDetailsPage() {
             onFocus={(e) => (e.currentTarget.style.borderColor = 'var(--primary)')}
             onBlur={(e) => (e.currentTarget.style.borderColor = 'var(--input)')}
           >
-            <Select.Value placeholder="Select grade…" />
+            <Select.Value placeholder={intl.formatMessage({ id: 'bookDetails.grade.placeholder' })} />
             <Select.Icon>
               <ChevronDownIcon style={{ color: 'var(--muted-foreground)', width: 16, height: 16 }} />
             </Select.Icon>

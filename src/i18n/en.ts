@@ -158,6 +158,8 @@ const en: Record<string, string> = {
   'bookDetails.heading': 'Tell us about your class',
   'bookDetails.timer.held': 'Your sessions are held',
   'bookDetails.grade.label': 'Grade',
+  'bookDetails.grade.selectLabel': 'Select grade',
+  'bookDetails.grade.placeholder': 'Select grade…',
   'bookDetails.grade.option': 'Grade {grade}',
   'bookDetails.students.label': 'Number of students',
   'bookDetails.students.max': 'max {max}',

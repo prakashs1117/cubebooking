@@ -105,8 +105,8 @@ export default function BookTimePage() {
         })
         .sort((a, b) => toDate(a.start).getTime() - toDate(b.start).getTime())
         .map((s) => ({
-          label: format(toDate(s.start), 'HH:mm'),
-          endLabel: format(toDate(s.end), 'HH:mm'),
+          label: intl.formatTime(toDate(s.start), { hour: '2-digit', minute: '2-digit' }),
+          endLabel: intl.formatTime(toDate(s.end), { hour: '2-digit', minute: '2-digit' }),
           slots: [s],
         }))
     }
@@ -131,12 +131,12 @@ export default function BookTimePage() {
       if (seen.has(key)) return []
       seen.add(key)
       return [{
-        label: format(toDate(first.start), 'HH:mm'),
-        endLabel: format(toDate(match.end), 'HH:mm'),
+        label: intl.formatTime(toDate(first.start), { hour: '2-digit', minute: '2-digit' }),
+        endLabel: intl.formatTime(toDate(match.end), { hour: '2-digit', minute: '2-digit' }),
         slots: [first, match],
       }]
     })
-  }, [selectedDate, sessionsByDay, programSelection, programIds])
+  }, [selectedDate, sessionsByDay, programSelection, programIds, intl])
 
   // Auto-select tomorrow when sessions first load and no date is chosen yet
   useEffect(() => {
