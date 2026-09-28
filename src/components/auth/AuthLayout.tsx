@@ -1,46 +1,47 @@
-import AppHeader from '../AppHeader'
+import type { ReactNode } from 'react'
 
-export default function AuthLayout({
-  title,
-  subtitle,
-  children,
-  footer,
-}: {
-  title: string
-  subtitle?: string
-  children: React.ReactNode
-  footer?: React.ReactNode
-}) {
+interface AuthLayoutProps {
+  children: ReactNode
+  footer?: ReactNode
+}
+
+/** Full-screen Liquid Carbon branded wrapper for auth screens. */
+export default function AuthLayout({ children, footer }: AuthLayoutProps) {
   return (
-    <div className="min-h-screen bg-[#F4F3F1] text-[#1A1519] flex flex-col">
-      <AppHeader />
+    <div
+      className="min-h-screen relative overflow-hidden flex flex-col items-center justify-center px-5 py-12"
+      style={{ background: 'var(--brand-purple)', fontFamily: 'var(--font-sans)', color: 'var(--foreground)' }}
+    >
+      {/* Floating brand circles */}
+      <div className="float" style={{ position: 'absolute', width: 320, height: 320, borderRadius: '9999px', background: 'var(--brand-mint)', top: -120, right: -100, opacity: 0.9 }} />
+      <div className="float" style={{ position: 'absolute', width: 180, height: 180, borderRadius: '9999px', background: 'var(--brand-magenta)', top: 180, right: -50, animationDelay: '-2s', opacity: 0.9 }} />
+      <div style={{ position: 'absolute', width: 80, height: 80, borderRadius: '9999px', background: 'var(--brand-yellow)', top: 360, left: 240 }} />
+      <div style={{ position: 'absolute', width: 140, height: 140, borderRadius: '9999px', border: '20px solid var(--brand-lime)', boxSizing: 'border-box', top: 80, left: -60 }} />
+      <div className="float" style={{ position: 'absolute', width: 100, height: 100, borderRadius: '9999px', background: 'var(--brand-purple)', bottom: 80, left: -30, opacity: 0.5, animationDelay: '-3s' }} />
 
-      <div className="flex-1 flex items-start justify-center px-5 py-10 sm:py-14">
-        <div className="w-full max-w-[420px]">
-          <h1 className="text-[26px] sm:text-[30px] font-extrabold tracking-tight leading-tight mb-1.5">{title}</h1>
-          {subtitle ? <p className="text-[14px] text-[#6B6470] mb-6">{subtitle}</p> : <div className="mb-6" />}
-
-          <div className="bg-white border border-[#E6E2DE] rounded-2xl p-6 sm:p-7 shadow-[0_1px_2px_rgba(26,21,25,.04)]">
-            {children}
-          </div>
-
-          {footer ? <div className="mt-5 text-center text-[13.5px] text-[#6B6470]">{footer}</div> : null}
-        </div>
+      {/* Content card */}
+      <div className="relative w-full max-w-sm md:max-w-md lg:max-w-lg">
+        {children}
       </div>
+
+      {footer ? (
+        <div className="relative mt-5 text-center text-sm" style={{ color: 'rgba(255,255,255,0.7)' }}>
+          {footer}
+        </div>
+      ) : null}
     </div>
   )
 }
 
-/** Google sign-in button — shared by the sign-in and sign-up screens. */
 export function GoogleButton({ onClick, disabled, label }: { onClick: () => void; disabled?: boolean; label: string }) {
   return (
     <button
       type="button"
       onClick={onClick}
       disabled={disabled}
-      className="w-full py-3.5 rounded-xl bg-white border border-[#D6D1CC] text-[14.5px] font-bold text-[#1A1519] flex items-center justify-center gap-2.5 transition-colors hover:border-[#772432] disabled:opacity-60 disabled:cursor-not-allowed"
+      className="w-full flex items-center justify-center gap-3 bg-white text-[#1A1519] font-semibold text-sm rounded-xl py-3 px-4 border border-white/20 shadow-sm transition-opacity hover:opacity-90 disabled:opacity-50 disabled:cursor-not-allowed tap"
     >
-      <svg viewBox="0 0 24 24" className="w-[18px] h-[18px]" aria-hidden="true">
+      <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true">
         <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 0 1-2.2 3.32v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.1Z" />
         <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.65l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84A11 11 0 0 0 12 23Z" />
         <path fill="#FBBC05" d="M5.84 14.11a6.6 6.6 0 0 1 0-4.22V7.05H2.18a11 11 0 0 0 0 9.9l3.66-2.84Z" />
@@ -53,10 +54,10 @@ export function GoogleButton({ onClick, disabled, label }: { onClick: () => void
 
 export function OrDivider() {
   return (
-    <div className="flex items-center gap-3 my-5">
-      <div className="h-px flex-1 bg-[#E6E2DE]" />
-      <span className="text-[11.5px] font-bold text-[#A29BA6] uppercase tracking-wide">or</span>
-      <div className="h-px flex-1 bg-[#E6E2DE]" />
+    <div className="flex items-center gap-3 my-4">
+      <div className="h-px flex-1" style={{ background: 'rgba(255,255,255,0.2)' }} />
+      <span className="text-xs font-bold uppercase tracking-widest" style={{ color: 'rgba(255,255,255,0.5)' }}>or</span>
+      <div className="h-px flex-1" style={{ background: 'rgba(255,255,255,0.2)' }} />
     </div>
   )
 }

@@ -1,9 +1,8 @@
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
-import { Mail } from 'lucide-react'
+import { Mail, ArrowLeft, Loader2, ArrowRight } from 'lucide-react'
 import { useAuthContext } from '../../context/AuthContext'
 import AuthLayout from './AuthLayout'
-import { TextField, SubmitButton, FormAlert } from '../FormField'
 
 const EMAIL_RE = /\S+@\S+\.\S+/
 
@@ -25,7 +24,6 @@ export default function ForgotPasswordPage() {
       await resetPassword(email.trim())
       setSent(true)
     } catch (err) {
-      // Deliberately generic: don't leak whether the address has an account.
       const message = err instanceof Error ? err.message : ''
       if (message.includes('No account found')) {
         setSent(true)
@@ -39,39 +37,81 @@ export default function ForgotPasswordPage() {
 
   return (
     <AuthLayout
-      title="Reset your password"
-      subtitle="We'll email you a link to choose a new one."
       footer={
-        <Link to="/signin" className="font-bold text-[#772432] hover:underline">
+        <Link to="/signin" className="flex items-center justify-center gap-1.5 text-xs font-semibold tap" style={{ color: 'rgba(255,255,255,0.6)' }}>
+          <ArrowLeft className="w-3.5 h-3.5" />
           Back to sign in
         </Link>
       }
     >
-      {sent ? (
-        <FormAlert kind="success">
-          If an account exists for <strong>{email.trim()}</strong>, a password reset link is on its way. Check your
-          inbox and spam folder.
-        </FormAlert>
-      ) : (
-        <>
-          {error ? <FormAlert kind="error">{error}</FormAlert> : null}
-          <form onSubmit={handleSubmit} noValidate>
-            <TextField
-              id="email"
-              label="Email"
-              type="email"
-              value={email}
-              onChange={setEmail}
-              placeholder="you@example.com"
-              icon={Mail}
-              autoComplete="email"
-            />
-            <SubmitButton disabled={!emailOk} loading={loading}>
-              Send reset link
-            </SubmitButton>
-          </form>
-        </>
-      )}
+      <div className="rise rounded-3xl p-6 md:p-8 shadow-xl" style={{ background: 'var(--background)' }}>
+        <h1 className="text-xl font-bold mb-1" style={{ fontFamily: 'var(--font-display)', color: 'var(--foreground)' }}>
+          Reset password
+        </h1>
+        <p className="text-sm mb-6" style={{ color: 'var(--muted-foreground)' }}>
+          We'll email you a link to choose a new one.
+        </p>
+
+        {sent ? (
+          <div className="text-center py-4">
+            <div className="text-4xl mb-4">✉️</div>
+            <p className="text-sm" style={{ color: 'var(--muted-foreground)' }}>
+              If an account exists for <strong style={{ color: 'var(--foreground)' }}>{email.trim()}</strong>,
+              a reset link is on its way. Check your inbox and spam folder.
+            </p>
+          </div>
+        ) : (
+          <>
+            {error ? (
+              <div className="mb-4 px-4 py-3 rounded-xl text-sm font-medium" style={{ background: 'var(--tint-red)', color: 'var(--destructive)' }}>
+                {error}
+              </div>
+            ) : null}
+
+            <form onSubmit={handleSubmit} noValidate className="flex flex-col gap-4">
+              <div className="flex flex-col gap-1.5">
+                <label htmlFor="email" className="text-sm font-medium" style={{ color: 'var(--foreground)' }}>
+                  Email
+                </label>
+                <div className="relative">
+                  <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4" style={{ color: 'var(--muted-foreground)' }} />
+                  <input
+                    id="email"
+                    type="email"
+                    autoComplete="email"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    placeholder="you@school.de"
+                    className="w-full h-11 pl-9 pr-4 rounded-xl border text-sm"
+                    style={{
+                      borderColor: 'var(--input)',
+                      background: 'var(--input-surface)',
+                      color: 'var(--foreground)',
+                      boxSizing: 'border-box',
+                    }}
+                  />
+                </div>
+              </div>
+
+              <button
+                type="submit"
+                disabled={!emailOk || loading}
+                className="w-full h-12 rounded-xl flex items-center justify-center gap-2 text-sm font-semibold tap transition-opacity disabled:opacity-50 disabled:cursor-not-allowed"
+                style={{ background: 'var(--primary)', color: 'var(--primary-foreground)' }}
+              >
+                {loading ? (
+                  <Loader2 className="w-4 h-4 animate-spin" />
+                ) : (
+                  <>
+                    Send reset link
+                    <ArrowRight className="w-4 h-4" />
+                  </>
+                )}
+              </button>
+            </form>
+          </>
+        )}
+      </div>
     </AuthLayout>
   )
 }

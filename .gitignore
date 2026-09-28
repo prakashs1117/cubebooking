@@ -23,10 +23,13 @@ dist-ssr
 *.sln
 *.sw?
 
-# Environment (never commit real credentials; .env.example is the template)
-# .env
-# .env.*
-# !.env.example
+# Environment — never commit real credentials
+.env
+.env.*
+!.env.example
+
+# Firebase service account key — never commit
+service-account.json
 
 # Firebase
 functions/node_modules

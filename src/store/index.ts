@@ -1,12 +1,3 @@
-import { configureStore } from '@reduxjs/toolkit'
-import { clubApi } from './clubApi'
-
-export const store = configureStore({
-  reducer: {
-    [clubApi.reducerPath]: clubApi.reducer,
-  },
-  middleware: (getDefaultMiddleware) => getDefaultMiddleware().concat(clubApi.middleware),
-})
-
-export type RootState = ReturnType<typeof store.getState>
-export type AppDispatch = typeof store.dispatch
+// State management: Zustand stores (see src/stores/) + TanStack React Query for server state.
+// This file is kept as a placeholder for any future global store exports.
+export {}

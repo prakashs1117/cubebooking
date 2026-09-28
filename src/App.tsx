@@ -1,144 +1,71 @@
 import { BrowserRouter as Router, Routes, Route, Navigate, useLocation } from 'react-router-dom'
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { AuthProvider, useAuthContext } from './context/AuthContext'
-import { isGuestOnly } from './lib/roles'
-import ClubInterestPage from './components/ClubInterestPage'
-import AdminManagementPage from './components/AdminManagementPage'
-import AdminLogin from './components/AdminLogin'
-import ProfilePage from './components/ProfilePage'
-import MembersPage from './components/MembersPage'
-import MeetingPosterPage from './components/roster/MeetingPosterPage'
-import RosterListPage from './components/roster/RosterListPage'
-import PosterSharePage from './components/roster/PosterSharePage'
-import VotingPage from './components/roster/VotingPage'
-import FeedbackPage from './components/FeedbackPage'
-import CommunityFeedPage from './components/blog/CommunityFeedPage'
-import PostDetailPage from './components/blog/PostDetailPage'
-import CreatePostPage from './components/blog/CreatePostPage'
-import MyPostsPage from './components/blog/MyPostsPage'
 import ProtectedRoute from './components/ProtectedRoute'
-import Loader from './components/Loader'
 import SignInPage from './components/auth/SignInPage'
-import SignUpPage from './components/auth/SignUpPage'
 import ForgotPasswordPage from './components/auth/ForgotPasswordPage'
-import Footer from './components/Footer'
-import BottomTabBar from './components/BottomTabBar'
+import HomePage from './components/pages/HomePage'
+import BookPage from './components/booking/BookPage'
+import BookProgramsPage from './components/booking/BookProgramsPage'
+import BookTimePage from './components/booking/BookTimePage'
+import BookDetailsPage from './components/booking/BookDetailsPage'
+import ReviewPage from './components/booking/ReviewPage'
+import ConfirmedPage from './components/booking/ConfirmedPage'
 
-/** Keeps signed-in users off the sign-in / sign-up screens. */
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: { staleTime: 30_000, retry: 1 },
+  },
+})
+
 function GuestOnly({ children }: { children: React.ReactNode }) {
   const { user, loading } = useAuthContext()
-  if (loading) return <Loader />
-  if (user) return <Navigate to="/profile" replace />
-  return <>{children}</>
-}
-
-function ClubMemberRoute({ children }: { children: React.ReactNode }) {
-  const { user, profile, loading } = useAuthContext()
   const location = useLocation()
-
-  if (loading) return <Loader />
-  if (!user) return <Navigate to="/signin" replace state={{ from: location.pathname }} />
-  if (!profile || isGuestOnly(profile)) {
-    return <Navigate to="/profile" replace />
-  }
+  if (loading) return null
+  if (user) return <Navigate to={(location.state as { from?: string })?.from ?? '/home'} replace />
   return <>{children}</>
-}
-
-function useShowTabBar() {
-  const { loading } = useAuthContext()
-  if (loading) return false
-  return true
 }
 
 function AppRoutes() {
-  const { isAdmin, loading } = useAuthContext()
-  const showTabBar = useShowTabBar()
-
   return (
-    <>
     <Routes>
-      <Route path="/" element={<ClubInterestPage />} />
-      <Route path="/onboarding" element={<ClubInterestPage />} />
-
-      <Route path="/signup" element={<GuestOnly><SignUpPage /></GuestOnly>} />
+      {/* Auth */}
       <Route path="/signin" element={<GuestOnly><SignInPage /></GuestOnly>} />
       <Route path="/forgot-password" element={<ForgotPasswordPage />} />
 
-      <Route
-        path="/profile"
-        element={
-          <ProtectedRoute>
-            <ProfilePage />
-          </ProtectedRoute>
-        }
-      />
+      {/* Home */}
+      <Route path="/home" element={<ProtectedRoute><HomePage /></ProtectedRoute>} />
 
-      <Route
-        path="/roster"
-        element={
-          <ClubMemberRoute>
-            <RosterListPage />
-          </ClubMemberRoute>
-        }
-      />
-      <Route
-        path="/members"
-        element={
-          <ClubMemberRoute>
-            <MembersPage />
-          </ClubMemberRoute>
-        }
-      />
-      <Route
-        path="/roster/:rosterId"
-        element={
-          <ClubMemberRoute>
-            <MeetingPosterPage />
-          </ClubMemberRoute>
-        }
-      />
+      {/* Onsite booking funnel */}
+      <Route path="/book" element={<ProtectedRoute><BookPage /></ProtectedRoute>} />
+      <Route path="/book/programs" element={<ProtectedRoute><BookProgramsPage /></ProtectedRoute>} />
+      <Route path="/book/time" element={<ProtectedRoute><BookTimePage /></ProtectedRoute>} />
+      <Route path="/book/details" element={<ProtectedRoute><BookDetailsPage /></ProtectedRoute>} />
+      <Route path="/book/review" element={<ProtectedRoute><ReviewPage /></ProtectedRoute>} />
+      <Route path="/book/confirmed" element={<ProtectedRoute><ConfirmedPage /></ProtectedRoute>} />
 
-      <Route
-        path="/admin-login"
-        element={loading ? <Loader /> : isAdmin ? <Navigate to="/management" replace /> : <AdminLogin />}
-      />
-      <Route path="/admin" element={<Navigate to="/management" replace />} />
+      {/* Future routes */}
+      {/* <Route path="/toad" element={<ProtectedRoute><ToadRequestPage /></ProtectedRoute>} /> */}
+      {/* <Route path="/bookings" element={<ProtectedRoute><BookingsPage /></ProtectedRoute>} /> */}
+      {/* <Route path="/bookings/:id" element={<ProtectedRoute><BookingDetailPage /></ProtectedRoute>} /> */}
+      {/* <Route path="/kit" element={<ProtectedRoute><KitPage /></ProtectedRoute>} /> */}
+      {/* <Route path="/profile" element={<ProtectedRoute><ProfilePage /></ProtectedRoute>} /> */}
+      {/* <Route path="/admin" element={<ProtectedRoute requireAdmin><AdminHomePage /></ProtectedRoute>} /> */}
 
-      <Route
-        path="/management"
-        element={
-          <ProtectedRoute requireAdmin>
-            <AdminManagementPage />
-          </ProtectedRoute>
-        }
-      />
-
-      <Route path="/poster/:rosterId" element={<PosterSharePage />} />
-
-      <Route path="/roster/:rosterId/vote" element={<VotingPage />} />
-
-      <Route path="/feedback" element={<FeedbackPage />} />
-
-      {/* Blog / Community — /blog/my and /blog/new MUST precede /blog/:postId */}
-      <Route path="/blog" element={<CommunityFeedPage />} />
-      <Route path="/blog/my" element={<ProtectedRoute><MyPostsPage /></ProtectedRoute>} />
-      <Route path="/blog/new" element={<ProtectedRoute><CreatePostPage /></ProtectedRoute>} />
-      <Route path="/blog/:postId/edit" element={<ProtectedRoute><CreatePostPage /></ProtectedRoute>} />
-      <Route path="/blog/:postId" element={<PostDetailPage />} />
-
-      <Route path="*" element={<Navigate to="/" replace />} />
+      <Route path="/" element={<Navigate to="/home" replace />} />
+      <Route path="*" element={<Navigate to="/home" replace />} />
     </Routes>
-    <Footer />
-    {showTabBar && <BottomTabBar />}
-    </>
   )
 }
 
 export default function App() {
   return (
-    <AuthProvider>
-      <Router>
-        <AppRoutes />
-      </Router>
-    </AuthProvider>
+    <QueryClientProvider client={queryClient}>
+      <AuthProvider>
+        <Router>
+          <AppRoutes />
+        </Router>
+      </AuthProvider>
+    </QueryClientProvider>
   )
 }

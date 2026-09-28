@@ -1,12 +1,17 @@
 import { Navigate, useLocation } from 'react-router-dom'
 import { useAuthContext } from '../context/AuthContext'
-import Loader from './Loader'
 
-/**
- * Gates a route on being signed in, and optionally on having the admin role.
- * Waits for AuthProvider to resolve both the auth state and the first profile
- * snapshot, so an admin refreshing /admin is never briefly bounced.
- */
+function Spinner() {
+  return (
+    <div className="min-h-screen flex items-center justify-center" style={{ background: 'var(--app-ground)' }}>
+      <div
+        className="w-8 h-8 rounded-full border-2 animate-spin"
+        style={{ borderColor: 'var(--border)', borderTopColor: 'var(--primary)' }}
+      />
+    </div>
+  )
+}
+
 export default function ProtectedRoute({
   children,
   requireAdmin = false,
@@ -17,14 +22,14 @@ export default function ProtectedRoute({
   const { user, loading, isAdmin } = useAuthContext()
   const location = useLocation()
 
-  if (loading) return <Loader />
+  if (loading) return <Spinner />
 
   if (!user) {
     return <Navigate to="/signin" replace state={{ from: location.pathname }} />
   }
 
   if (requireAdmin && !isAdmin) {
-    return <Navigate to="/profile" replace />
+    return <Navigate to="/home" replace />
   }
 
   return <>{children}</>
