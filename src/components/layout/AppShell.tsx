@@ -206,7 +206,6 @@ function MobileTopBar() {
         borderColor: 'var(--border)',
       }}
     >
-      <div className="w-10" />
       <MerckLogo width={44} height={21} />
       <div className="flex items-center gap-1">
         <ThemeToggle variant="icon" />
