@@ -4,6 +4,7 @@ import { CalendarPlus, Home } from 'lucide-react'
 import { format } from 'date-fns'
 import { useBookingStore } from '../../stores/bookingStore'
 import { useAuthContext } from '../../context/AuthContext'
+import { trackBookingConfirmed } from '../../services/analyticsService'
 
 const BRAND_COLORS = [
   'var(--brand-mint)', 'var(--brand-yellow)', 'var(--brand-magenta)',
@@ -45,6 +46,19 @@ export default function ConfirmedPage() {
   useEffect(() => {
     if (!slots.length) navigate('/home', { replace: true })
   }, [slots, navigate])
+
+  useEffect(() => {
+    if (slots.length) {
+      const programMap = {
+        'cube': 'Curiosity Cube',
+        'lab': 'Curiosity Lab',
+        'both': 'Cube + Lab',
+      }
+      const bookingId = `booking_${Date.now()}`
+      const programName = programMap[programSelection as keyof typeof programMap] || programSelection
+      trackBookingConfirmed(bookingId, programSelection, undefined)
+    }
+  }, [slots.length, programSelection])
 
   if (!slots.length) return null
 

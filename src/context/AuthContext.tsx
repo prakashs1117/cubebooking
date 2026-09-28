@@ -13,6 +13,7 @@ import {
   subscribeToUserProfile,
   createUserDoc,
 } from '../shared/auth/authService'
+import { trackUserSignIn, trackUserSignOut, setCurrentUser, setUserProps } from '../services/analyticsService'
 import type { AppUser } from '../shared/types'
 
 interface AuthContextValue {
@@ -53,15 +54,21 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       if (!nextUser) {
         setProfile(null)
         setLoading(false)
+        trackUserSignOut()
         return
       }
 
       setLoading(true)
+      setCurrentUser(nextUser.uid)
       profileUnsub.current = subscribeToUserProfile(
         nextUser.uid,
         (appUser) => {
           if (appUser) {
             setProfile(appUser)
+            setUserProps({
+              school_name: appUser.schoolName || '',
+              user_role: appUser.role || 'user',
+            })
             setLoading(false)
             return
           }
@@ -90,10 +97,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const signIn = useCallback(async (email: string, password: string) => {
     await svcSignIn(email, password)
+    trackUserSignIn(email, 'email')
   }, [])
 
   const signInWithGoogle = useCallback(async () => {
     await svcSignInWithGoogle()
+    trackUserSignIn('google_user', 'google')
   }, [])
 
   const sendMagicLink = useCallback(async (email: string) => {
@@ -116,6 +125,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const logout = useCallback(async () => {
     await svcSignOut()
+    trackUserSignOut()
   }, [])
 
   const value = useMemo<AuthContextValue>(

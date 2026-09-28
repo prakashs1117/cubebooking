@@ -4,6 +4,7 @@ import './index.css'
 import App from './App.tsx'
 import { ThemeProvider } from './context/ThemeContext.tsx'
 import LocaleProvider from './context/LocaleContext.tsx'
+import { initializeAnalytics } from './shared/firebase.ts'
 
 // Apply stored theme immediately before first paint to avoid flash
 ;(() => {
@@ -15,6 +16,9 @@ import LocaleProvider from './context/LocaleContext.tsx'
     document.documentElement.setAttribute('data-theme', resolved)
   } catch { /* noop */ }
 })()
+
+// Initialize Firebase Analytics
+initializeAnalytics().catch(console.error)
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>

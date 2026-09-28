@@ -1,6 +1,7 @@
 import { BrowserRouter as Router, Routes, Route, Navigate, useLocation } from 'react-router-dom'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { AuthProvider, useAuthContext } from './context/AuthContext'
+import { useAnalyticsInit, usePageTracking } from './hooks/useAnalytics'
 import ProtectedRoute from './components/ProtectedRoute'
 import AppShell from './components/layout/AppShell'
 import SignInPage from './components/auth/SignInPage'
@@ -22,6 +23,12 @@ const queryClient = new QueryClient({
     queries: { staleTime: 30_000, retry: 1 },
   },
 })
+
+function AnalyticsTracker() {
+  useAnalyticsInit()
+  usePageTracking()
+  return null
+}
 
 function GuestOnly({ children }: { children: React.ReactNode }) {
   const { user, loading } = useAuthContext()
@@ -77,6 +84,7 @@ export default function App() {
     <QueryClientProvider client={queryClient}>
       <AuthProvider>
         <Router>
+          <AnalyticsTracker />
           <AppRoutes />
         </Router>
       </AuthProvider>

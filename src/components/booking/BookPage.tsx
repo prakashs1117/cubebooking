@@ -1,7 +1,9 @@
 import { useNavigate } from 'react-router-dom'
+import { useEffect } from 'react'
 import { Building2, Truck } from 'lucide-react'
 import BookingLayout, { ContinueButton } from './BookingLayout'
 import { useBookingStore, type VisitType } from '../../stores/bookingStore'
+import { trackBookingInitiated, trackImpressionView } from '../../services/analyticsService'
 
 const VISIT_TYPES = [
   {
@@ -34,9 +36,22 @@ export default function BookPage() {
   const navigate = useNavigate()
   const { visitType, setVisitType } = useBookingStore()
 
+  useEffect(() => {
+    trackBookingInitiated('booking_funnel_start', 'Booking Funnel')
+    VISIT_TYPES.forEach(vt => {
+      trackImpressionView(vt.id, 'visit_type', vt.label)
+    })
+  }, [])
+
   const handleContinue = () => {
-    if (visitType === 'onsite') navigate('/book/programs')
-    else if (visitType === 'toad') navigate('/toad')
+    if (visitType === 'onsite') {
+      trackImpressionView('onsite', 'visit_type', 'Onsite STEM visit')
+      navigate('/book/programs')
+    }
+    else if (visitType === 'toad') {
+      trackImpressionView('toad', 'visit_type', 'TOAD truck visit')
+      navigate('/toad')
+    }
   }
 
   return (

@@ -1,6 +1,8 @@
 import { useNavigate } from 'react-router-dom'
+import { useEffect } from 'react'
 import BookingLayout, { ContinueButton } from './BookingLayout'
 import { useBookingStore, type ProgramSelection, type ProgramOrder } from '../../stores/bookingStore'
+import { trackProgramSelected, trackImpressionView } from '../../services/analyticsService'
 
 const OPTIONS: { id: ProgramSelection; title: string; sub: string; swatch: string }[] = [
   {
@@ -32,6 +34,24 @@ export default function BookProgramsPage() {
   const navigate = useNavigate()
   const { programSelection, programOrder, setProgramSelection, setProgramOrder } = useBookingStore()
 
+  useEffect(() => {
+    OPTIONS.forEach(option => {
+      trackImpressionView(option.id, 'program', option.title)
+    })
+  }, [])
+
+  const handleSelectProgram = (programId: ProgramSelection) => {
+    const program = OPTIONS.find(o => o.id === programId)
+    if (program) {
+      trackProgramSelected(program.id, program.title)
+    }
+    setProgramSelection(programId)
+  }
+
+  const handleNavigateContinue = () => {
+    navigate('/book/time')
+  }
+
   return (
     <BookingLayout
       title="Onsite STEM visit"
@@ -41,7 +61,7 @@ export default function BookProgramsPage() {
       footer={
         <ContinueButton
           disabled={!programSelection}
-          onClick={() => navigate('/book/time')}
+          onClick={handleNavigateContinue}
         />
       }
     >
@@ -59,7 +79,7 @@ export default function BookProgramsPage() {
               type="button"
               role="radio"
               aria-checked={selected}
-              onClick={() => setProgramSelection(opt.id)}
+              onClick={() => handleSelectProgram(opt.id)}
               className="tap flex items-center gap-3.5 p-3.5 rounded-[20px] border-2 text-left"
               style={{
                 background: 'var(--card)',
