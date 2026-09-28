@@ -8,65 +8,60 @@ import {
   Timestamp,
 } from 'firebase/firestore'
 import { db } from '../../shared/firebase'
+import { useAuthContext } from '../../context/AuthContext'
 import type { Session, ProgramId } from '../../shared/types'
 
-/** Fetch all open sessions for a program within a date range (week view). */
+type SessionDoc = Session & { id: string }
+
+/**
+ * Fetch open sessions for one or more programs within a date window.
+ * Runs one query per programId and merges — avoids Firestore 'in' + range
+ * index requirement and is more reliable across all auth states.
+ */
 export function useSessionsForWeek(
   programIds: ProgramId[],
   weekStart: Date,
   weekEnd: Date,
   enabled = true,
 ) {
+  const { user } = useAuthContext()
+
   return useQuery({
     queryKey: ['sessions', programIds.join(','), weekStart.toISOString(), weekEnd.toISOString()],
-    enabled: enabled && programIds.length > 0,
+    // Only run when auth is resolved AND we have a user (sessions require sign-in)
+    enabled: enabled && programIds.length > 0 && !!user,
     queryFn: async () => {
-      const q = query(
-        collection(db, 'sessions'),
-        where('programId', 'in', programIds),
-        where('status', '==', 'open'),
-        where('start', '>=', Timestamp.fromDate(weekStart)),
-        where('start', '<', Timestamp.fromDate(weekEnd)),
-        orderBy('start', 'asc'),
+      const start = Timestamp.fromDate(weekStart)
+      const end   = Timestamp.fromDate(weekEnd)
+
+      // One query per programId — avoids 'in' + range + orderBy index issues
+      const results = await Promise.all(
+        programIds.map((pid) =>
+          getDocs(
+            query(
+              collection(db, 'sessions'),
+              where('programId', '==', pid),
+              where('status', '==', 'open'),
+              where('start', '>=', start),
+              where('start', '<', end),
+              orderBy('start', 'asc'),
+            ),
+          ).then((snap) =>
+            snap.docs.map((d) => ({ id: d.id, ...d.data() }) as SessionDoc),
+          ),
+        ),
       )
-      const snap = await getDocs(q)
-      return snap.docs.map((doc) => ({ id: doc.id, ...doc.data() }) as Session & { id: string })
+
+      // Merge and sort by start time
+      return results
+        .flat()
+        .sort((a, b) => {
+          const at = (a.start as unknown as Timestamp).toDate().getTime()
+          const bt = (b.start as unknown as Timestamp).toDate().getTime()
+          return at - bt
+        })
     },
     staleTime: 30_000,
-  })
-}
-
-/** Check if a specific day has any available sessions for the given programs. */
-export function useAvailableDays(
-  programIds: ProgramId[],
-  monthStart: Date,
-  monthEnd: Date,
-  enabled = true,
-) {
-  return useQuery({
-    queryKey: ['sessions-days', programIds.join(','), monthStart.toISOString()],
-    enabled: enabled && programIds.length > 0,
-    queryFn: async () => {
-      const q = query(
-        collection(db, 'sessions'),
-        where('programId', 'in', programIds),
-        where('status', '==', 'open'),
-        where('start', '>=', Timestamp.fromDate(monthStart)),
-        where('start', '<', Timestamp.fromDate(monthEnd)),
-        orderBy('start', 'asc'),
-      )
-      const snap = await getDocs(q)
-      const availableDays = new Set<string>()
-      snap.forEach((doc) => {
-        const data = doc.data()
-        const start: Timestamp = data.start
-        const available = data.capacity - data.seatsTaken - data.seatsHeld
-        if (available > 0) {
-          availableDays.add(start.toDate().toDateString())
-        }
-      })
-      return availableDays
-    },
-    staleTime: 60_000,
+    retry: 2,
   })
 }

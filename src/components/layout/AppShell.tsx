@@ -212,6 +212,10 @@ function MobileTopBar({ onMenuOpen }: { onMenuOpen: () => void }) {
 
 // ─── Mobile bottom tab bar ────────────────────────────────────────────────────
 function MobileTabBar({ currentPath }: { currentPath: string }) {
+  // Split NAV into left 2 and right 2, with Book FAB in centre
+  const left  = NAV.slice(0, 2)   // Home, Bookings
+  const right = NAV.slice(2)      // Kit, Profile
+
   return (
     <nav
       className="md:hidden fixed bottom-0 left-0 right-0 z-30 border-t"
@@ -223,31 +227,45 @@ function MobileTabBar({ currentPath }: { currentPath: string }) {
       }}
       aria-label="Main navigation"
     >
-      <div className="grid" style={{ gridTemplateColumns: 'repeat(4, 1fr)', height: 56 }}>
-        {NAV.map((item) => {
+      <div className="grid" style={{ gridTemplateColumns: 'repeat(5, 1fr)', height: 58 }}>
+        {/* Left tabs */}
+        {left.map((item) => {
           const active = isActive(item.href, currentPath)
           return (
-            <Link
-              key={item.href}
-              to={item.href}
+            <Link key={item.href} to={item.href}
               className="flex flex-col items-center justify-center gap-0.5 tap"
-              style={{
-                textDecoration: 'none',
-                color: active ? 'var(--brand-purple)' : 'var(--muted-foreground)',
-                fontSize: 10,
-                fontWeight: active ? 600 : 400,
-                letterSpacing: '0.01em',
-              }}
+              style={{ textDecoration: 'none', color: active ? 'var(--brand-purple)' : 'var(--muted-foreground)', fontSize: 10, fontWeight: active ? 600 : 400 }}
             >
-              {/* Active indicator dot above icon */}
-              <span
-                className="grid place-items-center rounded-full transition-all duration-200"
-                style={{
-                  width: 40,
-                  height: 28,
-                  background: active ? 'var(--tint-purple)' : 'transparent',
-                }}
-              >
+              <span className="grid place-items-center rounded-full transition-all"
+                style={{ width: 40, height: 28, background: active ? 'var(--tint-purple)' : 'transparent' }}>
+                <item.icon style={{ width: 20, height: 20 }} />
+              </span>
+              {item.label}
+            </Link>
+          )
+        })}
+
+        {/* Centre Book FAB */}
+        <Link to="/book" aria-label="Book a visit"
+          className="flex items-center justify-center tap"
+          style={{ textDecoration: 'none' }}
+        >
+          <span className="grid place-items-center rounded-full shadow-lg tap"
+            style={{ width: 48, height: 48, background: 'var(--primary)', color: '#fff', marginBottom: 6, boxShadow: '0 4px 14px rgba(20,155,95,0.4)' }}>
+            <Plus style={{ width: 22, height: 22 }} />
+          </span>
+        </Link>
+
+        {/* Right tabs */}
+        {right.map((item) => {
+          const active = isActive(item.href, currentPath)
+          return (
+            <Link key={item.href} to={item.href}
+              className="flex flex-col items-center justify-center gap-0.5 tap"
+              style={{ textDecoration: 'none', color: active ? 'var(--brand-purple)' : 'var(--muted-foreground)', fontSize: 10, fontWeight: active ? 600 : 400 }}
+            >
+              <span className="grid place-items-center rounded-full transition-all"
+                style={{ width: 40, height: 28, background: active ? 'var(--tint-purple)' : 'transparent' }}>
                 <item.icon style={{ width: 20, height: 20 }} />
               </span>
               {item.label}
