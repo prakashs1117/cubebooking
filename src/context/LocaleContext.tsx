@@ -1,4 +1,4 @@
-import { createContext, useContext, useState, type ReactNode } from 'react'
+import { createContext, useContext, useState, useCallback, type ReactNode } from 'react'
 import { IntlProvider } from 'react-intl'
 import { messages, type Locale } from '../i18n'
 
@@ -26,10 +26,10 @@ export default function LocaleProvider({ children }: { children: ReactNode }) {
     return 'de'
   })
 
-  const setLocale = (l: Locale) => {
+  const setLocale = useCallback((l: Locale) => {
     setLocaleState(l)
     try { localStorage.setItem(STORAGE_KEY, l) } catch { /* noop */ }
-  }
+  }, [])
 
   return (
     <LocaleContext.Provider value={{ locale, setLocale }}>
@@ -37,7 +37,7 @@ export default function LocaleProvider({ children }: { children: ReactNode }) {
         locale={locale}
         messages={messages[locale]}
         defaultLocale="de"
-        onError={() => { /* suppress missing-translation warnings in prod */ }}
+        onError={import.meta.env.PROD ? () => {} : undefined}
       >
         {children}
       </IntlProvider>
