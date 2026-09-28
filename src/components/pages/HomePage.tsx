@@ -92,8 +92,8 @@ export default function HomePage() {
           className="rise-2 tap relative overflow-hidden rounded-3xl p-5 flex flex-col gap-4"
           style={{ background: 'var(--brand-purple)', color: '#ffffff', boxShadow: 'var(--shadow-float)', textDecoration: 'none' }}
         >
-          <div style={{ position: 'absolute', width: 180, height: 180, borderRadius: '9999px', background: 'var(--brand-magenta)', right: -60, top: -70, opacity: 0.9 }} />
-          <div style={{ position: 'absolute', width: 90, height: 90, borderRadius: '9999px', background: 'var(--brand-mint)', right: 40, top: 40, opacity: 0.9 }} />
+          <div style={{ position: 'absolute', width: 90, height: 90, borderRadius: '9999px', background: 'var(--brand-mint)', right: 40, top: 40, opacity: 0.8 }} />
+          <div style={{ position: 'absolute', width: 180, height: 180, borderRadius: '9999px', background: 'var(--brand-magenta)', right: -60, top: -70, opacity: 9 }} />
 
           <div className="relative flex justify-between items-start">
             <div className="flex flex-col gap-1.5">
