@@ -48,15 +48,9 @@ export default function ConfirmedPage() {
   }, [slots, navigate])
 
   useEffect(() => {
-    if (slots.length) {
-      const programMap = {
-        'cube': 'Curiosity Cube',
-        'lab': 'Curiosity Lab',
-        'both': 'Cube + Lab',
-      }
+    if (slots.length && programSelection) {
       const bookingId = `booking_${Date.now()}`
-      const programName = programMap[programSelection as keyof typeof programMap] || programSelection
-      trackBookingConfirmed(bookingId, programSelection, undefined)
+      trackBookingConfirmed(bookingId, programSelection)
     }
   }, [slots.length, programSelection])
 

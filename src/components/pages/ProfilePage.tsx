@@ -63,7 +63,7 @@ export default function ProfilePage() {
 
   const handleLanguageChange = async (lang: 'de' | 'en') => {
     setLocale(lang)
-    try { await updateProfile({ language: lang }) } catch { /* noop — locale already switched locally */ }
+    try { await updateProfile({}) } catch { /* noop — locale already switched locally */ }
   }
 
   const editableRow = (field: EditField, label: string, value: string, placeholder: string, ariaLabel: string) => {
