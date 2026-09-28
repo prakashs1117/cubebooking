@@ -1,7 +1,9 @@
 import { useState } from 'react'
 import { Link, useNavigate, useLocation } from 'react-router-dom'
 import { Eye, EyeOff, Mail, ArrowRight, Loader2 } from 'lucide-react'
+import { useIntl } from 'react-intl'
 import { useAuthContext } from '../../context/AuthContext'
+import { useLocale } from '../../context/LocaleContext'
 import AuthLayout, { GoogleButton, OrDivider } from './AuthLayout'
 import MerckLogo from './MerckLogo'
 
@@ -12,6 +14,8 @@ export default function SignInPage() {
   const location = useLocation()
   const { signIn, signInWithGoogle, sendMagicLink } = useAuthContext()
   const returnTo = (location.state as { from?: string })?.from ?? '/home'
+  const intl = useIntl()
+  const { locale, setLocale } = useLocale()
 
   const [mode, setMode] = useState<Mode>('password')
   const [email, setEmail] = useState('')
@@ -61,7 +65,7 @@ export default function SignInPage() {
     <AuthLayout
       footer={
         <p style={{ color: 'rgba(255,255,255,0.5)', fontSize: 12 }}>
-          All data hosted in the EU · GDPR compliant
+          {intl.formatMessage({ id: 'auth.signIn.gdpr' })}
         </p>
       }
     >
@@ -76,16 +80,17 @@ export default function SignInPage() {
           className="flex gap-1 p-1 rounded-full"
           style={{ background: 'rgba(255,255,255,0.14)' }}
         >
-          {(['DE', 'EN'] as const).map((lang) => (
+          {(['de', 'en'] as const).map((lang) => (
             <button
               key={lang}
               type="button"
+              onClick={() => setLocale(lang)}
               className="tap px-3 py-1 rounded-full text-xs font-bold transition-colors"
-              style={lang === 'DE'
+              style={lang === locale
                 ? { background: 'rgba(255,255,255,0.92)', color: 'var(--brand-purple)' }
                 : { background: 'transparent', color: 'rgba(255,255,255,0.7)' }}
             >
-              {lang}
+              {lang.toUpperCase()}
             </button>
           ))}
         </div>
@@ -94,13 +99,15 @@ export default function SignInPage() {
       {/* Hero text */}
       <div className="rise mb-8">
         <div className="text-xs font-semibold uppercase tracking-widest mb-3" style={{ color: 'var(--brand-mint)', letterSpacing: '0.14em' }}>
-          Curiosity Cube · Labs · TOAD
+          {intl.formatMessage({ id: 'auth.tagline' })}
         </div>
         <h1 className="m-0 text-4xl md:text-5xl font-extrabold leading-tight tracking-tight text-white mb-3" style={{ fontFamily: 'var(--font-display)' }}>
-          Book a STEM<br />experience
+          {intl.formatMessage({ id: 'auth.hero.title' }).split('\n').map((line, i) => (
+            <span key={i}>{line}{i === 0 && <br />}</span>
+          ))}
         </h1>
         <p className="text-base leading-relaxed" style={{ color: 'rgba(255,255,255,0.72)', maxWidth: 280 }}>
-          Schools in the Darmstadt area can book the Curiosity Cube, Lab, or TOAD truck in under 3 minutes.
+          {intl.formatMessage({ id: 'auth.hero.sub' })}
         </p>
       </div>
 
@@ -109,9 +116,14 @@ export default function SignInPage() {
         {magicSent ? (
           <div className="text-center py-4">
             <div className="text-4xl mb-4">✉️</div>
-            <h2 className="text-lg font-bold mb-2" style={{ color: 'var(--foreground)' }}>Check your inbox</h2>
+            <h2 className="text-lg font-bold mb-2" style={{ color: 'var(--foreground)' }}>
+              {intl.formatMessage({ id: 'auth.magicSent.title' })}
+            </h2>
             <p className="text-sm" style={{ color: 'var(--muted-foreground)' }}>
-              We sent a sign-in link to <strong>{email.trim()}</strong>. Click it to continue — no password needed.
+              {intl.formatMessage(
+                { id: 'auth.magicSent.body' },
+                { email: <strong>{email.trim()}</strong> }
+              )}
             </p>
             <button
               type="button"
@@ -119,7 +131,7 @@ export default function SignInPage() {
               style={{ color: 'var(--primary)' }}
               onClick={() => setMagicSent(false)}
             >
-              Use a different address
+              {intl.formatMessage({ id: 'auth.magicSent.different' })}
             </button>
           </div>
         ) : (
@@ -134,7 +146,7 @@ export default function SignInPage() {
               {/* Email */}
               <div className="flex flex-col gap-1.5">
                 <label htmlFor="email" className="text-sm font-medium" style={{ color: 'var(--foreground)' }}>
-                  Email
+                  {intl.formatMessage({ id: 'auth.signIn.emailLabel' })}
                 </label>
                 <div className="relative">
                   <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4" style={{ color: 'var(--muted-foreground)' }} />
@@ -144,7 +156,7 @@ export default function SignInPage() {
                     autoComplete="email"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
-                    placeholder="you@school.de"
+                    placeholder={intl.formatMessage({ id: 'auth.signIn.emailPlaceholder' })}
                     className="w-full h-11 pl-9 pr-4 rounded-xl border text-sm"
                     style={{
                       borderColor: 'var(--input)',
@@ -161,10 +173,10 @@ export default function SignInPage() {
                 <div className="flex flex-col gap-1.5">
                   <div className="flex justify-between items-center">
                     <label htmlFor="password" className="text-sm font-medium" style={{ color: 'var(--foreground)' }}>
-                      Password
+                      {intl.formatMessage({ id: 'auth.signIn.passwordLabel' })}
                     </label>
                     <Link to="/forgot-password" className="text-xs font-semibold tap" style={{ color: 'var(--primary)' }}>
-                      Forgot?
+                      {intl.formatMessage({ id: 'auth.signIn.forgotPassword' })}
                     </Link>
                   </div>
                   <div className="relative">
@@ -174,7 +186,7 @@ export default function SignInPage() {
                       autoComplete="current-password"
                       value={password}
                       onChange={(e) => setPassword(e.target.value)}
-                      placeholder="Your password"
+                      placeholder={intl.formatMessage({ id: 'auth.signIn.passwordPlaceholder' })}
                       className="w-full h-11 pl-4 pr-10 rounded-xl border text-sm"
                       style={{
                         borderColor: 'var(--input)',
@@ -186,7 +198,9 @@ export default function SignInPage() {
                     <button
                       type="button"
                       onClick={() => setShowPassword((s) => !s)}
-                      aria-label={showPassword ? 'Hide password' : 'Show password'}
+                      aria-label={showPassword
+                        ? intl.formatMessage({ id: 'auth.hidePassword' })
+                        : intl.formatMessage({ id: 'auth.showPassword' })}
                       className="absolute right-3 top-1/2 -translate-y-1/2 tap"
                       style={{ color: 'var(--muted-foreground)' }}
                     >
@@ -207,7 +221,9 @@ export default function SignInPage() {
                   <Loader2 className="w-4 h-4 animate-spin" />
                 ) : (
                   <>
-                    {mode === 'magic-link' ? 'Send sign-in link' : 'Sign in'}
+                    {mode === 'magic-link'
+                      ? intl.formatMessage({ id: 'auth.signIn.submitMagic' })
+                      : intl.formatMessage({ id: 'auth.signIn.submit' })}
                     <ArrowRight className="w-4 h-4" />
                   </>
                 )}
@@ -221,12 +237,14 @@ export default function SignInPage() {
               className="w-full mt-3 text-xs font-semibold tap text-center"
               style={{ color: 'var(--muted-foreground)' }}
             >
-              {mode === 'password' ? 'Sign in with magic link instead' : 'Use password instead'}
+              {mode === 'password'
+                ? intl.formatMessage({ id: 'auth.signIn.switchToMagic' })
+                : intl.formatMessage({ id: 'auth.signIn.switchToPassword' })}
             </button>
 
             <OrDivider />
 
-            <GoogleButton onClick={handleGoogle} disabled={loading} label="Continue with Google" />
+            <GoogleButton onClick={handleGoogle} disabled={loading} label={intl.formatMessage({ id: 'auth.signIn.google' })} />
           </>
         )}
       </div>

@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import { Mail, ArrowLeft, Loader2, ArrowRight } from 'lucide-react'
+import { useIntl } from 'react-intl'
 import { useAuthContext } from '../../context/AuthContext'
 import AuthLayout from './AuthLayout'
 
@@ -8,6 +9,7 @@ const EMAIL_RE = /\S+@\S+\.\S+/
 
 export default function ForgotPasswordPage() {
   const { resetPassword } = useAuthContext()
+  const intl = useIntl()
   const [email, setEmail] = useState('')
   const [loading, setLoading] = useState(false)
   const [sent, setSent] = useState(false)
@@ -40,24 +42,26 @@ export default function ForgotPasswordPage() {
       footer={
         <Link to="/signin" className="flex items-center justify-center gap-1.5 text-xs font-semibold tap" style={{ color: 'rgba(255,255,255,0.6)' }}>
           <ArrowLeft className="w-3.5 h-3.5" />
-          Back to sign in
+          {intl.formatMessage({ id: 'forgot.backToSignIn' })}
         </Link>
       }
     >
       <div className="rise rounded-3xl p-6 md:p-8 shadow-xl" style={{ background: 'var(--background)' }}>
         <h1 className="text-xl font-bold mb-1" style={{ fontFamily: 'var(--font-display)', color: 'var(--foreground)' }}>
-          Reset password
+          {intl.formatMessage({ id: 'forgot.title' })}
         </h1>
         <p className="text-sm mb-6" style={{ color: 'var(--muted-foreground)' }}>
-          We'll email you a link to choose a new one.
+          {intl.formatMessage({ id: 'forgot.subtitle' })}
         </p>
 
         {sent ? (
           <div className="text-center py-4">
             <div className="text-4xl mb-4">✉️</div>
             <p className="text-sm" style={{ color: 'var(--muted-foreground)' }}>
-              If an account exists for <strong style={{ color: 'var(--foreground)' }}>{email.trim()}</strong>,
-              a reset link is on its way. Check your inbox and spam folder.
+              {intl.formatMessage(
+                { id: 'forgot.sent' },
+                { email: <strong style={{ color: 'var(--foreground)' }}>{email.trim()}</strong> }
+              )}
             </p>
           </div>
         ) : (
@@ -71,7 +75,7 @@ export default function ForgotPasswordPage() {
             <form onSubmit={handleSubmit} noValidate className="flex flex-col gap-4">
               <div className="flex flex-col gap-1.5">
                 <label htmlFor="email" className="text-sm font-medium" style={{ color: 'var(--foreground)' }}>
-                  Email
+                  {intl.formatMessage({ id: 'forgot.emailLabel' })}
                 </label>
                 <div className="relative">
                   <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4" style={{ color: 'var(--muted-foreground)' }} />
@@ -103,7 +107,7 @@ export default function ForgotPasswordPage() {
                   <Loader2 className="w-4 h-4 animate-spin" />
                 ) : (
                   <>
-                    Send reset link
+                    {intl.formatMessage({ id: 'forgot.submit' })}
                     <ArrowRight className="w-4 h-4" />
                   </>
                 )}
