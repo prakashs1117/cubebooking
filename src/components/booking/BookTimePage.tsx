@@ -6,6 +6,8 @@ import { useIntl } from 'react-intl'
 import BookingLayout, { ContinueButton } from './BookingLayout'
 import { useBookingStore } from '../../stores/bookingStore'
 import { useSessionsForWeek } from '../../hooks/queries/useSessions'
+import { useTeacherBookingWindows } from '../../hooks/queries/useBookings'
+import { slotsOverlapTeacherBookings } from '../../services/bookingConflictService'
 import type { ProgramId, Session } from '../../shared/types'
 import type { Timestamp } from 'firebase/firestore'
 
@@ -73,6 +75,8 @@ export default function BookTimePage() {
     programIds.length > 0,
   )
 
+  const teacherWindows = useTeacherBookingWindows()
+
   // Group sessions by the LOCAL date string of their start time
   const sessionsByDay = useMemo(() => {
     const map: Record<string, SessionDoc[]> = {}
@@ -101,6 +105,8 @@ export default function BookTimePage() {
           const timeKey = toDate(s.start).getTime().toString()
           if (seen.has(timeKey)) return false
           seen.add(timeKey)
+          const slotWindow = { start: toDate(s.start), end: toDate(s.end) }
+          if (slotsOverlapTeacherBookings([slotWindow], teacherWindows)) return false
           return true
         })
         .sort((a, b) => toDate(a.start).getTime() - toDate(b.start).getTime())
@@ -127,16 +133,21 @@ export default function BookTimePage() {
           && s.capacity - s.seatsTaken - s.seatsHeld > 0,
       )
       if (!match) return []
-      const key = `${first.id}-${match.id}`
-      if (seen.has(key)) return []
-      seen.add(key)
+      const pairKey = `${toDate(first.start).getTime()}-${toDate(match.end).getTime()}`
+      if (seen.has(pairKey)) return []
+      seen.add(pairKey)
+      const windows = [
+        { start: toDate(first.start), end: toDate(first.end) },
+        { start: toDate(match.start), end: toDate(match.end) },
+      ]
+      if (slotsOverlapTeacherBookings(windows, teacherWindows)) return []
       return [{
         label: intl.formatTime(toDate(first.start), { hour: '2-digit', minute: '2-digit' }),
         endLabel: intl.formatTime(toDate(match.end), { hour: '2-digit', minute: '2-digit' }),
         slots: [first, match],
       }]
     })
-  }, [selectedDate, sessionsByDay, programSelection, programIds, intl])
+  }, [selectedDate, sessionsByDay, programSelection, programIds, intl, teacherWindows])
 
   // Auto-select tomorrow when sessions first load and no date is chosen yet
   useEffect(() => {
@@ -206,7 +217,7 @@ export default function BookTimePage() {
       {isError && (
         <div className="flex items-center gap-2 px-4 py-3 rounded-xl text-sm" style={{ background: 'var(--tint-yellow)' }}>
           <AlertCircle className="w-4 h-4 flex-none" style={{ color: 'var(--brand-orange)' }} />
-          <span>Could not load availability. Check your connection and try again.</span>
+          <span>{intl.formatMessage({ id: 'bookTime.loadError' })}</span>
         </div>
       )}
 
