@@ -10,6 +10,13 @@ service cloud.firestore {
       return isSignedIn() && request.auth.token.role == 'admin';
     }
 
+    function isStaff() {
+      return isSignedIn() && (
+        request.auth.token.role == 'admin' ||
+        request.auth.token.role == 'coordinator'
+      );
+    }
+
     // Default: deny everything
     match /{document=**} {
       allow read, write: if false;
@@ -58,7 +65,7 @@ service cloud.firestore {
     // (admin SDK bypasses rules). Teachers can only read their own and cancel.
     match /bookings/{bookingId} {
       allow read: if isSignedIn() && (
-        resource.data.teacherId == request.auth.uid || isAdmin()
+        resource.data.teacherId == request.auth.uid || isStaff()
       );
 
       // Teachers can create their own bookings directly (Cloud Function not yet deployed)
@@ -71,8 +78,8 @@ service cloud.firestore {
         && request.resource.data.status == 'cancelled'
         && request.resource.data.teacherId == resource.data.teacherId;
 
-      // Admins can update/delete any booking
-      allow update: if isAdmin();
+      // Staff (admin or coordinator) can update any booking; only admins can delete
+      allow update: if isStaff();
       allow delete: if isAdmin();
     }
 

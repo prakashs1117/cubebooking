@@ -1,10 +1,8 @@
-import { useNavigate } from 'react-router-dom'
 import { useEffect } from 'react'
 import { Building2, Truck } from 'lucide-react'
 import { useIntl } from 'react-intl'
-import BookingLayout from './BookingLayout'
-import { useBookingStore, type VisitType } from '../../stores/bookingStore'
-import { trackBookingInitiated, trackImpressionView } from '../../services/analyticsService'
+import { useBookingStore, type VisitType } from '../../../stores/bookingStore'
+import { trackBookingInitiated, trackImpressionView } from '../../../services/analyticsService'
 
 function useVisitTypes() {
   const intl = useIntl()
@@ -36,15 +34,18 @@ function useVisitTypes() {
   ] as const
 }
 
-export default function BookPage() {
-  const navigate = useNavigate()
+interface Props {
+  onSelect: (vt: VisitType) => void
+}
+
+export function BookTypeStep({ onSelect }: Props) {
   const intl = useIntl()
   const visitTypes = useVisitTypes()
   const { visitType, setVisitType } = useBookingStore()
 
   useEffect(() => {
     trackBookingInitiated('booking_funnel_start', 'Booking Funnel')
-    visitTypes.forEach(vt => {
+    visitTypes.forEach((vt) => {
       trackImpressionView(vt.id, 'visit_type', vt.label)
     })
   // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -52,22 +53,12 @@ export default function BookPage() {
 
   const handleSelect = (vt: VisitType) => {
     setVisitType(vt)
-    if (vt === 'onsite') {
-      trackImpressionView('onsite', 'visit_type', intl.formatMessage({ id: 'book.type.onsite.label' }))
-      navigate('/book/programs')
-    } else {
-      trackImpressionView('toad', 'visit_type', intl.formatMessage({ id: 'book.type.toad.label' }))
-      navigate('/toad')
-    }
+    trackImpressionView(vt, 'visit_type', intl.formatMessage({ id: `book.type.${vt}.label` }))
+    onSelect(vt)
   }
 
   return (
-    <BookingLayout
-      title={intl.formatMessage({ id: 'book.title' })}
-      step={1}
-      totalSteps={4}
-      onClose="/home"
-    >
+    <>
       <div className="rise">
         <h1 className="m-0 text-[28px] font-extrabold leading-[34px] tracking-tight" style={{ fontFamily: 'var(--font-display)' }}>
           {intl.formatMessage({ id: 'book.heading' })}
@@ -93,7 +84,6 @@ export default function BookPage() {
                 boxShadow: selected ? '0 0 0 3px rgba(20,155,95,0.15)' : 'none',
               }}
             >
-              {/* Coloured header band */}
               <div className="relative h-[110px] overflow-hidden" style={{ background: vt.headerBg }}>
                 <div style={{
                   position: 'absolute', borderRadius: '9999px',
@@ -118,8 +108,6 @@ export default function BookPage() {
                   </span>
                 )}
               </div>
-
-              {/* Card body */}
               <div className="px-5 py-4 flex flex-col gap-2">
                 <div className="flex items-center justify-between gap-3">
                   <span className="text-[17px] font-bold">{vt.label}</span>
@@ -133,6 +121,6 @@ export default function BookPage() {
           )
         })}
       </div>
-    </BookingLayout>
+    </>
   )
 }

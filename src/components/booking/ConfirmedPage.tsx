@@ -1,10 +1,10 @@
 import { useEffect } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, useLocation } from 'react-router-dom'
 import { CalendarPlus, Home } from 'lucide-react'
 import { useIntl } from 'react-intl'
 import { useBookingStore } from '../../stores/bookingStore'
-import { useAuthContext } from '../../context/AuthContext'
 import { trackBookingConfirmed } from '../../services/analyticsService'
+import { BookingQRCode } from '../ui/BookingQRCode'
 
 const BRAND_COLORS = [
   'var(--brand-mint)', 'var(--brand-yellow)', 'var(--brand-magenta)',
@@ -40,20 +40,23 @@ function makeCalendarUrl(title: string, start: Date, end: Date, desc = '') {
 
 export default function ConfirmedPage() {
   const navigate = useNavigate()
+  const location = useLocation()
   const intl = useIntl()
   const { slots, classDetails, programSelection, reset } = useBookingStore()
-  const { profile } = useAuthContext()
+
+  const locationState = location.state as { bookingId?: string; bookingCode?: string } | null
+  const bookingId = locationState?.bookingId ?? null
+  const bookingCode = locationState?.bookingCode ?? null
 
   useEffect(() => {
     if (!slots.length) navigate('/home', { replace: true })
   }, [slots, navigate])
 
   useEffect(() => {
-    if (slots.length && programSelection) {
-      const bookingId = `booking_${Date.now()}`
+    if (slots.length && programSelection && bookingId) {
       trackBookingConfirmed(bookingId, programSelection)
     }
-  }, [slots.length, programSelection])
+  }, [slots.length, programSelection, bookingId])
 
   if (!slots.length) return null
 
@@ -70,7 +73,7 @@ export default function ConfirmedPage() {
     `Curiosity ${programTitle} – Class ${classDetails.grade}`,
     firstSlot.start,
     lastSlot.end,
-    `${classDetails.studentCount} students · Grade ${classDetails.grade}`
+    `${classDetails.studentCount} students · Grade ${classDetails.grade}`,
   )
 
   const handleDone = () => {
@@ -134,31 +137,53 @@ export default function ConfirmedPage() {
           {intl.formatMessage({ id: 'confirmed.heading' })}
         </h1>
         <p className="rise-3 m-0 text-base leading-6" style={{ color: 'rgba(255,255,255,0.88)' }}>
-          {intl.formatMessage({ id: 'confirmed.sub' }, { programTitle, grade: classDetails.grade, date: dateLabel, time: timeRange }).split('\n').map((line, i) => <span key={i}>{line}{i === 0 && <br />}</span>)}
+          {intl.formatMessage({ id: 'confirmed.sub' }, { programTitle, grade: classDetails.grade, date: dateLabel, time: timeRange })
+            .split('\n')
+            .map((line, i) => <span key={i}>{line}{i === 0 && <br />}</span>)}
         </p>
       </div>
 
-      {/* QR / booking code card */}
+      {/* Booking code + QR card */}
       <div
-        className="rise-4 mx-5 p-[18px] rounded-3xl flex gap-4 items-center"
+        className="rise-4 mx-5 rounded-3xl overflow-hidden"
         style={{ background: 'var(--background)', color: 'var(--foreground)' }}
       >
-        <div className="flex-none grid place-items-center w-[84px] h-[84px] rounded-2xl" style={{ background: 'var(--muted)' }}>
-          <svg viewBox="0 0 24 24" width="44" height="44" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
-            <rect width="5" height="5" x="3" y="3" rx="1"/><rect width="5" height="5" x="16" y="3" rx="1"/>
-            <rect width="5" height="5" x="3" y="16" rx="1"/><path d="M21 16h-3a2 2 0 0 0-2 2v3"/>
-            <path d="M21 21v.01"/><path d="M12 7v3a2 2 0 0 1-2 2H7"/>
-            <path d="M3 12h.01"/><path d="M12 3h.01"/><path d="M12 16v.01"/>
-            <path d="M16 12h1"/><path d="M21 12v.01"/><path d="M12 21v-1"/>
-          </svg>
-        </div>
-        <div className="flex flex-col gap-0.5">
-          <span className="text-xs" style={{ color: 'var(--muted-foreground)' }}>{intl.formatMessage({ id: 'confirmed.code.label' })}</span>
-          <span className="text-[22px] font-extrabold tracking-widest" style={{ fontFamily: 'var(--font-display)', letterSpacing: '0.04em' }}>
-            {profile?.displayName ? `CC-${profile.displayName.slice(0, 2).toUpperCase()}${Math.floor(Math.random() * 9000 + 1000)}` : 'CC-1234'}
+        {/* Code row */}
+        <div className="flex items-center gap-4 px-[18px] py-[18px] border-b" style={{ borderColor: 'var(--border)' }}>
+          <div className="flex flex-col gap-0.5 flex-1">
+            <span className="text-xs font-medium" style={{ color: 'var(--muted-foreground)' }}>
+              {intl.formatMessage({ id: 'confirmed.code.label' })}
+            </span>
+            <span className="text-[22px] font-extrabold tracking-widest" style={{ fontFamily: 'var(--font-display)', letterSpacing: '0.04em' }}>
+              {bookingCode ?? '—'}
+            </span>
+            <span className="text-xs" style={{ color: 'var(--muted-foreground)' }}>
+              {intl.formatMessage({ id: 'confirmed.code.sub' })}
+            </span>
+          </div>
+          {/* Status badge */}
+          <span
+            className="self-start inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-bold"
+            style={{ background: 'var(--tint-green, #dcfce7)', color: 'var(--brand-green, #16a34a)' }}
+          >
+            ✓ {intl.formatMessage({ id: 'confirmed.status' })}
           </span>
-          <span className="text-xs" style={{ color: 'var(--muted-foreground)' }}>{intl.formatMessage({ id: 'confirmed.code.sub' })}</span>
         </div>
+
+        {/* QR code section */}
+        {bookingId && (
+          <div className="flex flex-col items-center gap-3 px-[18px] py-5">
+            <div
+              className="p-3 rounded-2xl"
+              style={{ background: '#ffffff' }}
+            >
+              <BookingQRCode bookingId={bookingId} size={160} />
+            </div>
+            <p className="m-0 text-xs text-center" style={{ color: 'var(--muted-foreground)' }}>
+              {intl.formatMessage({ id: 'confirmed.qr.hint' })}
+            </p>
+          </div>
+        )}
       </div>
 
       {/* Actions */}

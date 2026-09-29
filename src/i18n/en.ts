@@ -267,6 +267,14 @@ const en: Record<string, string> = {
   'maintenance.defaultMessage': "We're updating the app. We'll be back in a few minutes.",
   'maintenance.checkBack': 'Please check back shortly.',
   'maintenance.dismiss': 'Dismiss',
+
+  // ── Confirmed page ─────────────────────────────────────────────────────────
+  'confirmed.status': 'Confirmed',
+  'confirmed.qr.hint': 'Show this QR code at the venue for quick check-in.',
+
+  // ── Booking detail QR ──────────────────────────────────────────────────────
+  'bookingDetail.qr.label': 'Show QR code',
+  'bookingDetail.qr.hint': 'Show this code at the venue for quick check-in.',
 }
 
 export default en

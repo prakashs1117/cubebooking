@@ -23,6 +23,7 @@ interface AuthContextValue {
   profile: AppUser | null
   loading: boolean
   isAdmin: boolean
+  isStaff: boolean   // admin or coordinator — can scan and verify bookings
   signIn: (email: string, password: string) => Promise<void>
   signInWithGoogle: () => Promise<void>
   sendMagicLink: (email: string) => Promise<void>
@@ -158,6 +159,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       profile,
       loading,
       isAdmin: profile?.role === 'admin',
+      isStaff: profile?.role === 'admin' || profile?.role === 'coordinator',
       signIn,
       signInWithGoogle,
       sendMagicLink,

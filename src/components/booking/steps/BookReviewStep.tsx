@@ -1,14 +1,12 @@
 import { useState, useEffect } from 'react'
-import { useNavigate, Link } from 'react-router-dom'
 import { Timer, ShieldCheck } from 'lucide-react'
 import { useIntl } from 'react-intl'
 import { collection, addDoc, serverTimestamp } from 'firebase/firestore'
-import { useQueryClient } from '@tanstack/react-query'
-import { db } from '../../shared/firebase'
-import { useAuthContext } from '../../context/AuthContext'
-import { useBookingStore } from '../../stores/bookingStore'
-import { useNotificationStore } from '../../stores/notificationStore'
-import BookingLayout, { ContinueButton } from './BookingLayout'
+import { db } from '../../../shared/firebase'
+import { useAuthContext } from '../../../context/AuthContext'
+import { useBookingStore } from '../../../stores/bookingStore'
+import { useNotificationStore } from '../../../stores/notificationStore'
+import { ContinueButton } from '../BookingLayout'
 
 function useCountdown(expiresAt: Date | null) {
   const [remaining, setRemaining] = useState(() =>
@@ -37,12 +35,16 @@ function makeBookingCode() {
   return 'CC-' + Array.from({ length: 4 }, () => chars[Math.floor(Math.random() * chars.length)]).join('')
 }
 
-export default function ReviewPage() {
-  const navigate = useNavigate()
+interface Props {
+  onBack: () => void
+  onConfirmed: () => void
+  onExpired: () => void
+}
+
+export function BookReviewStep({ onBack, onConfirmed, onExpired }: Props) {
   const intl = useIntl()
   const { user, profile } = useAuthContext()
-  const { visitType, programSelection, slots, holdExpiresAt, classDetails, confirmSlots, reset } = useBookingStore()
-  const queryClient = useQueryClient()
+  const { visitType, programSelection, slots, holdExpiresAt, classDetails, reset } = useBookingStore()
   const pushNotification = useNotificationStore((s) => s.push)
   const { remaining, label: timerLabel } = useCountdown(holdExpiresAt)
   const [submitting, setSubmitting] = useState(false)
@@ -51,14 +53,11 @@ export default function ReviewPage() {
   useEffect(() => {
     if (holdExpiresAt && remaining === 0 && holdExpiresAt.getTime() < Date.now()) {
       reset()
-      navigate('/book', { replace: true })
+      onExpired()
     }
-  }, [remaining, holdExpiresAt, reset, navigate])
+  }, [remaining, holdExpiresAt, reset, onExpired])
 
-  if (!slots.length || !user) {
-    navigate('/book', { replace: true })
-    return null
-  }
+  if (!slots.length || !user) return null
 
   const firstSlot = slots[0]
   const lastSlot = slots[slots.length - 1]
@@ -69,16 +68,14 @@ export default function ReviewPage() {
     : programLabel(firstSlot.programId, intl)
   const programColors = programSelection === 'both'
     ? ['var(--brand-mint)', 'var(--brand-yellow)']
-    : firstSlot.programId === 'cube'
-    ? ['var(--brand-mint)']
-    : ['var(--brand-yellow)']
+    : firstSlot.programId === 'cube' ? ['var(--brand-mint)'] : ['var(--brand-yellow)']
 
   const rows = [
-    { k: intl.formatMessage({ id: 'review.row.date' }),     v: dateStr, href: '/book/time' },
-    { k: intl.formatMessage({ id: 'review.row.time' }),     v: timeRange, href: '/book/time' },
-    { k: intl.formatMessage({ id: 'review.row.grade' }),    v: String(classDetails.grade), href: '/book/details' },
-    { k: intl.formatMessage({ id: 'review.row.students' }), v: String(classDetails.studentCount), href: '/book/details' },
-    ...(classDetails.accessNeeds ? [{ k: intl.formatMessage({ id: 'review.row.access' }), v: classDetails.accessNeeds, href: '/book/details' }] : []),
+    { k: intl.formatMessage({ id: 'review.row.date' }),     v: dateStr,                          onEdit: onBack },
+    { k: intl.formatMessage({ id: 'review.row.time' }),     v: timeRange,                        onEdit: onBack },
+    { k: intl.formatMessage({ id: 'review.row.grade' }),    v: String(classDetails.grade),       onEdit: onBack },
+    { k: intl.formatMessage({ id: 'review.row.students' }), v: String(classDetails.studentCount), onEdit: onBack },
+    ...(classDetails.accessNeeds ? [{ k: intl.formatMessage({ id: 'review.row.access' }), v: classDetails.accessNeeds, onEdit: onBack }] : []),
   ]
 
   const handleConfirm = async () => {
@@ -94,7 +91,7 @@ export default function ReviewPage() {
         order: i + 1,
       }))
 
-      const docRef = await addDoc(collection(db, 'bookings'), {
+      await addDoc(collection(db, 'bookings'), {
         type: visitType ?? 'onsite',
         teacherId: user.uid,
         teacherName: profile?.displayName ?? '',
@@ -109,7 +106,6 @@ export default function ReviewPage() {
         createdAt: serverTimestamp(),
       })
 
-      // Build calendar URL
       const calFmt = (d: Date) => d.toISOString().replace(/[-:]/g, '').replace('.000', '')
       const calParams = new URLSearchParams({
         action: 'TEMPLATE',
@@ -128,11 +124,8 @@ export default function ReviewPage() {
         bookingId: bookingCode,
       })
 
-      confirmSlots()
-      queryClient.invalidateQueries({ queryKey: ['slot-availability'] })
-      queryClient.invalidateQueries({ queryKey: ['bookings'] })
       reset()
-      navigate('/book/confirmed', { state: { bookingId: docRef.id, bookingCode }, replace: true })
+      onConfirmed()
     } catch (err: unknown) {
       const message = (err as { message?: string })?.message ?? ''
       const code = (err as { code?: string })?.code ?? ''
@@ -150,18 +143,7 @@ export default function ReviewPage() {
   }
 
   return (
-    <BookingLayout
-      title={intl.formatMessage({ id: 'review.title' })}
-      step={4}
-      totalSteps={4}
-      onBack="/book/details"
-      footer={
-        <ContinueButton loading={submitting} onClick={handleConfirm}>
-          {intl.formatMessage({ id: 'review.confirm' })}
-        </ContinueButton>
-      }
-    >
-      {/* Timer */}
+    <>
       {holdExpiresAt && (
         <div className="flex items-center gap-2 text-sm font-semibold tabular-nums" style={{ color: remaining < 120 ? 'var(--destructive)' : 'var(--muted-foreground)' }}>
           <Timer className="i i-sm" />
@@ -173,16 +155,12 @@ export default function ReviewPage() {
         {intl.formatMessage({ id: 'review.heading' })}
       </h1>
 
-      {/* Booking summary card */}
       <div className="rise-2 rounded-3xl border overflow-hidden" style={{ background: 'var(--card)', borderColor: 'var(--border)' }}>
-        {/* Colour band */}
         <div className="flex h-2.5">
           {programColors.map((c, i) => (
             <span key={i} className="flex-1" style={{ background: c }} />
           ))}
         </div>
-
-        {/* Header */}
         <div className="px-[18px] py-[18px] flex flex-col gap-1 border-b border-dashed" style={{ borderColor: 'var(--border)' }}>
           <span className="text-xs font-semibold uppercase tracking-widest" style={{ color: 'var(--muted-foreground)' }}>
             {intl.formatMessage({ id: 'review.type' })}
@@ -192,22 +170,24 @@ export default function ReviewPage() {
           </span>
           <span className="text-[15px] font-medium">{dateStr}</span>
         </div>
-
-        {/* Rows */}
         <div className="px-[18px] flex flex-col">
           {rows.map((row) => (
             <div key={row.k} className="flex items-center gap-3 min-h-[48px] border-b last:border-b-0" style={{ borderColor: 'var(--border)' }}>
               <span className="w-[110px] text-[13px]" style={{ color: 'var(--muted-foreground)' }}>{row.k}</span>
               <span className="flex-1 text-sm font-semibold">{row.v}</span>
-              <Link to={row.href} className="text-[13px] font-medium min-h-[44px] inline-flex items-center" style={{ color: 'var(--primary)' }}>
+              <button
+                type="button"
+                onClick={row.onEdit}
+                className="text-[13px] font-medium min-h-[44px] inline-flex items-center tap"
+                style={{ color: 'var(--primary)', background: 'none', border: 'none', cursor: 'pointer' }}
+              >
                 {intl.formatMessage({ id: 'review.row.edit' })}
-              </Link>
+              </button>
             </div>
           ))}
         </div>
       </div>
 
-      {/* Privacy note */}
       <div className="rise-3 flex gap-2.5 items-start p-3.5 rounded-2xl" style={{ background: 'var(--muted)' }}>
         <ShieldCheck className="i i-sm flex-none mt-0.5" style={{ color: 'var(--muted-foreground)' }} />
         <p className="m-0 text-xs leading-relaxed" style={{ color: 'var(--muted-foreground)' }}>
@@ -220,6 +200,10 @@ export default function ReviewPage() {
           {error}
         </div>
       )}
-    </BookingLayout>
+
+      <ContinueButton loading={submitting} onClick={handleConfirm}>
+        {intl.formatMessage({ id: 'review.confirm' })}
+      </ContinueButton>
+    </>
   )
 }

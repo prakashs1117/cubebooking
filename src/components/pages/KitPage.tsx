@@ -82,7 +82,7 @@ export default function KitPage() {
       style={{ background: 'var(--app-ground)', fontFamily: 'var(--font-sans)', color: 'var(--foreground)' }}
     >
       {/* Header */}
-      <header className="px-5 pt-12 lg:pt-6 pb-3 flex flex-col gap-4">
+      <header className="px-5 pt-4 lg:pt-6 pb-3 flex flex-col gap-4">
         <h1 className="m-0 text-3xl font-extrabold tracking-tight" style={{ fontFamily: 'var(--font-display)' }}>
           {intl.formatMessage({ id: 'kit.title' })}
         </h1>

@@ -70,6 +70,7 @@ export type BookingStatus =
   | 'approved'      // TOAD approved by Merck
   | 'declined'      // TOAD declined
   | 'confirmed'     // onsite confirmed instantly
+  | 'arrived'       // admin scanned QR and checked class in
   | 'cancelled'
 
 export interface BookingSegment {
@@ -94,6 +95,7 @@ export interface Booking {
   status: BookingStatus
   declineReason?: string
   holdExpiresAt?: Timestamp   // set during checkout
+  arrivedAt?: Timestamp       // set when admin marks class as checked in
   createdAt: Timestamp
   updatedAt?: Timestamp
 }

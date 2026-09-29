@@ -37,7 +37,7 @@ export async function createUserDoc(firebaseUser: User): Promise<void> {
     email: firebaseUser.email ?? '',
     displayName: firebaseUser.displayName ?? '',
     photoURL: firebaseUser.photoURL ?? '',
-    role: null,
+    role: 'teacher',
     language: 'en',
     createdAt: serverTimestamp(),
     updatedAt: serverTimestamp(),

@@ -267,6 +267,14 @@ const de: Record<string, string> = {
   'maintenance.defaultMessage': 'Wir aktualisieren die App. In wenigen Minuten sind wir wieder da.',
   'maintenance.checkBack': 'Bitte schau bald wieder vorbei.',
   'maintenance.dismiss': 'Schließen',
+
+  // ── Bestätigungsseite ──────────────────────────────────────────────────────
+  'confirmed.status': 'Bestätigt',
+  'confirmed.qr.hint': 'Zeigen Sie diesen QR-Code am Eingang für den schnellen Check-in.',
+
+  // ── Buchungsdetail QR ──────────────────────────────────────────────────────
+  'bookingDetail.qr.label': 'QR-Code anzeigen',
+  'bookingDetail.qr.hint': 'Zeigen Sie diesen Code am Eingang für den schnellen Check-in.',
 }
 
 export default de

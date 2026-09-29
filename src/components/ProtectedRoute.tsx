@@ -15,11 +15,13 @@ function Spinner() {
 export default function ProtectedRoute({
   children,
   requireAdmin = false,
+  requireStaff = false,
 }: {
   children: React.ReactNode
   requireAdmin?: boolean
+  requireStaff?: boolean
 }) {
-  const { user, loading, isAdmin } = useAuthContext()
+  const { user, loading, isAdmin, isStaff } = useAuthContext()
   const location = useLocation()
 
   if (loading) return <Spinner />
@@ -29,6 +31,10 @@ export default function ProtectedRoute({
   }
 
   if (requireAdmin && !isAdmin) {
+    return <Navigate to="/home" replace />
+  }
+
+  if (requireStaff && !isStaff) {
     return <Navigate to="/home" replace />
   }
 

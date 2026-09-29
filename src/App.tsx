@@ -10,16 +10,12 @@ import AppShell from './components/layout/AppShell'
 import SignInPage from './components/auth/SignInPage'
 import ForgotPasswordPage from './components/auth/ForgotPasswordPage'
 import HomePage from './components/pages/HomePage'
-import BookPage from './components/booking/BookPage'
-import BookProgramsPage from './components/booking/BookProgramsPage'
-import BookTimePage from './components/booking/BookTimePage'
-import BookDetailsPage from './components/booking/BookDetailsPage'
-import ReviewPage from './components/booking/ReviewPage'
-import ConfirmedPage from './components/booking/ConfirmedPage'
 import BookingsPage from './components/pages/BookingsPage'
 import BookingDetailPage from './components/pages/BookingDetailPage'
 import KitPage from './components/pages/KitPage'
 import ProfilePage from './components/pages/ProfilePage'
+import QRScanPage from './components/admin/QRScanPage'
+import BookingVerifyPage from './components/admin/BookingVerifyPage'
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -76,13 +72,12 @@ function AppRoutes() {
       <Route path="/kit" element={<ShellRoute element={<KitPage />} />} />
       <Route path="/profile" element={<ShellRoute element={<ProfilePage />} />} />
 
-      {/* Booking funnel — no shell (full-screen flow) */}
-      <Route path="/book" element={<ProtectedRoute><BookPage /></ProtectedRoute>} />
-      <Route path="/book/programs" element={<ProtectedRoute><BookProgramsPage /></ProtectedRoute>} />
-      <Route path="/book/time" element={<ProtectedRoute><BookTimePage /></ProtectedRoute>} />
-      <Route path="/book/details" element={<ProtectedRoute><BookDetailsPage /></ProtectedRoute>} />
-      <Route path="/book/review" element={<ProtectedRoute><ReviewPage /></ProtectedRoute>} />
-      <Route path="/book/confirmed" element={<ProtectedRoute><ConfirmedPage /></ProtectedRoute>} />
+      {/* Booking funnel — now handled via modal; redirect old URLs to home */}
+      <Route path="/book/*" element={<Navigate to="/home" replace />} />
+
+      {/* Admin — no shell, role-guarded */}
+      <Route path="/admin/scan" element={<ProtectedRoute requireStaff><QRScanPage /></ProtectedRoute>} />
+      <Route path="/admin/verify/:bookingId" element={<ProtectedRoute requireStaff><BookingVerifyPage /></ProtectedRoute>} />
 
       {/* Future routes */}
       {/* <Route path="/toad" element={<ProtectedRoute><ToadRequestPage /></ProtectedRoute>} /> */}

@@ -1,9 +1,7 @@
-import { useNavigate } from 'react-router-dom'
 import { useEffect } from 'react'
 import { useIntl } from 'react-intl'
-import BookingLayout from './BookingLayout'
-import { useBookingStore, type ProgramSelection, type ProgramOrder } from '../../stores/bookingStore'
-import { trackProgramSelected, trackImpressionView } from '../../services/analyticsService'
+import { useBookingStore, type ProgramSelection, type ProgramOrder } from '../../../stores/bookingStore'
+import { trackProgramSelected, trackImpressionView } from '../../../services/analyticsService'
 
 function useBookProgramOptions() {
   const intl = useIntl()
@@ -13,57 +11,46 @@ function useBookProgramOptions() {
     { id: 'both', title: intl.formatMessage({ id: 'bookPrograms.both.title' }), sub: intl.formatMessage({ id: 'bookPrograms.both.sub' }), swatch: 'linear-gradient(135deg, var(--brand-mint) 50%, var(--brand-yellow) 50%)' },
   ]
   const orderOptions: { id: ProgramOrder; label: string; sub: string }[] = [
-    {
-      id: 'cube-first',
-      label: intl.formatMessage({ id: 'bookPrograms.order.cubeFirst.label' }),
-      sub: intl.formatMessage({ id: 'bookPrograms.order.sub' }),
-    },
-    {
-      id: 'lab-first',
-      label: intl.formatMessage({ id: 'bookPrograms.order.labFirst.label' }),
-      sub: intl.formatMessage({ id: 'bookPrograms.order.sub' }),
-    },
+    { id: 'cube-first', label: intl.formatMessage({ id: 'bookPrograms.order.cubeFirst.label' }), sub: intl.formatMessage({ id: 'bookPrograms.order.sub' }) },
+    { id: 'lab-first',  label: intl.formatMessage({ id: 'bookPrograms.order.labFirst.label' }),  sub: intl.formatMessage({ id: 'bookPrograms.order.sub' }) },
   ]
   return { options, orderOptions }
 }
 
-export default function BookProgramsPage() {
-  const navigate = useNavigate()
+interface Props {
+  onContinue: () => void
+}
+
+export function BookProgramsStep({ onContinue }: Props) {
   const intl = useIntl()
   const { options, orderOptions } = useBookProgramOptions()
   const { programSelection, programOrder, setProgramSelection, setProgramOrder } = useBookingStore()
 
   useEffect(() => {
-    options.forEach(option => {
+    options.forEach((option) => {
       trackImpressionView(option.id, 'program', option.title)
     })
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
   const handleSelectProgram = (programId: ProgramSelection) => {
-    const program = options.find(o => o.id === programId)
+    const program = options.find((o) => o.id === programId)
     if (program) trackProgramSelected(program.id, program.title)
     setProgramSelection(programId)
-    if (programId !== 'both') navigate('/book/time')
+    if (programId !== 'both') onContinue()
   }
 
   const handleSelectOrder = (order: ProgramOrder) => {
     setProgramOrder(order)
-    navigate('/book/time')
+    onContinue()
   }
 
   return (
-    <BookingLayout
-      title={intl.formatMessage({ id: 'bookPrograms.title' })}
-      step={2}
-      totalSteps={4}
-      onBack="/book"
-    >
+    <>
       <h1 className="m-0 rise text-[28px] font-extrabold leading-[34px] tracking-tight" style={{ fontFamily: 'var(--font-display)' }}>
         {intl.formatMessage({ id: 'bookPrograms.heading' })}
       </h1>
 
-      {/* Program radio group */}
       <div className="rise-2 flex flex-col gap-2.5" role="radiogroup" aria-label="Programs">
         {options.map((opt) => {
           const isSelected = programSelection === opt.id
@@ -89,7 +76,6 @@ export default function BookProgramsPage() {
         })}
       </div>
 
-      {/* Order picker — only shown when "both" selected */}
       {programSelection === 'both' && (
         <section className="rise flex flex-col gap-3">
           <div className="flex flex-col gap-1">
@@ -123,6 +109,6 @@ export default function BookProgramsPage() {
           </div>
         </section>
       )}
-    </BookingLayout>
+    </>
   )
 }

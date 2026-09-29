@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
-import { ChevronLeft, Share2, CalendarPlus, MapPin, Clock, Users, GraduationCap } from 'lucide-react'
+import { ChevronLeft, Share2, CalendarPlus, MapPin, Clock, Users, GraduationCap, QrCode, ChevronDown } from 'lucide-react'
 import { useIntl } from 'react-intl'
 import { doc, updateDoc } from 'firebase/firestore'
 import { db } from '../../shared/firebase'
@@ -8,6 +8,7 @@ import { useBooking } from '../../hooks/queries/useBookings'
 import { slotToDate, slotEndDate } from '../../config/slots'
 import { trackBookingCancelled } from '../../services/analyticsService'
 import { CancelBookingDialog } from '../booking/CancelBookingDialog'
+import { BookingQRCode } from '../ui/BookingQRCode'
 
 function makeCalendarUrl(title: string, start: Date, end: Date, details = '') {
   const fmt = (d: Date) => d.toISOString().replace(/[-:]/g, '').replace('.000', '')
@@ -28,6 +29,7 @@ export default function BookingDetailPage() {
   const { data: booking, isLoading, error } = useBooking(id)
   const [cancelling, setCancelling] = useState(false)
   const [cancelDialogOpen, setCancelDialogOpen] = useState(false)
+  const [qrOpen, setQrOpen] = useState(false)
 
   // Derive times from segment date+startHour
   const firstSeg = booking?.segments?.[0]
@@ -113,7 +115,7 @@ export default function BookingDetailPage() {
       style={{ background: 'var(--app-ground)', fontFamily: 'var(--font-sans)', color: 'var(--foreground)' }}
     >
       {/* Mint hero header */}
-      <div className="relative overflow-hidden px-3 pt-11 pb-5" style={{ background: headerBg }}>
+      <div className="relative overflow-hidden px-3 pt-3 pb-5" style={{ background: headerBg }}>
         <div style={{ position: 'absolute', right: -40, bottom: -80, width: 220, height: 220, borderRadius: '9999px', background: 'var(--brand-yellow)', opacity: 0.7 }} />
         <div style={{ position: 'absolute', right: 120, top: -30, width: 90, height: 90, borderRadius: '9999px', border: '14px solid rgba(255,255,255,0.55)', boxSizing: 'border-box' }} />
 
@@ -158,6 +160,39 @@ export default function BookingDetailPage() {
             </div>
           ))}
         </div>
+
+        {/* QR code — expandable */}
+        {id && booking.status !== 'cancelled' && (
+          <div className="rounded-2xl border overflow-hidden" style={{ background: 'var(--card)', borderColor: 'var(--border)' }}>
+            <button
+              type="button"
+              onClick={() => setQrOpen((o) => !o)}
+              className="tap w-full flex items-center gap-3 px-4 min-h-[52px]"
+            >
+              <QrCode className="w-4 h-4 flex-none" style={{ color: 'var(--muted-foreground)' }} />
+              <span className="flex-1 text-sm font-semibold text-left">
+                {intl.formatMessage({ id: 'bookingDetail.qr.label' })}
+              </span>
+              <ChevronDown
+                className="w-4 h-4 flex-none transition-transform"
+                style={{
+                  color: 'var(--muted-foreground)',
+                  transform: qrOpen ? 'rotate(180deg)' : 'rotate(0deg)',
+                }}
+              />
+            </button>
+            {qrOpen && (
+              <div className="flex flex-col items-center gap-3 px-4 pb-5 pt-1 border-t" style={{ borderColor: 'var(--border)' }}>
+                <div className="p-3 rounded-2xl" style={{ background: '#ffffff' }}>
+                  <BookingQRCode bookingId={id} size={180} />
+                </div>
+                <p className="m-0 text-xs text-center" style={{ color: 'var(--muted-foreground)' }}>
+                  {intl.formatMessage({ id: 'bookingDetail.qr.hint' })}
+                </p>
+              </div>
+            )}
+          </div>
+        )}
 
         {/* Actions */}
         <div className="flex flex-col gap-2.5">

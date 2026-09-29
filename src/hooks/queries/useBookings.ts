@@ -5,6 +5,7 @@ import { db } from '../../shared/firebase'
 import type { Booking, ProgramId } from '../../shared/types'
 import { useAuthContext } from '../../context/AuthContext'
 import { dateToSlotKey, slotToDate } from '../../config/slots'
+import { useBookingStore } from '../../stores/bookingStore'
 
 export type BookingDoc = Booking & { id: string }
 
@@ -59,6 +60,7 @@ export function useSlotAvailability(
   date: string | null,
 ): SlotAvailabilityMap {
   const { user } = useAuthContext()
+  const bookedSlotKeys = useBookingStore((s) => s.bookedSlotKeys)
 
   const { data } = useQuery({
     queryKey: ['slot-availability', programIds.join(','), date],
@@ -85,5 +87,13 @@ export function useSlotAvailability(
     staleTime: 30_000,
   })
 
-  return data ?? {}
+  // Merge optimistic local knowledge: slots confirmed this session are 'yours'
+  // immediately, without waiting for the Firestore refetch to land.
+  const base = data ?? {}
+  if (bookedSlotKeys.size === 0) return base
+  const merged: SlotAvailabilityMap = { ...base }
+  for (const key of bookedSlotKeys) {
+    if (merged[key] !== 'yours') merged[key] = 'yours'
+  }
+  return merged
 }

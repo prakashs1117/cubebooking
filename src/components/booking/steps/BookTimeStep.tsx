@@ -1,15 +1,11 @@
 import { useState, useMemo, useRef, useEffect } from 'react'
-import { useNavigate } from 'react-router-dom'
 import { ChevronLeft, ChevronRight } from 'lucide-react'
 import { addDays, startOfWeek, format, isSameDay, addWeeks } from 'date-fns'
 import { useIntl } from 'react-intl'
-import BookingLayout from './BookingLayout'
-import { useBookingStore } from '../../stores/bookingStore'
-import { useSlotAvailability } from '../../hooks/queries/useBookings'
-import { SLOT_HOURS, COMBO_PAIRS, slotToDate, slotEndDate, dateToSlotKey } from '../../config/slots'
-import type { ProgramId } from '../../shared/types'
-
-// ─── Typed slot shapes ────────────────────────────────────────────────────────
+import { useBookingStore } from '../../../stores/bookingStore'
+import { useSlotAvailability } from '../../../hooks/queries/useBookings'
+import { SLOT_HOURS, COMBO_PAIRS, slotToDate, slotEndDate, dateToSlotKey } from '../../../config/slots'
+import type { ProgramId } from '../../../shared/types'
 
 interface SingleSlotItem {
   kind: 'single'
@@ -38,8 +34,6 @@ interface ComboSlotItem {
   endLabel: string
 }
 
-// ─── Helpers ──────────────────────────────────────────────────────────────────
-
 function getProgramIds(selection: string | null, order: string): ProgramId[] {
   if (selection === 'cube') return ['cube']
   if (selection === 'lab') return ['lab']
@@ -61,10 +55,11 @@ function formatDateKey(date: Date): string {
   return `${y}-${m}-${d}`
 }
 
-// ─── Component ────────────────────────────────────────────────────────────────
+interface Props {
+  onContinue: () => void
+}
 
-export default function BookTimePage() {
-  const navigate = useNavigate()
+export function BookTimeStep({ onContinue }: Props) {
   const intl = useIntl()
   const { programSelection, programOrder, selectedDate, setSelectedDate, setSlots, startHold } = useBookingStore()
 
@@ -99,7 +94,6 @@ export default function BookTimePage() {
 
   const availabilityMap = useSlotAvailability(programIds, dateKey)
 
-  // Auto-advance to first bookable day of this week if no date selected
   useEffect(() => {
     if (!selectedDate) {
       const firstBookable = weekDays.find((d) => d >= tomorrow)
@@ -167,7 +161,7 @@ export default function BookTimePage() {
       end: slotEndDate(dateKey, h),
     }])
     startHold()
-    navigate('/book/details')
+    onContinue()
   }
 
   const handleSelectCombo = (h1: number, h2: number, firstProg: ProgramId, secondProg: ProgramId) => {
@@ -177,20 +171,14 @@ export default function BookTimePage() {
       { programId: secondProg, date: dateKey, startHour: h2, start: slotToDate(dateKey, h2), end: slotEndDate(dateKey, h2) },
     ])
     startHold()
-    navigate('/book/details')
+    onContinue()
   }
 
   const monthLabel = intl.formatDate(weekDays[0], { month: 'long', year: 'numeric' })
+  const stepTitle = getStepTitle(programSelection, programOrder, intl)
 
   return (
-    <BookingLayout
-      title={getStepTitle(programSelection, programOrder, intl)}
-      step={3}
-      totalSteps={4}
-      onBack="/book/programs"
-      footer={null}
-    >
-      {/* Month + week nav */}
+    <>
       <div className="flex items-center justify-between">
         <h1 className="m-0 text-[28px] font-extrabold tracking-tight" style={{ fontFamily: 'var(--font-display)' }}>
           {monthLabel}
@@ -218,7 +206,10 @@ export default function BookTimePage() {
         </div>
       </div>
 
-      {/* 5-day week grid */}
+      {stepTitle && (
+        <p className="text-sm" style={{ color: 'var(--muted-foreground)' }}>{stepTitle}</p>
+      )}
+
       <div className="grid gap-2" style={{ gridTemplateColumns: 'repeat(5, minmax(0, 1fr))' }}>
         {weekDays.map((day, i) => {
           const dayMidnight = new Date(day.getFullYear(), day.getMonth(), day.getDate())
@@ -255,7 +246,6 @@ export default function BookTimePage() {
         })}
       </div>
 
-      {/* Time slots for selected day */}
       {selectedDate && dateKey && (
         <div className="rise flex flex-col gap-5">
           <h2 className="text-sm font-semibold" style={{ color: 'var(--muted-foreground)' }}>
@@ -269,8 +259,7 @@ export default function BookTimePage() {
                 )
                 return (
                   <div key={period} className="flex flex-col gap-2">
-                    <span className="text-xs font-bold uppercase tracking-widest flex items-center gap-1.5"
-                      style={{ color: 'var(--muted-foreground)' }}>
+                    <span className="text-xs font-bold uppercase tracking-widest flex items-center gap-1.5" style={{ color: 'var(--muted-foreground)' }}>
                       {period === 'morning' ? '☀️ Morning' : '🌤 Afternoon'}
                     </span>
                     <div className="flex gap-2.5 overflow-x-auto pb-1" style={{ scrollbarWidth: 'none' }}>
@@ -284,32 +273,20 @@ export default function BookTimePage() {
                             onClick={() => handleSelectSingle(s.startHour, s.programId)}
                             className="tap flex-none flex flex-col items-center justify-center gap-1 rounded-2xl border text-sm"
                             style={{
-                              width: 88,
-                              minHeight: 80,
-                              background: 'var(--card)',
-                              borderColor: 'var(--border)',
+                              width: 88, minHeight: 80,
+                              background: 'var(--card)', borderColor: 'var(--border)',
                               opacity: s.disabled ? 0.45 : 1,
                               cursor: s.disabled ? 'default' : 'pointer',
                             }}
                           >
-                            <span className="font-bold text-[15px]" style={{ color: s.disabled ? 'var(--muted-foreground)' : 'var(--foreground)' }}>
-                              {s.label}
-                            </span>
-                            <span className="text-[11px]" style={{ color: 'var(--muted-foreground)' }}>
-                              {s.endLabel}
-                            </span>
+                            <span className="font-bold text-[15px]" style={{ color: s.disabled ? 'var(--muted-foreground)' : 'var(--foreground)' }}>{s.label}</span>
+                            <span className="text-[11px]" style={{ color: 'var(--muted-foreground)' }}>{s.endLabel}</span>
                             {s.reason ? (
-                              <span className="px-1.5 py-0.5 rounded-full text-[10px] font-semibold"
-                                style={{ background: 'var(--muted)', color: 'var(--muted-foreground)' }}>
-                                {s.reason === 'yours'
-                                  ? intl.formatMessage({ id: 'bookTime.slot.yours' })
-                                  : intl.formatMessage({ id: 'bookTime.slot.booked' })}
+                              <span className="px-1.5 py-0.5 rounded-full text-[10px] font-semibold" style={{ background: 'var(--muted)', color: 'var(--muted-foreground)' }}>
+                                {s.reason === 'yours' ? intl.formatMessage({ id: 'bookTime.slot.yours' }) : intl.formatMessage({ id: 'bookTime.slot.booked' })}
                               </span>
                             ) : (
-                              <span className="px-1.5 py-0.5 rounded-full text-[10px] font-semibold"
-                                style={{ background: 'var(--muted)', color: 'var(--muted-foreground)' }}>
-                                1h
-                              </span>
+                              <span className="px-1.5 py-0.5 rounded-full text-[10px] font-semibold" style={{ background: 'var(--muted)', color: 'var(--muted-foreground)' }}>1h</span>
                             )}
                           </button>
                         )
@@ -324,8 +301,7 @@ export default function BookTimePage() {
                 )
                 return (
                   <div key={period} className="flex flex-col gap-2">
-                    <span className="text-xs font-bold uppercase tracking-widest flex items-center gap-1.5"
-                      style={{ color: 'var(--muted-foreground)' }}>
+                    <span className="text-xs font-bold uppercase tracking-widest flex items-center gap-1.5" style={{ color: 'var(--muted-foreground)' }}>
                       {period === 'morning' ? '☀️ Morning' : '🌤 Afternoon'}
                     </span>
                     <div className="flex gap-2.5 overflow-x-auto pb-1" style={{ scrollbarWidth: 'none' }}>
@@ -339,32 +315,20 @@ export default function BookTimePage() {
                             onClick={() => handleSelectCombo(s.startHour, s.secondHour, s.firstProg, s.secondProg)}
                             className="tap flex-none flex flex-col items-center justify-center gap-1 rounded-2xl border text-sm"
                             style={{
-                              width: 104,
-                              minHeight: 80,
-                              background: 'var(--card)',
-                              borderColor: 'var(--border)',
+                              width: 104, minHeight: 80,
+                              background: 'var(--card)', borderColor: 'var(--border)',
                               opacity: s.disabled ? 0.45 : 1,
                               cursor: s.disabled ? 'default' : 'pointer',
                             }}
                           >
-                            <span className="font-bold text-[15px]" style={{ color: s.disabled ? 'var(--muted-foreground)' : 'var(--foreground)' }}>
-                              {s.label}
-                            </span>
-                            <span className="text-[11px]" style={{ color: 'var(--muted-foreground)' }}>
-                              {s.endLabel}
-                            </span>
+                            <span className="font-bold text-[15px]" style={{ color: s.disabled ? 'var(--muted-foreground)' : 'var(--foreground)' }}>{s.label}</span>
+                            <span className="text-[11px]" style={{ color: 'var(--muted-foreground)' }}>{s.endLabel}</span>
                             {s.reason ? (
-                              <span className="px-1.5 py-0.5 rounded-full text-[10px] font-semibold"
-                                style={{ background: 'var(--muted)', color: 'var(--muted-foreground)' }}>
-                                {s.reason === 'yours'
-                                  ? intl.formatMessage({ id: 'bookTime.slot.yours' })
-                                  : intl.formatMessage({ id: 'bookTime.slot.booked' })}
+                              <span className="px-1.5 py-0.5 rounded-full text-[10px] font-semibold" style={{ background: 'var(--muted)', color: 'var(--muted-foreground)' }}>
+                                {s.reason === 'yours' ? intl.formatMessage({ id: 'bookTime.slot.yours' }) : intl.formatMessage({ id: 'bookTime.slot.booked' })}
                               </span>
                             ) : (
-                              <span className="px-1.5 py-0.5 rounded-full text-[10px] font-semibold"
-                                style={{ background: 'var(--muted)', color: 'var(--muted-foreground)' }}>
-                                2h
-                              </span>
+                              <span className="px-1.5 py-0.5 rounded-full text-[10px] font-semibold" style={{ background: 'var(--muted)', color: 'var(--muted-foreground)' }}>2h</span>
                             )}
                           </button>
                         )
@@ -376,6 +340,6 @@ export default function BookTimePage() {
           }
         </div>
       )}
-    </BookingLayout>
+    </>
   )
 }
