@@ -123,3 +123,28 @@ export function useSlotAvailability(
   }
   return merged
 }
+
+/**
+ * Staff-only: query all bookings, optionally filtered to a single date.
+ * Callers MUST be in a staff-gated component (isStaff === true).
+ */
+export function useAllBookings(date?: string) {
+  return useQuery({
+    queryKey: ['bookings', 'all', date ?? 'all'],
+    queryFn: async () => {
+      // Firestore doesn't support querying nested array fields (segments[].date).
+      // Fetch all active bookings and filter client-side by date if provided.
+      const q = query(
+        collection(db, 'bookings'),
+        where('status', 'in', ['confirmed', 'approved', 'pending', 'arrived']),
+        orderBy('createdAt', 'desc'),
+      )
+      const snap = await getDocs(q)
+      const all = snap.docs.map((d) => ({ id: d.id, ...d.data() }) as BookingDoc)
+      if (!date) return all
+      // Client-side filter: booking has at least one segment on the requested date
+      return all.filter((b) => b.segments?.some((s) => s.date === date))
+    },
+    staleTime: 30_000,
+  })
+}
