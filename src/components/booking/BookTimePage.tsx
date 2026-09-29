@@ -1,15 +1,43 @@
 import { useState, useMemo, useRef, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { ChevronLeft, ChevronRight, AlertCircle } from 'lucide-react'
+import { ChevronLeft, ChevronRight } from 'lucide-react'
 import { addDays, startOfWeek, format, isSameDay, addWeeks } from 'date-fns'
 import { useIntl } from 'react-intl'
 import BookingLayout, { ContinueButton } from './BookingLayout'
 import { useBookingStore } from '../../stores/bookingStore'
-import { useSessionsForWeek } from '../../hooks/queries/useSessions'
-import { useTeacherBookingWindows } from '../../hooks/queries/useBookings'
-import { slotsOverlapTeacherBookings } from '../../services/bookingConflictService'
-import type { ProgramId, Session } from '../../shared/types'
-import type { Timestamp } from 'firebase/firestore'
+import { useSlotAvailability } from '../../hooks/queries/useBookings'
+import { SLOT_HOURS, COMBO_PAIRS, slotToDate, slotEndDate, dateToSlotKey } from '../../config/slots'
+import type { ProgramId } from '../../shared/types'
+
+// ─── Typed slot shapes ────────────────────────────────────────────────────────
+
+interface SingleSlotItem {
+  kind: 'single'
+  startHour: number
+  programId: ProgramId
+  start: Date
+  end: Date
+  disabled: boolean
+  reason: 'taken' | 'yours' | null
+  label: string
+  endLabel: string
+}
+
+interface ComboSlotItem {
+  kind: 'combo'
+  startHour: number
+  endHour: number
+  firstProg: ProgramId
+  secondProg: ProgramId
+  start: Date
+  end: Date
+  disabled: boolean
+  reason: 'taken' | 'yours' | null
+  label: string
+  endLabel: string
+}
+
+// ─── Helpers ──────────────────────────────────────────────────────────────────
 
 function getProgramIds(selection: string | null, order: string): ProgramId[] {
   if (selection === 'cube') return ['cube']
@@ -25,11 +53,14 @@ function getStepTitle(selection: string | null, order: string, intl: ReturnType<
   return intl.formatMessage({ id: 'bookTime.title' })
 }
 
-type SessionDoc = Session & { id: string }
-
-function toDate(val: unknown): Date {
-  return (val as Timestamp).toDate()
+function formatDateKey(date: Date): string {
+  const y = date.getFullYear()
+  const m = String(date.getMonth() + 1).padStart(2, '0')
+  const d = String(date.getDate()).padStart(2, '0')
+  return `${y}-${m}-${d}`
 }
+
+// ─── Component ────────────────────────────────────────────────────────────────
 
 export default function BookTimePage() {
   const navigate = useNavigate()
@@ -46,13 +77,11 @@ export default function BookTimePage() {
     intl.formatMessage({ id: 'bookTime.dow.fri' }),
   ]
 
-  // Stable reference: today midnight and tomorrow midnight
   const todayRef = useRef<Date>((() => { const d = new Date(); d.setHours(0,0,0,0); return d })())
   const tomorrowRef = useRef<Date>((() => { const d = new Date(); d.setHours(0,0,0,0); d.setDate(d.getDate()+1); return d })())
   const today    = todayRef.current
   const tomorrow = tomorrowRef.current
 
-  // Start on the week that contains tomorrow
   const baseWeek = useMemo(() => {
     const base = startOfWeek(addWeeks(today, weekOffset), { weekStartsOn: 1 })
     base.setHours(0, 0, 0, 0)
@@ -64,118 +93,87 @@ export default function BookTimePage() {
     [baseWeek],
   )
 
-  // Give a full 7-day window to account for timezone offsets
-  const weekEnd = addDays(baseWeek, 7)
   const programIds = getProgramIds(programSelection, programOrder)
+  const dateKey = selectedDate ? formatDateKey(selectedDate) : null
 
-  const { data: sessions = [], isLoading, isError } = useSessionsForWeek(
-    programIds,
-    baseWeek,
-    weekEnd,
-    programIds.length > 0,
-  )
+  const availabilityMap = useSlotAvailability(programIds, dateKey)
 
-  const teacherWindows = useTeacherBookingWindows()
-
-  // Group sessions by the LOCAL date string of their start time
-  const sessionsByDay = useMemo(() => {
-    const map: Record<string, SessionDoc[]> = {}
-    for (const s of sessions) {
-      const start = toDate(s.start)
-      // Use local date string so IST/CET/etc. days match what the calendar shows
-      const key = new Date(start.getFullYear(), start.getMonth(), start.getDate()).toDateString()
-      if (!map[key]) map[key] = []
-      map[key].push(s as unknown as SessionDoc)
+  // Auto-advance to first bookable day of this week if no date selected
+  useEffect(() => {
+    if (!selectedDate) {
+      const firstBookable = weekDays.find((d) => d >= tomorrow)
+      if (firstBookable) setSelectedDate(new Date(firstBookable))
     }
-    return map
-  }, [sessions])
+  }, [selectedDate, weekDays, tomorrow, setSelectedDate])
 
-  const availableTimes = useMemo(() => {
-    if (!selectedDate) return []
-    const key = new Date(selectedDate.getFullYear(), selectedDate.getMonth(), selectedDate.getDate()).toDateString()
-    const daySessions = sessionsByDay[key] ?? []
+  const singleTimes = useMemo((): SingleSlotItem[] => {
+    if (!dateKey || programSelection === 'both') return []
+    const pid = programIds[0]
+    return SLOT_HOURS.map((h) => {
+      const key = dateToSlotKey(dateKey, h)
+      const status = availabilityMap[key]
+      return {
+        kind: 'single' as const,
+        startHour: h,
+        programId: pid,
+        start: slotToDate(dateKey, h),
+        end: slotEndDate(dateKey, h),
+        disabled: !!status,
+        reason: status ?? null,
+        label: intl.formatTime(slotToDate(dateKey, h), { hour: '2-digit', minute: '2-digit' }),
+        endLabel: intl.formatTime(slotEndDate(dateKey, h), { hour: '2-digit', minute: '2-digit' }),
+      }
+    })
+  }, [dateKey, programSelection, programIds, availabilityMap, intl])
 
-    if (programSelection !== 'both') {
-      const seen = new Set<string>()
-      return daySessions
-        .filter((s) => {
-          const timeKey = toDate(s.start).getTime().toString()
-          if (seen.has(timeKey)) return false
-          seen.add(timeKey)
-          return true
-        })
-        .sort((a, b) => toDate(a.start).getTime() - toDate(b.start).getTime())
-        .map((s) => {
-          const slotWindow = { start: toDate(s.start), end: toDate(s.end) }
-          const isFull = s.capacity - s.seatsTaken - s.seatsHeld <= 0
-          const isYours = slotsOverlapTeacherBookings([slotWindow], teacherWindows)
-          return {
-            label: intl.formatTime(toDate(s.start), { hour: '2-digit', minute: '2-digit' }),
-            endLabel: intl.formatTime(toDate(s.end), { hour: '2-digit', minute: '2-digit' }),
-            slots: [s],
-            disabled: isFull || isYours,
-            reason: isYours ? 'yours' as const : isFull ? 'booked' as const : null,
-          }
-        })
-    }
-
-    // "Both" — find non-overlapping pairs where second starts exactly when first ends
+  const comboTimes = useMemo((): ComboSlotItem[] => {
+    if (!dateKey || programSelection !== 'both') return []
     const firstProg = programIds[0]
     const secondProg = programIds[1]
-    const firsts = daySessions
-      .filter((s) => s.programId === firstProg)
-      .sort((a, b) => toDate(a.start).getTime() - toDate(b.start).getTime())
-
-    const usedSessionIds = new Set<string>()
-    return firsts.flatMap((first) => {
-      if (usedSessionIds.has(first.id)) return []
-      const firstEnd = toDate(first.end).getTime()
-      const match = daySessions.find(
-        (s) =>
-          s.programId === secondProg &&
-          toDate(s.start).getTime() === firstEnd &&
-          !usedSessionIds.has(s.id),
-      )
-      if (!match) return []
-      usedSessionIds.add(first.id)
-      usedSessionIds.add(match.id)
-      const windows = [
-        { start: toDate(first.start), end: toDate(first.end) },
-        { start: toDate(match.start), end: toDate(match.end) },
-      ]
-      const isFull =
-        first.capacity - first.seatsTaken - first.seatsHeld <= 0 ||
-        match.capacity - match.seatsTaken - match.seatsHeld <= 0
-      const isYours = slotsOverlapTeacherBookings(windows, teacherWindows)
-      return [{
-        label: intl.formatTime(toDate(first.start), { hour: '2-digit', minute: '2-digit' }),
-        endLabel: intl.formatTime(toDate(match.end), { hour: '2-digit', minute: '2-digit' }),
-        slots: [first, match],
-        disabled: isFull || isYours,
-        reason: isYours ? 'yours' as const : isFull ? 'booked' as const : null,
-      }]
-    })
-  }, [selectedDate, sessionsByDay, programSelection, programIds, intl, teacherWindows])
-
-  // Auto-select tomorrow when sessions first load and no date is chosen yet
-  useEffect(() => {
-    if (!selectedDate && !isLoading && sessions.length > 0) {
-      const tomorrowKey = new Date(tomorrow.getFullYear(), tomorrow.getMonth(), tomorrow.getDate()).toDateString()
-      if (sessionsByDay[tomorrowKey]?.length) {
-        setSelectedDate(new Date(tomorrow))
+    return COMBO_PAIRS.map(([h1, h2]) => {
+      const key1 = dateToSlotKey(dateKey, h1)
+      const key2 = dateToSlotKey(dateKey, h2)
+      const s1 = availabilityMap[key1]
+      const s2 = availabilityMap[key2]
+      const disabled = !!(s1 || s2)
+      const reason: 'taken' | 'yours' | null = disabled
+        ? (s1 === 'yours' && s2 === 'yours' ? 'yours' : 'taken')
+        : null
+      return {
+        kind: 'combo' as const,
+        startHour: h1,
+        endHour: h2 + 1,
+        firstProg,
+        secondProg,
+        start: slotToDate(dateKey, h1),
+        end: slotEndDate(dateKey, h2),
+        disabled,
+        reason,
+        label: intl.formatTime(slotToDate(dateKey, h1), { hour: '2-digit', minute: '2-digit' }),
+        endLabel: intl.formatTime(slotEndDate(dateKey, h2), { hour: '2-digit', minute: '2-digit' }),
       }
-    }
-  }, [isLoading, sessions.length, selectedDate, sessionsByDay, tomorrow, setSelectedDate])
+    })
+  }, [dateKey, programSelection, programIds, availabilityMap, intl])
 
-  const selectedSlotKey = slots.length > 0 ? slots[0].sessionId : null
+  const selectedSlotKey = slots.length > 0 ? dateToSlotKey(slots[0].date, slots[0].startHour) : null
 
-  const handleSelectTime = (slotDocs: SessionDoc[]) => {
-    setSlots(slotDocs.map((s) => ({
-      sessionId: s.id,
-      programId: s.programId,
-      start: toDate(s.start),
-      end: toDate(s.end),
-    })))
+  const handleSelectSingle = (h: number, pid: ProgramId) => {
+    if (!dateKey) return
+    setSlots([{
+      programId: pid,
+      date: dateKey,
+      startHour: h,
+      start: slotToDate(dateKey, h),
+      end: slotEndDate(dateKey, h),
+    }])
+  }
+
+  const handleSelectCombo = (h1: number, h2: number, firstProg: ProgramId, secondProg: ProgramId) => {
+    if (!dateKey) return
+    setSlots([
+      { programId: firstProg,  date: dateKey, startHour: h1, start: slotToDate(dateKey, h1), end: slotEndDate(dateKey, h1) },
+      { programId: secondProg, date: dateKey, startHour: h2, start: slotToDate(dateKey, h2), end: slotEndDate(dateKey, h2) },
+    ])
   }
 
   const handleContinue = () => {
@@ -221,25 +219,13 @@ export default function BookTimePage() {
         </div>
       </div>
 
-      {/* Connection error banner */}
-      {isError && (
-        <div className="flex items-center gap-2 px-4 py-3 rounded-xl text-sm" style={{ background: 'var(--tint-yellow)' }}>
-          <AlertCircle className="w-4 h-4 flex-none" style={{ color: 'var(--brand-orange)' }} />
-          <span>{intl.formatMessage({ id: 'bookTime.loadError' })}</span>
-        </div>
-      )}
-
       {/* 5-day week grid */}
       <div className="grid gap-2" style={{ gridTemplateColumns: 'repeat(5, minmax(0, 1fr))' }}>
         {weekDays.map((day, i) => {
           const dayMidnight = new Date(day.getFullYear(), day.getMonth(), day.getDate())
-          const key = dayMidnight.toDateString()
-          const hasSessions = (sessionsByDay[key]?.length ?? 0) > 0
-          // Block today and past — earliest bookable day is tomorrow
           const isPast = dayMidnight < tomorrow
           const isSel = selectedDate ? isSameDay(day, selectedDate) : false
-          // Only mark closed if load is complete (not loading, no error) and genuinely no sessions
-          const closed = isPast || (!isLoading && !isError && !hasSessions)
+          const closed = isPast
 
           return (
             <button
@@ -262,13 +248,8 @@ export default function BookTimePage() {
               <span className="text-2xl font-extrabold leading-none" style={{ fontFamily: 'var(--font-display)' }}>
                 {format(day, 'd')}
               </span>
-              {/* Green dot = sessions available */}
               {!closed && !isSel && (
                 <span className="w-1.5 h-1.5 rounded-full" style={{ background: 'var(--primary)' }} />
-              )}
-              {/* Loading shimmer */}
-              {isLoading && !isPast && (
-                <span className="w-4 h-1 rounded-full animate-pulse mt-0.5" style={{ background: 'var(--muted)' }} />
               )}
             </button>
           )
@@ -276,80 +257,96 @@ export default function BookTimePage() {
       </div>
 
       {/* Time slots for selected day */}
-      {selectedDate && (
+      {selectedDate && dateKey && (
         <div className="rise flex flex-col gap-2">
           <h2 className="text-sm font-semibold" style={{ color: 'var(--muted-foreground)' }}>
             {intl.formatDate(selectedDate, { weekday: 'long', day: 'numeric', month: 'long' })}
           </h2>
 
-          {isLoading ? (
-            <div className="flex flex-col gap-2">
-              {[1, 2, 3].map((n) => (
-                <div key={n} className="h-14 rounded-2xl animate-pulse" style={{ background: 'var(--muted)' }} />
-              ))}
-            </div>
-          ) : availableTimes.length === 0 ? (
-            <p className="text-sm py-6 text-center" style={{ color: 'var(--muted-foreground)' }}>
-              {intl.formatMessage({ id: 'bookTime.noSlots' })}
-            </p>
-          ) : (
-            <div className="flex flex-col gap-2">
-              {availableTimes.map(({ label, endLabel, slots: slotDocs, disabled, reason }) => {
-                const isSel = !disabled && selectedSlotKey === slotDocs[0].id
-                const startMs = toDate(slotDocs[0].start).getTime()
-                const endMs   = toDate(slotDocs[slotDocs.length - 1].end).getTime()
-                const mins    = Math.round((endMs - startMs) / 60000)
-                const durLabel = mins >= 60 ? `${mins / 60}h` : `${mins} min`
+          <div className="flex flex-col gap-2">
+            {programSelection !== 'both'
+              ? singleTimes.map((s) => {
+                  const key = dateToSlotKey(dateKey, s.startHour)
+                  const isSel = !s.disabled && selectedSlotKey === key
 
-                return (
-                  <button
-                    key={label}
-                    type="button"
-                    disabled={disabled}
-                    onClick={() => handleSelectTime(slotDocs as unknown as SessionDoc[])}
-                    className="flex items-center px-4 h-14 rounded-2xl border-2 text-sm"
-                    style={{
-                      background: isSel ? 'var(--tint-purple)' : 'var(--card)',
-                      borderColor: isSel ? 'var(--primary)' : 'var(--border)',
-                      color: disabled ? 'var(--muted-foreground)' : 'var(--foreground)',
-                      opacity: disabled ? 0.55 : 1,
-                      cursor: disabled ? 'default' : 'pointer',
-                    }}
-                  >
-                    {/* Time range */}
-                    <span className="font-semibold">{label}</span>
-                    <span className="mx-1.5 opacity-40">–</span>
-                    <span className="font-semibold">{endLabel}</span>
-                    {/* Duration badge */}
-                    <span
-                      className="ml-2 px-2 py-0.5 rounded-full text-xs font-medium"
+                  return (
+                    <button
+                      key={key}
+                      type="button"
+                      disabled={s.disabled}
+                      onClick={() => handleSelectSingle(s.startHour, s.programId)}
+                      className="flex items-center px-4 h-14 rounded-2xl border-2 text-sm"
                       style={{
-                        background: isSel ? 'rgba(80,50,145,0.12)' : 'var(--muted)',
-                        color: 'var(--muted-foreground)',
+                        background: isSel ? 'var(--tint-purple)' : 'var(--card)',
+                        borderColor: isSel ? 'var(--primary)' : 'var(--border)',
+                        color: s.disabled ? 'var(--muted-foreground)' : 'var(--foreground)',
+                        opacity: s.disabled ? 0.55 : 1,
+                        cursor: s.disabled ? 'default' : 'pointer',
                       }}
                     >
-                      {durLabel}
-                    </span>
-                    {/* Disabled reason pill */}
-                    {reason ? (
-                      <span className="ml-auto px-2 py-0.5 rounded-full text-xs font-medium"
-                        style={{ background: 'var(--muted)', color: 'var(--muted-foreground)' }}
-                      >
-                        {reason === 'yours'
-                          ? intl.formatMessage({ id: 'bookTime.slot.yours' })
-                          : intl.formatMessage({ id: 'bookTime.slot.booked' })}
+                      <span className="font-semibold">{s.label}</span>
+                      <span className="mx-1.5 opacity-40">–</span>
+                      <span className="font-semibold">{s.endLabel}</span>
+                      <span className="ml-2 px-2 py-0.5 rounded-full text-xs font-medium"
+                        style={{ background: isSel ? 'rgba(80,50,145,0.12)' : 'var(--muted)', color: 'var(--muted-foreground)' }}>
+                        1h
                       </span>
-                    ) : (
-                      /* Radio indicator — available slots only */
-                      <span className="ml-auto w-5 h-5 rounded-full box-border flex-none transition-all"
-                        style={{ border: isSel ? '6px solid var(--primary)' : '2px solid var(--border)' }}
-                      />
-                    )}
-                  </button>
-                )
-              })}
-            </div>
-          )}
+                      {s.reason ? (
+                        <span className="ml-auto px-2 py-0.5 rounded-full text-xs font-medium"
+                          style={{ background: 'var(--muted)', color: 'var(--muted-foreground)' }}>
+                          {s.reason === 'yours'
+                            ? intl.formatMessage({ id: 'bookTime.slot.yours' })
+                            : intl.formatMessage({ id: 'bookTime.slot.booked' })}
+                        </span>
+                      ) : (
+                        <span className="ml-auto w-5 h-5 rounded-full box-border flex-none transition-all"
+                          style={{ border: isSel ? '6px solid var(--primary)' : '2px solid var(--border)' }} />
+                      )}
+                    </button>
+                  )
+                })
+              : comboTimes.map((s) => {
+                  const key = dateToSlotKey(dateKey, s.startHour)
+                  const isSel = !s.disabled && selectedSlotKey === key
+
+                  return (
+                    <button
+                      key={key}
+                      type="button"
+                      disabled={s.disabled}
+                      onClick={() => handleSelectCombo(s.startHour, s.startHour + 1, s.firstProg, s.secondProg)}
+                      className="flex items-center px-4 h-14 rounded-2xl border-2 text-sm"
+                      style={{
+                        background: isSel ? 'var(--tint-purple)' : 'var(--card)',
+                        borderColor: isSel ? 'var(--primary)' : 'var(--border)',
+                        color: s.disabled ? 'var(--muted-foreground)' : 'var(--foreground)',
+                        opacity: s.disabled ? 0.55 : 1,
+                        cursor: s.disabled ? 'default' : 'pointer',
+                      }}
+                    >
+                      <span className="font-semibold">{s.label}</span>
+                      <span className="mx-1.5 opacity-40">–</span>
+                      <span className="font-semibold">{s.endLabel}</span>
+                      <span className="ml-2 px-2 py-0.5 rounded-full text-xs font-medium"
+                        style={{ background: isSel ? 'rgba(80,50,145,0.12)' : 'var(--muted)', color: 'var(--muted-foreground)' }}>
+                        2h
+                      </span>
+                      {s.reason ? (
+                        <span className="ml-auto px-2 py-0.5 rounded-full text-xs font-medium"
+                          style={{ background: 'var(--muted)', color: 'var(--muted-foreground)' }}>
+                          {s.reason === 'yours'
+                            ? intl.formatMessage({ id: 'bookTime.slot.yours' })
+                            : intl.formatMessage({ id: 'bookTime.slot.booked' })}
+                        </span>
+                      ) : (
+                        <span className="ml-auto w-5 h-5 rounded-full box-border flex-none transition-all"
+                          style={{ border: isSel ? '6px solid var(--primary)' : '2px solid var(--border)' }} />
+                      )}
+                    </button>
+                  )
+                })
+            }
+          </div>
         </div>
       )}
     </BookingLayout>
