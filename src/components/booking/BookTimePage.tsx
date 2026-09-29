@@ -124,18 +124,20 @@ export default function BookTimePage() {
       .filter((s) => s.programId === firstProg && s.capacity - s.seatsTaken - s.seatsHeld > 0)
       .sort((a, b) => toDate(a.start).getTime() - toDate(b.start).getTime())
 
-    const seen = new Set<string>()
+    const usedSessionIds = new Set<string>()
     return firsts.flatMap((first) => {
+      if (usedSessionIds.has(first.id)) return []
       const firstEnd = toDate(first.end).getTime()
       const match = daySessions.find(
-        (s) => s.programId === secondProg
-          && toDate(s.start).getTime() === firstEnd
-          && s.capacity - s.seatsTaken - s.seatsHeld > 0,
+        (s) =>
+          s.programId === secondProg &&
+          toDate(s.start).getTime() === firstEnd &&
+          s.capacity - s.seatsTaken - s.seatsHeld > 0 &&
+          !usedSessionIds.has(s.id),
       )
       if (!match) return []
-      const pairKey = `${toDate(first.start).getTime()}-${toDate(match.end).getTime()}`
-      if (seen.has(pairKey)) return []
-      seen.add(pairKey)
+      usedSessionIds.add(first.id)
+      usedSessionIds.add(match.id)
       const windows = [
         { start: toDate(first.start), end: toDate(first.end) },
         { start: toDate(match.start), end: toDate(match.end) },
