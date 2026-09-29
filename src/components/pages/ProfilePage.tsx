@@ -1,9 +1,14 @@
 import { useRef, useState } from 'react'
-import { Shield, Globe, Trash2, Download, ChevronRight, Check, Palette, Pencil, X, Loader2 } from 'lucide-react'
+import { Shield, Globe, Trash2, Download, ChevronRight, Check, Palette, Pencil, X, Loader2, HelpCircle, MessageSquarePlus, FileText, CheckCircle2 } from 'lucide-react'
 import { useIntl } from 'react-intl'
 import { useAuthContext } from '../../context/AuthContext'
 import { useLocale } from '../../context/LocaleContext'
 import ThemeToggle from '../ui/ThemeToggle'
+import { FAQDialog } from '../profile/FAQDialog'
+import { FeedbackDialog } from '../profile/FeedbackDialog'
+import { PrivacyPolicyDialog } from '../profile/PrivacyPolicyDialog'
+import { UserAgreementDialog } from '../profile/UserAgreementDialog'
+import type { Timestamp } from 'firebase/firestore'
 
 function InitialsAvatar({ name, size = 56 }: { name: string; size?: number }) {
   const initials = name.split(' ').map((p) => p[0]).slice(0, 2).join('').toUpperCase()
@@ -63,7 +68,7 @@ export default function ProfilePage() {
 
   const handleLanguageChange = async (lang: 'de' | 'en') => {
     setLocale(lang)
-    try { await updateProfile({}) } catch { /* noop — locale already switched locally */ }
+    try { await updateProfile({ language: lang }) } catch { /* noop — locale already switched locally */ }
   }
 
   const editableRow = (field: EditField, label: string, value: string, placeholder: string, ariaLabel: string) => {
@@ -250,6 +255,79 @@ export default function ProfilePage() {
               <Trash2 className="w-4 h-4 flex-none" />
               {intl.formatMessage({ id: 'profile.privacy.deleteAccount' })}
             </button>
+          </div>
+        </section>
+
+        {/* Legal & Support */}
+        <section className="flex flex-col gap-2">
+          <h2 className="text-xs font-semibold uppercase tracking-widest px-1" style={{ color: 'var(--muted-foreground)', letterSpacing: '0.12em' }}>
+            {intl.formatMessage({ id: 'profile.legal.title' })}
+          </h2>
+
+          <div className="rounded-2xl border overflow-hidden" style={{ background: 'var(--card)', borderColor: 'var(--border)' }}>
+            {/* FAQ */}
+            <FAQDialog
+              trigger={
+                <button
+                  type="button"
+                  className="tap w-full flex items-center gap-3 px-4 min-h-[52px] border-b text-sm text-left"
+                  style={{ background: 'transparent', border: 'none', borderBottom: `1px solid var(--border)`, color: 'var(--foreground)', cursor: 'pointer' }}
+                >
+                  <HelpCircle className="w-4 h-4 flex-none" style={{ color: 'var(--muted-foreground)' }} />
+                  <span className="flex-1">{intl.formatMessage({ id: 'profile.legal.faq' })}</span>
+                  <ChevronRight className="w-4 h-4 flex-none" style={{ color: 'var(--muted-foreground)' }} />
+                </button>
+              }
+            />
+
+            {/* Feedback */}
+            <FeedbackDialog
+              trigger={
+                <button
+                  type="button"
+                  className="tap w-full flex items-center gap-3 px-4 min-h-[52px] border-b text-sm text-left"
+                  style={{ background: 'transparent', border: 'none', borderBottom: `1px solid var(--border)`, color: 'var(--foreground)', cursor: 'pointer' }}
+                >
+                  <MessageSquarePlus className="w-4 h-4 flex-none" style={{ color: 'var(--muted-foreground)' }} />
+                  <span className="flex-1">{intl.formatMessage({ id: 'profile.legal.feedback' })}</span>
+                  <ChevronRight className="w-4 h-4 flex-none" style={{ color: 'var(--muted-foreground)' }} />
+                </button>
+              }
+            />
+
+            {/* Privacy Policy */}
+            <PrivacyPolicyDialog
+              trigger={
+                <button
+                  type="button"
+                  className="tap w-full flex items-center gap-3 px-4 min-h-[52px] border-b text-sm text-left"
+                  style={{ background: 'transparent', border: 'none', borderBottom: `1px solid var(--border)`, color: 'var(--foreground)', cursor: 'pointer' }}
+                >
+                  <Shield className="w-4 h-4 flex-none" style={{ color: 'var(--muted-foreground)' }} />
+                  <span className="flex-1">{intl.formatMessage({ id: 'profile.legal.privacy' })}</span>
+                  <ChevronRight className="w-4 h-4 flex-none" style={{ color: 'var(--muted-foreground)' }} />
+                </button>
+              }
+            />
+
+            {/* User Agreement */}
+            <UserAgreementDialog
+              trigger={
+                <button
+                  type="button"
+                  className="tap w-full flex items-center gap-3 px-4 min-h-[52px] text-sm text-left"
+                  style={{ background: 'transparent', border: 'none', color: 'var(--foreground)', cursor: 'pointer' }}
+                >
+                  <FileText className="w-4 h-4 flex-none" style={{ color: 'var(--muted-foreground)' }} />
+                  <span className="flex-1">{intl.formatMessage({ id: 'profile.legal.agreement' })}</span>
+                  {(profile?.agreedAt as Timestamp | undefined)?.toDate ? (
+                    <CheckCircle2 className="w-4 h-4 flex-none" style={{ color: 'var(--brand-green)' }} />
+                  ) : (
+                    <ChevronRight className="w-4 h-4 flex-none" style={{ color: 'var(--muted-foreground)' }} />
+                  )}
+                </button>
+              }
+            />
           </div>
         </section>
 

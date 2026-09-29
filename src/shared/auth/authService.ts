@@ -12,7 +12,7 @@ import {
   type User,
   type Unsubscribe,
 } from 'firebase/auth'
-import { doc, getDoc, setDoc, onSnapshot, serverTimestamp } from 'firebase/firestore'
+import { doc, getDoc, setDoc, addDoc, collection, onSnapshot, serverTimestamp } from 'firebase/firestore'
 import { auth, db } from '../firebase'
 import { authErrorMessage } from '../lib/authErrors'
 import type { AppUser } from '../types'
@@ -38,7 +38,7 @@ export async function createUserDoc(firebaseUser: User): Promise<void> {
     displayName: firebaseUser.displayName ?? '',
     photoURL: firebaseUser.photoURL ?? '',
     role: null,
-    language: 'de',
+    language: 'en',
     createdAt: serverTimestamp(),
     updatedAt: serverTimestamp(),
   }, { merge: true })
@@ -124,6 +124,28 @@ export async function updateUserProfile(
   await setDoc(doc(db, 'users', user.uid), firestoreFields, { merge: true })
 }
 
+export async function saveFeedback(
+  user: User,
+  payload: { rating: number; category: string; message: string; displayName: string; schoolName?: string },
+): Promise<void> {
+  await addDoc(collection(db, 'feedback'), {
+    uid: user.uid,
+    displayName: payload.displayName,
+    schoolName: payload.schoolName ?? '',
+    rating: payload.rating,
+    category: payload.category,
+    message: payload.message,
+    createdAt: serverTimestamp(),
+  })
+}
+
+export async function acceptAgreement(user: User): Promise<void> {
+  await setDoc(doc(db, 'users', user.uid), {
+    agreedAt: serverTimestamp(),
+    updatedAt: serverTimestamp(),
+  }, { merge: true })
+}
+
 export async function signOut(): Promise<void> {
   await firebaseSignOut(auth)
 }
@@ -155,7 +177,8 @@ export function subscribeToUserProfile(
         role: data.role ?? null,
         schoolId: data.schoolId ?? undefined,
         schoolName: data.schoolName ?? undefined,
-        language: data.language ?? 'de',
+        language: data.language ?? 'en',
+        agreedAt: data.agreedAt,
         createdAt: data.createdAt,
         updatedAt: data.updatedAt,
       })

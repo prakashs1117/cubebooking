@@ -2,6 +2,9 @@ import { BrowserRouter as Router, Routes, Route, Navigate, useLocation } from 'r
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { AuthProvider, useAuthContext } from './context/AuthContext'
 import { useAnalyticsInit, usePageTracking } from './hooks/useAnalytics'
+import { useMaintenanceMode } from './hooks/useMaintenanceMode'
+import { MaintenanceBanner } from './components/ui/MaintenanceBanner'
+import { MaintenanceModal } from './components/ui/MaintenanceModal'
 import ProtectedRoute from './components/ProtectedRoute'
 import AppShell from './components/layout/AppShell'
 import SignInPage from './components/auth/SignInPage'
@@ -28,6 +31,18 @@ function AnalyticsTracker() {
   useAnalyticsInit()
   usePageTracking()
   return null
+}
+
+function MaintenanceGate({ children }: { children: React.ReactNode }) {
+  const { enabled, bannerOnly, message, loading } = useMaintenanceMode()
+  if (loading) return <>{children}</>
+  return (
+    <>
+      {enabled && bannerOnly && <MaintenanceBanner message={message} />}
+      {enabled && !bannerOnly && <MaintenanceModal message={message} />}
+      {children}
+    </>
+  )
 }
 
 function GuestOnly({ children }: { children: React.ReactNode }) {
@@ -84,8 +99,10 @@ export default function App() {
     <QueryClientProvider client={queryClient}>
       <AuthProvider>
         <Router>
-          <AnalyticsTracker />
-          <AppRoutes />
+          <MaintenanceGate>
+            <AnalyticsTracker />
+            <AppRoutes />
+          </MaintenanceGate>
         </Router>
       </AuthProvider>
     </QueryClientProvider>

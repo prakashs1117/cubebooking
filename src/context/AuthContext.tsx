@@ -8,6 +8,8 @@ import {
   completeMagicLinkSignIn as svcCompleteMagicLink,
   resetPassword as svcResetPassword,
   updateUserProfile as svcUpdateUserProfile,
+  saveFeedback as svcSaveFeedback,
+  acceptAgreement as svcAcceptAgreement,
   signOut as svcSignOut,
   subscribeToAuthUser,
   subscribeToUserProfile,
@@ -27,6 +29,8 @@ interface AuthContextValue {
   completeMagicLinkSignIn: (href: string) => Promise<boolean>
   resetPassword: (email: string) => Promise<void>
   updateProfile: (fields: { displayName?: string; schoolName?: string; language?: string }) => Promise<void>
+  submitFeedback: (payload: { rating: number; category: string; message: string }) => Promise<void>
+  acceptAgreement: () => Promise<void>
   logout: () => Promise<void>
 }
 
@@ -42,7 +46,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const { setLocale } = useLocale()
 
   useEffect(() => {
-    if (profile?.language) setLocale(profile.language)
+    if (!profile?.language) return
+    // localStorage is the source of truth. Only use Firestore profile language
+    // when the user has no local preference stored at all.
+    const stored = (() => { try { return localStorage.getItem('curiosity-locale') } catch { return null } })()
+    if (stored !== 'en' && stored !== 'de') {
+      setLocale(profile.language as 'en' | 'de')
+    }
   }, [profile?.language, setLocale])
 
   useEffect(() => {
@@ -123,6 +133,20 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     await svcUpdateUserProfile(user, fields)
   }, [user])
 
+  const submitFeedback = useCallback(async (payload: { rating: number; category: string; message: string }) => {
+    if (!user) throw new Error('Not signed in')
+    await svcSaveFeedback(user, {
+      ...payload,
+      displayName: profile?.displayName ?? '',
+      schoolName: profile?.schoolName,
+    })
+  }, [user, profile])
+
+  const acceptAgreement = useCallback(async () => {
+    if (!user) throw new Error('Not signed in')
+    await svcAcceptAgreement(user)
+  }, [user])
+
   const logout = useCallback(async () => {
     await svcSignOut()
     trackUserSignOut()
@@ -140,9 +164,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       completeMagicLinkSignIn,
       resetPassword,
       updateProfile,
+      submitFeedback,
+      acceptAgreement,
       logout,
     }),
-    [user, profile, loading, signIn, signInWithGoogle, sendMagicLink, completeMagicLinkSignIn, resetPassword, updateProfile, logout],
+    [user, profile, loading, signIn, signInWithGoogle, sendMagicLink, completeMagicLinkSignIn, resetPassword, updateProfile, submitFeedback, acceptAgreement, logout],
   )
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>
