@@ -13,8 +13,21 @@ export interface AppUser {
   schoolId?: string
   schoolName?: string
   language: 'de' | 'en'
+  agreedAt?: Timestamp
   createdAt?: Timestamp
   updatedAt?: Timestamp
+}
+
+// ─── Feedback ─────────────────────────────────────────────────────────────────
+
+export interface FeedbackDoc {
+  uid: string
+  displayName: string
+  schoolName?: string
+  rating: number
+  category: string
+  message: string
+  createdAt: Timestamp
 }
 
 // ─── Programs ─────────────────────────────────────────────────────────────────
@@ -60,9 +73,10 @@ export type BookingStatus =
   | 'cancelled'
 
 export interface BookingSegment {
-  sessionId: string
   programId: ProgramId
   order: number               // 1 = first, 2 = second (Cube+Lab combo)
+  date: string                // 'YYYY-MM-DD'
+  startHour: number           // 0–23
 }
 
 export interface Booking {

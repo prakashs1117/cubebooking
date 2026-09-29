@@ -6,8 +6,9 @@ export type ProgramSelection = 'cube' | 'lab' | 'both'
 export type ProgramOrder = 'cube-first' | 'lab-first'
 
 export interface SelectedSlot {
-  sessionId: string
   programId: ProgramId
+  date: string       // 'YYYY-MM-DD'
+  startHour: number  // 0–23
   start: Date
   end: Date
 }
