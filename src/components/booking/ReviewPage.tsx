@@ -87,8 +87,7 @@ export default function ReviewPage() {
       const functions = getFunctions(app, 'europe-west1')
       const confirm = httpsCallable<
         {
-          sessionIds: string[]
-          segments: { sessionId: string; programId: string; order: number }[]
+          segments: { programId: string; date: string; startHour: number; order: number }[]
           visitType: string
           teacherName: string
           teacherEmail: string
@@ -102,15 +101,14 @@ export default function ReviewPage() {
       >(functions, 'confirmBooking')
 
       const bookingCode = makeBookingCode()
-      const sessionIds = slots.map((s) => s.sessionId)
       const segments = slots.map((s, i) => ({
-        sessionId: s.sessionId,
         programId: s.programId,
+        date: s.date,
+        startHour: s.startHour,
         order: i + 1,
       }))
 
       await confirm({
-        sessionIds,
         segments,
         visitType: visitType ?? 'onsite',
         teacherName: profile?.displayName ?? '',
