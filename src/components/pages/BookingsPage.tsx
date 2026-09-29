@@ -1,9 +1,12 @@
 import { Link } from 'react-router-dom'
 import * as Tabs from '@radix-ui/react-tabs'
 import { format } from 'date-fns'
+import { de, enUS } from 'date-fns/locale'
 import { CalendarCheck, ChevronRight, Menu as MenuIcon } from 'lucide-react'
+import { useIntl } from 'react-intl'
 import { useMyBookings, isUpcoming, type BookingDoc } from '../../hooks/queries/useBookings'
-import type { Timestamp } from 'firebase/firestore'
+import { slotToDate, slotEndDate } from '../../config/slots'
+import { useLocale } from '../../context/LocaleContext'
 
 const PROGRAM_COLORS: Record<string, string> = {
   cube: 'var(--cube)',
@@ -12,11 +15,31 @@ const PROGRAM_COLORS: Record<string, string> = {
   both: 'var(--brand-purple)',
 }
 
-function programLabel(booking: BookingDoc): string {
+// Get locale and timezone based on user's language preference
+function getLocaleConfig(locale: string): { locale: Locale; timezone: string; timeFormat: string } {
+  // Germany: de-DE locale, Europe/Berlin timezone, 24-hour format
+  // US: en-US locale, America/New_York timezone, 12-hour format
+  if (locale === 'de') {
+    return {
+      locale: de,
+      timezone: 'Europe/Berlin',
+      timeFormat: 'HH:mm', // 24-hour
+    }
+  }
+  return {
+    locale: enUS,
+    timezone: 'America/New_York',
+    timeFormat: 'h:mm a', // 12-hour with AM/PM
+  }
+}
+
+type Locale = typeof de
+
+function programLabel(booking: BookingDoc, intl: ReturnType<typeof useIntl>): string {
   const ids = [...new Set(booking.segments?.map((s) => s.programId) ?? [])]
-  if (ids.length === 0) return 'Visit'
-  if (ids.length === 1) return ids[0] === 'cube' ? 'Curiosity Cube' : ids[0] === 'lab' ? 'Curiosity Lab' : 'TOAD Truck'
-  return 'Cube + Lab'
+  if (ids.length === 0) return intl.formatMessage({ id: 'program.cube' })
+  if (ids.length === 1) return ids[0] === 'cube' ? intl.formatMessage({ id: 'program.cube' }) : ids[0] === 'lab' ? intl.formatMessage({ id: 'program.lab' }) : intl.formatMessage({ id: 'program.toad' })
+  return intl.formatMessage({ id: 'program.both' })
 }
 
 function programColor(booking: BookingDoc): string {
@@ -26,31 +49,53 @@ function programColor(booking: BookingDoc): string {
 }
 
 function BookingCard({ booking }: { booking: BookingDoc }) {
-  const label = programLabel(booking)
+  const { locale: userLocale } = useLocale()
+  const intl = useIntl()
+  const localeConfig = getLocaleConfig(userLocale)
+
+  // Derive times from segment date+startHour
+  const firstSeg = booking.segments?.[0]
+  const lastSeg = booking.segments?.[booking.segments.length - 1]
+  const times = firstSeg?.date != null && firstSeg?.startHour != null && lastSeg?.date != null && lastSeg?.startHour != null
+    ? {
+        startDate: slotToDate(firstSeg.date, firstSeg.startHour),
+        endDate: slotEndDate(lastSeg.date, lastSeg.startHour),
+      }
+    : { startDate: null, endDate: null }
+
+  const label = programLabel(booking, intl)
   const color = programColor(booking)
+
   const dateLabel = (() => {
     try {
-      const seg = booking.segments?.[0] as unknown as { start?: Timestamp }
-      if (seg?.start) return format(seg.start.toDate(), 'EEE d MMM yyyy')
-    } catch { /* noop */ }
+      if (times?.startDate) {
+        return format(times.startDate, 'EEE d MMM yyyy', { locale: localeConfig.locale })
+      }
+    } catch (e) {
+      console.error('Error formatting date:', e)
+    }
     return ''
   })()
 
   const timeLabel = (() => {
     try {
-      const firstSeg = booking.segments?.[0] as unknown as { start?: Timestamp }
-      const lastSeg = booking.segments?.[booking.segments.length - 1] as unknown as { end?: Timestamp }
-      if (firstSeg?.start && lastSeg?.end) {
-        const startTime = format(firstSeg.start.toDate(), 'HH:mm')
-        const endTime = format(lastSeg.end.toDate(), 'HH:mm')
+      if (times?.startDate && times?.endDate) {
+        const startTime = format(times.startDate, localeConfig.timeFormat, { locale: localeConfig.locale })
+        const endTime = format(times.endDate, localeConfig.timeFormat, { locale: localeConfig.locale })
         return `${startTime}–${endTime}`
       }
-    } catch { /* noop */ }
+    } catch (e) {
+      console.error('Error formatting time:', e)
+    }
     return ''
   })()
 
   const statusColor = booking.status === 'confirmed' ? 'var(--brand-green)' : booking.status === 'pending' ? 'var(--brand-orange)' : 'var(--muted-foreground)'
-  const statusLabel = booking.status === 'confirmed' ? 'Confirmed' : booking.status === 'pending' ? 'Pending' : booking.status
+  const statusLabel = booking.status === 'confirmed'
+    ? intl.formatMessage({ id: 'bookings.status.confirmed' })
+    : booking.status === 'pending'
+    ? intl.formatMessage({ id: 'bookings.status.pending' })
+    : intl.formatMessage({ id: 'bookings.status.cancelled' })
 
   return (
     <Link
@@ -78,13 +123,12 @@ function BookingCard({ booking }: { booking: BookingDoc }) {
           <span className="text-xs font-semibold flex-none" style={{ color: statusColor }}>{statusLabel}</span>
         </div>
         {dateLabel && (
-          <div className="flex items-center gap-2 text-xs" style={{ color: 'var(--muted-foreground)' }}>
-            <span>{dateLabel}</span>
-            {timeLabel && <span>· {timeLabel}</span>}
+          <div className="text-xs" style={{ color: 'var(--muted-foreground)' }}>
+            {timeLabel ? `${dateLabel} · ${timeLabel}` : dateLabel}
           </div>
         )}
         <div className="text-xs" style={{ color: 'var(--muted-foreground)' }}>
-          {booking.studentCount} students · Grade {booking.grade}
+          {intl.formatMessage({ id: 'bookings.card.meta' }, { count: booking.studentCount, grade: booking.grade })}
         </div>
       </div>
 
@@ -106,6 +150,7 @@ function SkeletonCard() {
 }
 
 export default function BookingsPage() {
+  const intl = useIntl()
   const { data: bookings = [], isLoading } = useMyBookings()
 
   const upcoming = bookings.filter((b) => isUpcoming(b) && b.status !== 'cancelled')
@@ -118,10 +163,9 @@ export default function BookingsPage() {
     >
       <header className="px-5 pt-12 lg:pt-6 pb-3 flex flex-col gap-4">
         <div className="flex items-center justify-between">
-          <h1 className="m-0 text-3xl font-extrabold tracking-tight" style={{ fontFamily: 'var(--font-display)' }}>
-            My bookings
+          <h1 className="m-0 text-2xl font-extrabold tracking-tight" style={{ fontFamily: 'var(--font-display)' }}>
+            {intl.formatMessage({ id: 'bookings.title' })}
           </h1>
-          <MenuIcon className="w-5 h-5 lg:hidden" style={{ color: 'var(--muted-foreground)' }} />
         </div>
 
         {/* Tabs */}
@@ -131,10 +175,10 @@ export default function BookingsPage() {
             style={{ background: 'var(--muted)' }}
           >
             <Tabs.Trigger value="upcoming" className="tab-trigger tap">
-              Upcoming · {upcoming.length}
+              {intl.formatMessage({ id: 'bookings.tab.upcoming' }, { count: upcoming.length })}
             </Tabs.Trigger>
             <Tabs.Trigger value="past" className="tab-trigger tap">
-              Past
+              {intl.formatMessage({ id: 'bookings.tab.past' })}
             </Tabs.Trigger>
           </Tabs.List>
 
@@ -143,9 +187,9 @@ export default function BookingsPage() {
               [1, 2, 3].map((n) => <SkeletonCard key={n} />)
             ) : upcoming.length === 0 ? (
               <EmptyState
-                label="No upcoming bookings"
-                sub="Book a Cube, Lab, or TOAD visit for your class."
-                cta={{ label: 'Book a visit', href: '/book' }}
+                label={intl.formatMessage({ id: 'bookings.empty.upcoming' })}
+                sub={intl.formatMessage({ id: 'bookings.empty.upcoming.sub' })}
+                cta={{ label: intl.formatMessage({ id: 'bookings.cta.book' }), href: '/book' }}
               />
             ) : (
               upcoming.map((b) => <BookingCard key={b.id} booking={b} />)
@@ -156,7 +200,10 @@ export default function BookingsPage() {
             {isLoading ? (
               [1, 2].map((n) => <SkeletonCard key={n} />)
             ) : past.length === 0 ? (
-              <EmptyState label="No past bookings yet" sub="Your completed visits will appear here." />
+              <EmptyState
+                label={intl.formatMessage({ id: 'bookings.empty.past' })}
+                sub={intl.formatMessage({ id: 'bookings.empty.past.sub' })}
+              />
             ) : (
               past.map((b) => <BookingCard key={b.id} booking={b} />)
             )}

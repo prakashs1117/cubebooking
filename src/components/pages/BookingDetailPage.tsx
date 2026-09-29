@@ -1,7 +1,13 @@
+import { useState } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
-import { ChevronLeft, Share2, CalendarPlus, XCircle, MapPin, Clock, Users, GraduationCap } from 'lucide-react'
+import { ChevronLeft, Share2, CalendarPlus, MapPin, Clock, Users, GraduationCap } from 'lucide-react'
 import { useIntl } from 'react-intl'
-import { useBooking, useBookingTimes } from '../../hooks/queries/useBookings'
+import { doc, updateDoc } from 'firebase/firestore'
+import { db } from '../../shared/firebase'
+import { useBooking } from '../../hooks/queries/useBookings'
+import { slotToDate, slotEndDate } from '../../config/slots'
+import { trackBookingCancelled } from '../../services/analyticsService'
+import { CancelBookingDialog } from '../booking/CancelBookingDialog'
 
 function makeCalendarUrl(title: string, start: Date, end: Date, details = '') {
   const fmt = (d: Date) => d.toISOString().replace(/[-:]/g, '').replace('.000', '')
@@ -20,10 +26,37 @@ export default function BookingDetailPage() {
   const navigate = useNavigate()
   const intl = useIntl()
   const { data: booking, isLoading, error } = useBooking(id)
+  const [cancelling, setCancelling] = useState(false)
+  const [cancelDialogOpen, setCancelDialogOpen] = useState(false)
 
-  // ALL hooks must be called before any early return — Rules of Hooks
-  const sessionIds = (booking?.segments ?? []).map((s) => s.sessionId).filter(Boolean)
-  const { data: times } = useBookingTimes(sessionIds)
+  // Derive times from segment date+startHour
+  const firstSeg = booking?.segments?.[0]
+  const lastSeg = booking?.segments?.[booking.segments.length - 1]
+  const times = firstSeg?.date != null && firstSeg?.startHour != null && lastSeg?.date != null && lastSeg?.startHour != null
+    ? {
+        startDate: slotToDate(firstSeg.date, firstSeg.startHour),
+        endDate: slotEndDate(lastSeg.date, lastSeg.startHour),
+      }
+    : { startDate: null, endDate: null }
+
+  const handleConfirmCancel = async () => {
+    if (!id || !booking) return
+
+    setCancelling(true)
+    try {
+      await updateDoc(doc(db, 'bookings', id), {
+        status: 'cancelled',
+        updatedAt: new Date(),
+      })
+      trackBookingCancelled(id, 'user_cancelled')
+      setCancelDialogOpen(false)
+      navigate('/bookings', { replace: true })
+    } catch (err) {
+      console.error('Failed to cancel booking:', err)
+      alert(intl.formatMessage({ id: 'bookingDetail.cancelError' }) || 'Failed to cancel booking. Please try again.')
+      setCancelling(false)
+    }
+  }
 
   if (isLoading) return (
     <div className="min-h-screen flex items-center justify-center" style={{ background: 'var(--app-ground)' }}>
@@ -45,7 +78,13 @@ export default function BookingDetailPage() {
   const ids = [...new Set(booking.segments?.map((s) => s.programId) ?? [])]
   const isBoth = ids.length > 1
   const headerBg = isBoth ? 'var(--brand-purple)' : ids[0] === 'cube' ? 'var(--brand-mint)' : ids[0] === 'lab' ? 'var(--brand-yellow)' : 'var(--brand-magenta)'
-  const programTitle = isBoth ? 'Cube + Lab visit' : ids[0] === 'cube' ? 'Curiosity Cube' : ids[0] === 'lab' ? 'Curiosity Lab' : 'TOAD Truck'
+  const programTitle = isBoth
+    ? intl.formatMessage({ id: 'program.both.visit' })
+    : ids[0] === 'cube'
+    ? intl.formatMessage({ id: 'program.cube' })
+    : ids[0] === 'lab'
+    ? intl.formatMessage({ id: 'program.lab' })
+    : intl.formatMessage({ id: 'program.toad' })
 
   const startDate = times?.startDate ?? null
   const endDate   = times?.endDate   ?? null
@@ -140,14 +179,12 @@ export default function BookingDetailPage() {
             </a>
           )}
           {booking.status !== 'cancelled' && (
-            <button
-              type="button"
-              className="tap w-full h-11 rounded-xl flex items-center justify-center gap-2 text-sm font-semibold"
-              style={{ background: 'var(--tint-red)', color: 'var(--destructive)' }}
-            >
-              <XCircle className="w-4 h-4" />
-              {intl.formatMessage({ id: 'bookingDetail.cancel' })}
-            </button>
+            <CancelBookingDialog
+              open={cancelDialogOpen}
+              onOpenChange={setCancelDialogOpen}
+              onConfirm={handleConfirmCancel}
+              isLoading={cancelling}
+            />
           )}
         </div>
       </div>
