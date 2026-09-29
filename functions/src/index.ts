@@ -6,15 +6,15 @@ initializeApp()
 
 const db = getFirestore()
 
-interface BookingSegmentInput {
-  sessionId: string
+interface SegmentInput {
   programId: string
+  date: string       // 'YYYY-MM-DD'
+  startHour: number  // 0–23
   order: number
 }
 
 interface ConfirmBookingData {
-  sessionIds: string[]
-  segments: BookingSegmentInput[]
+  segments: SegmentInput[]
   visitType: 'onsite' | 'toad'
   teacherName: string
   teacherEmail: string
@@ -25,13 +25,9 @@ interface ConfirmBookingData {
   bookingCode: string
 }
 
-function rangesOverlap(
-  aStart: FirebaseFirestore.Timestamp,
-  aEnd: FirebaseFirestore.Timestamp,
-  bStart: FirebaseFirestore.Timestamp,
-  bEnd: FirebaseFirestore.Timestamp,
-): boolean {
-  return aStart.toMillis() < bEnd.toMillis() && aEnd.toMillis() > bStart.toMillis()
+function slotsOverlap(aDate: string, aHour: number, bDate: string, bHour: number): boolean {
+  // Two 1-hour slots overlap when they share the same date and startHours differ by less than 1
+  return aDate === bDate && Math.abs(aHour - bHour) < 1
 }
 
 export const confirmBooking = onCall<ConfirmBookingData>(
@@ -42,88 +38,66 @@ export const confirmBooking = onCall<ConfirmBookingData>(
     }
 
     const teacherId = request.auth.uid
-    const { sessionIds, segments, visitType, teacherName, teacherEmail, schoolId, grade, studentCount, accessNeeds, bookingCode } = request.data
+    const { segments, visitType, teacherName, teacherEmail, schoolId, grade, studentCount, accessNeeds, bookingCode } = request.data
 
-    if (!sessionIds?.length || !segments?.length) {
-      throw new HttpsError('invalid-argument', 'sessionIds and segments are required.')
+    if (!segments?.length) {
+      throw new HttpsError('invalid-argument', 'segments are required.')
     }
 
-    const bookingId = await db.runTransaction(async (tx) => {
-      // ── Step A: verify each session is still open and has capacity ──────────
-      const sessionRefs = sessionIds.map((id) => db.collection('sessions').doc(id))
-      const sessionSnaps = await Promise.all(sessionRefs.map((ref) => tx.get(ref)))
+    const activeStatuses = ['confirmed', 'approved', 'pending']
 
-      const proposedWindows: { start: FirebaseFirestore.Timestamp; end: FirebaseFirestore.Timestamp }[] = []
+    // ── Step A: check each slot is not already taken ──────────────────────────
+    for (const seg of segments) {
+      const snap = await db.collection('bookings')
+        .where('status', 'in', activeStatuses)
+        .get()
 
-      for (const snap of sessionSnaps) {
-        if (!snap.exists) {
-          throw new HttpsError('failed-precondition', 'slots-unavailable')
-        }
-        const data = snap.data()!
-        if (data['status'] !== 'open') {
-          throw new HttpsError('failed-precondition', 'slots-unavailable')
-        }
-        const taken: number = data['seatsTaken'] ?? 0
-        const held: number = data['seatsHeld'] ?? 0
-        const capacity: number = data['capacity'] ?? 0
-        if (taken + held >= capacity) {
-          throw new HttpsError('failed-precondition', 'slots-unavailable')
-        }
-        proposedWindows.push({
-          start: data['start'] as FirebaseFirestore.Timestamp,
-          end: data['end'] as FirebaseFirestore.Timestamp,
-        })
+      const conflict = snap.docs.some((d) => {
+        const data = d.data()
+        return (data['segments'] as SegmentInput[] ?? []).some(
+          (s) => s.programId === seg.programId && s.date === seg.date && s.startHour === seg.startHour,
+        )
+      })
+
+      if (conflict) {
+        throw new HttpsError('failed-precondition', 'slots-unavailable')
       }
+    }
 
-      // ── Step B: verify teacher has no overlapping active booking ────────────
-      const bookingsSnap = await tx.get(
-        db.collection('bookings')
-          .where('teacherId', '==', teacherId)
-          .where('status', 'in', ['confirmed', 'approved', 'pending']),
-      )
+    // ── Step B: check teacher has no overlapping active booking ───────────────
+    const teacherSnap = await db.collection('bookings')
+      .where('teacherId', '==', teacherId)
+      .where('status', 'in', activeStatuses)
+      .get()
 
-      for (const bookingDoc of bookingsSnap.docs) {
-        const bData = bookingDoc.data()
-        const existingSegments: BookingSegmentInput[] = bData['segments'] ?? []
-        for (const seg of existingSegments) {
-          const existingSessionSnap = await tx.get(db.collection('sessions').doc(seg.sessionId))
-          if (!existingSessionSnap.exists) continue
-          const eData = existingSessionSnap.data()!
-          const eStart = eData['start'] as FirebaseFirestore.Timestamp
-          const eEnd = eData['end'] as FirebaseFirestore.Timestamp
-          for (const proposed of proposedWindows) {
-            if (rangesOverlap(proposed.start, proposed.end, eStart, eEnd)) {
-              throw new HttpsError('failed-precondition', 'teacher-conflict')
-            }
+    for (const d of teacherSnap.docs) {
+      const existingSegs: SegmentInput[] = d.data()['segments'] ?? []
+      for (const existing of existingSegs) {
+        for (const proposed of segments) {
+          if (slotsOverlap(proposed.date, proposed.startHour, existing.date, existing.startHour)) {
+            throw new HttpsError('failed-precondition', 'teacher-conflict')
           }
         }
       }
+    }
 
-      // ── Step C: write the booking ────────────────────────────────────────────
-      const bookingRef = db.collection('bookings').doc()
-      tx.set(bookingRef, {
-        type: visitType,
-        teacherId,
-        teacherName,
-        teacherEmail,
-        schoolId,
-        segments,
-        grade,
-        studentCount,
-        accessNeeds: accessNeeds ?? '',
-        status: visitType === 'toad' ? 'pending' : 'confirmed',
-        bookingCode,
-        createdAt: FieldValue.serverTimestamp(),
-      })
-
-      // ── Step D: increment seatsTaken on each session ─────────────────────────
-      for (const ref of sessionRefs) {
-        tx.update(ref, { seatsTaken: FieldValue.increment(1) })
-      }
-
-      return bookingRef.id
+    // ── Step C: write the booking ─────────────────────────────────────────────
+    const bookingRef = db.collection('bookings').doc()
+    await bookingRef.set({
+      type: visitType,
+      teacherId,
+      teacherName,
+      teacherEmail,
+      schoolId,
+      segments,
+      grade,
+      studentCount,
+      accessNeeds: accessNeeds ?? '',
+      status: visitType === 'toad' ? 'pending' : 'confirmed',
+      bookingCode,
+      createdAt: FieldValue.serverTimestamp(),
     })
 
-    return { bookingId }
+    return { bookingId: bookingRef.id }
   },
 )
