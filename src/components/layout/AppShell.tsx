@@ -3,7 +3,7 @@ import { Link, useLocation, useNavigate } from 'react-router-dom'
 import * as Dialog from '@radix-ui/react-dialog'
 import {
   Home, CalendarCheck, Package, User, Plus, X,
-  LogOut, Shield, ChevronRight,
+  LogOut, Shield, ChevronRight, QrCode,
 } from 'lucide-react'
 import { useIntl } from 'react-intl'
 import { useAuthContext } from '../../context/AuthContext'
@@ -28,7 +28,7 @@ function isActive(href: string, path: string) {
 
 // ─── Desktop sidebar ──────────────────────────────────────────────────────────
 function Sidebar({ onClose }: { onClose?: () => void }) {
-  const { profile, logout } = useAuthContext()
+  const { profile, logout, isStaff } = useAuthContext()
   const navigate = useNavigate()
   const location = useLocation()
   const intl = useIntl()
@@ -104,6 +104,28 @@ function Sidebar({ onClose }: { onClose?: () => void }) {
           )
         })}
 
+        {isStaff && (
+          <Link
+            to="/admin/scan"
+            onClick={onClose}
+            className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium tap"
+            style={{
+              textDecoration: 'none',
+              background: isActive('/admin/scan', location.pathname) || isActive('/admin', location.pathname)
+                ? 'var(--tint-purple)' : 'transparent',
+              color: isActive('/admin/scan', location.pathname) || isActive('/admin', location.pathname)
+                ? 'var(--brand-purple)' : 'var(--foreground)',
+              fontWeight: isActive('/admin/scan', location.pathname) || isActive('/admin', location.pathname) ? 600 : 400,
+            }}
+          >
+            <QrCode style={{ width: 18, height: 18, flexShrink: 0 }} />
+            <span className="flex-1">{intl.formatMessage({ id: 'nav.scan' })}</span>
+            {(isActive('/admin/scan', location.pathname) || isActive('/admin', location.pathname)) && (
+              <ChevronRight style={{ width: 14, height: 14, opacity: 0.4 }} />
+            )}
+          </Link>
+        )}
+
         <div className="h-px my-2" style={{ background: 'var(--border)' }} />
 
         <Link
@@ -139,6 +161,7 @@ function TabletTopNav({ onMenuOpen }: { onMenuOpen: () => void }) {
   const location = useLocation()
   const intl = useIntl()
   const nav = useNav()
+  const { isStaff } = useAuthContext()
   return (
     <header
       className="hidden md:flex lg:hidden sticky top-0 z-30 items-center border-b px-4"
@@ -179,6 +202,17 @@ function TabletTopNav({ onMenuOpen }: { onMenuOpen: () => void }) {
 
       {/* Right: Book CTA + theme toggle + notification */}
       <div className="flex items-center gap-2">
+        {isStaff && (
+          <Link
+            to="/admin/scan"
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-semibold tap"
+            style={{ textDecoration: 'none', background: 'var(--muted)', color: 'var(--foreground)' }}
+            aria-label={intl.formatMessage({ id: 'nav.scan' })}
+          >
+            <QrCode style={{ width: 15, height: 15 }} />
+            {intl.formatMessage({ id: 'nav.scan' })}
+          </Link>
+        )}
         <Link
           to="/home?book=1"
           className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-semibold tap"
@@ -219,6 +253,7 @@ function MobileTopBar() {
 function MobileTabBar({ currentPath }: { currentPath: string }) {
   const intl = useIntl()
   const nav = useNav()
+  const { isStaff } = useAuthContext()
   // Split nav into left 2 and right 2, with Book FAB in centre
   const left  = nav.slice(0, 2)   // Home, Bookings
   const right = nav.slice(2)      // Kit, Profile
@@ -252,16 +287,33 @@ function MobileTabBar({ currentPath }: { currentPath: string }) {
           )
         })}
 
-        {/* Centre Book FAB */}
-        <Link to="/home?book=1" aria-label={intl.formatMessage({ id: 'nav.book' })}
-          className="flex items-center justify-center tap"
-          style={{ textDecoration: 'none' }}
-        >
-          <span className="grid place-items-center rounded-full shadow-lg tap"
-            style={{ width: 48, height: 48, background: 'var(--primary)', color: '#fff', marginBottom: 6, boxShadow: '0 4px 14px rgba(20,155,95,0.4)' }}>
-            <Plus style={{ width: 22, height: 22 }} />
-          </span>
-        </Link>
+        {/* Centre: Scan for staff, Book FAB for teachers */}
+        {isStaff ? (
+          <Link to="/admin/scan" aria-label={intl.formatMessage({ id: 'nav.scan' })}
+            className="flex flex-col items-center justify-center gap-0.5 tap"
+            style={{
+              textDecoration: 'none',
+              color: isActive('/admin', currentPath) ? 'var(--brand-purple)' : 'var(--muted-foreground)',
+              fontSize: 10, fontWeight: isActive('/admin', currentPath) ? 600 : 400,
+            }}
+          >
+            <span className="grid place-items-center rounded-full"
+              style={{ width: 40, height: 28, background: isActive('/admin', currentPath) ? 'var(--tint-purple)' : 'transparent' }}>
+              <QrCode style={{ width: 20, height: 20 }} />
+            </span>
+            {intl.formatMessage({ id: 'nav.scan' })}
+          </Link>
+        ) : (
+          <Link to="/home?book=1" aria-label={intl.formatMessage({ id: 'nav.book' })}
+            className="flex items-center justify-center tap"
+            style={{ textDecoration: 'none' }}
+          >
+            <span className="grid place-items-center rounded-full shadow-lg tap"
+              style={{ width: 48, height: 48, background: 'var(--primary)', color: '#fff', marginBottom: 6, boxShadow: '0 4px 14px rgba(20,155,95,0.4)' }}>
+              <Plus style={{ width: 22, height: 22 }} />
+            </span>
+          </Link>
+        )}
 
         {/* Right tabs */}
         {right.map((item) => {
