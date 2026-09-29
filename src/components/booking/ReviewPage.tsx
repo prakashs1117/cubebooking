@@ -2,8 +2,8 @@ import { useState, useEffect } from 'react'
 import { useNavigate, Link } from 'react-router-dom'
 import { Timer, ShieldCheck } from 'lucide-react'
 import { useIntl } from 'react-intl'
-import { getFunctions, httpsCallable } from 'firebase/functions'
-import app from '../../shared/firebase'
+import { collection, addDoc, serverTimestamp } from 'firebase/firestore'
+import { db } from '../../shared/firebase'
 import { useAuthContext } from '../../context/AuthContext'
 import { useBookingStore } from '../../stores/bookingStore'
 import { useNotificationStore } from '../../stores/notificationStore'
@@ -84,22 +84,6 @@ export default function ReviewPage() {
     setSubmitting(true)
     setError(null)
     try {
-      const functions = getFunctions(app, 'europe-west1')
-      const confirm = httpsCallable<
-        {
-          segments: { programId: string; date: string; startHour: number; order: number }[]
-          visitType: string
-          teacherName: string
-          teacherEmail: string
-          schoolId: string
-          grade: string
-          studentCount: number
-          accessNeeds: string
-          bookingCode: string
-        },
-        { bookingId: string }
-      >(functions, 'confirmBooking')
-
       const bookingCode = makeBookingCode()
       const segments = slots.map((s, i) => ({
         programId: s.programId,
@@ -108,16 +92,19 @@ export default function ReviewPage() {
         order: i + 1,
       }))
 
-      await confirm({
-        segments,
-        visitType: visitType ?? 'onsite',
+      await addDoc(collection(db, 'bookings'), {
+        type: visitType ?? 'onsite',
+        teacherId: user.uid,
         teacherName: profile?.displayName ?? '',
         teacherEmail: user.email ?? '',
         schoolId: profile?.schoolId ?? '',
+        segments,
         grade: classDetails.grade,
         studentCount: classDetails.studentCount,
         accessNeeds: classDetails.accessNeeds ?? '',
+        status: visitType === 'toad' ? 'pending' : 'confirmed',
         bookingCode,
+        createdAt: serverTimestamp(),
       })
 
       // Build calendar URL

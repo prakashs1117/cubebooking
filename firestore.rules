@@ -61,7 +61,9 @@ service cloud.firestore {
         resource.data.teacherId == request.auth.uid || isAdmin()
       );
 
-      // No client-side create — handled by confirmBooking Cloud Function.
+      // Teachers can create their own bookings directly (Cloud Function not yet deployed)
+      allow create: if isSignedIn()
+        && request.resource.data.teacherId == request.auth.uid;
 
       // Teachers can cancel their own bookings (status → 'cancelled')
       allow update: if isSignedIn()
