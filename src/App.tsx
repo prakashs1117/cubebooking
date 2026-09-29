@@ -16,6 +16,7 @@ import KitPage from './components/pages/KitPage'
 import ProfilePage from './components/pages/ProfilePage'
 import QRScanPage from './components/admin/QRScanPage'
 import BookingVerifyPage from './components/admin/BookingVerifyPage'
+import AdminDashboardPage from './components/admin/AdminDashboardPage'
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -75,13 +76,21 @@ function AppRoutes() {
       {/* Booking funnel — now handled via modal; redirect old URLs to home */}
       <Route path="/book/*" element={<Navigate to="/home" replace />} />
 
-      {/* Admin — no shell, role-guarded */}
+      {/* Admin — role-guarded */}
+      <Route path="/admin" element={
+        <ProtectedRoute>
+          <AppShell>
+            <ProtectedRoute requireStaff>
+              <AdminDashboardPage />
+            </ProtectedRoute>
+          </AppShell>
+        </ProtectedRoute>
+      } />
       <Route path="/admin/scan" element={<ProtectedRoute requireStaff><QRScanPage /></ProtectedRoute>} />
       <Route path="/admin/verify/:bookingId" element={<ProtectedRoute requireStaff><BookingVerifyPage /></ProtectedRoute>} />
 
       {/* Future routes */}
       {/* <Route path="/toad" element={<ProtectedRoute><ToadRequestPage /></ProtectedRoute>} /> */}
-      {/* <Route path="/admin" element={<ShellRoute element={<AdminHomePage />} />} /> */}
 
       <Route path="/" element={<Navigate to="/home" replace />} />
       <Route path="*" element={<Navigate to="/home" replace />} />
