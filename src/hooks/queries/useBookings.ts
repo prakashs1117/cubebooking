@@ -65,34 +65,19 @@ export function useSlotAvailability(
     enabled: !!user && !!date && programIds.length > 0,
     queryFn: async () => {
       const activeStatuses = ['confirmed', 'approved', 'pending']
-      const results = await Promise.all(
-        programIds.map((pid) =>
-          getDocs(
-            query(
-              collection(db, 'bookings'),
-              where('status', 'in', activeStatuses),
-            ),
-          ).then((snap) =>
-            snap.docs
-              .map((d) => ({ id: d.id, ...d.data() }) as BookingDoc)
-              .filter((b) =>
-                (b.segments ?? []).some(
-                  (seg) => seg.programId === pid && seg.date === date,
-                ),
-              ),
-          ),
-        ),
+      const snap = await getDocs(
+        query(collection(db, 'bookings'), where('status', 'in', activeStatuses))
       )
+      const allBookings = snap.docs.map((d) => ({ id: d.id, ...d.data() }) as BookingDoc)
 
       const map: SlotAvailabilityMap = {}
-      for (const bookingList of results) {
-        for (const booking of bookingList) {
-          for (const seg of booking.segments ?? []) {
-            if (!programIds.includes(seg.programId as ProgramId)) continue
-            if (seg.date !== date) continue
-            const key = dateToSlotKey(date, seg.startHour)
-            map[key] = booking.teacherId === user!.uid ? 'yours' : 'taken'
-          }
+      for (const booking of allBookings) {
+        for (const seg of booking.segments ?? []) {
+          if (!programIds.includes(seg.programId as ProgramId)) continue
+          if (seg.date !== date) continue
+          const key = dateToSlotKey(date!, seg.startHour)
+          const newVal = booking.teacherId === user!.uid ? 'yours' : 'taken'
+          if (map[key] !== 'yours') map[key] = newVal
         }
       }
       return map
