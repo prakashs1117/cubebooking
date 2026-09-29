@@ -1,32 +1,14 @@
-import { useMemo } from 'react'
+// src/hooks/queries/useBookings.ts
 import { useQuery } from '@tanstack/react-query'
-import { collection, query, where, orderBy, getDocs, doc, getDoc } from 'firebase/firestore'
+import { collection, query, where, getDocs, doc, getDoc, orderBy } from 'firebase/firestore'
 import { db } from '../../shared/firebase'
-import type { Booking } from '../../shared/types'
+import type { Booking, ProgramId } from '../../shared/types'
 import { useAuthContext } from '../../context/AuthContext'
-import type { Timestamp } from 'firebase/firestore'
-
-/** Fetch start/end times for a booking by looking up its session IDs. */
-export function useBookingTimes(sessionIds: string[]) {
-  return useQuery({
-    queryKey: ['session-times', sessionIds.join(',')],
-    enabled: sessionIds.length > 0,
-    queryFn: async () => {
-      const snaps = await Promise.all(sessionIds.map((id) => getDoc(doc(db, 'sessions', id))))
-      const docs = snaps.filter((s) => s.exists()).map((s) => s.data())
-      if (!docs.length) return { startDate: null, endDate: null }
-      const starts = docs.map((d) => (d.start as Timestamp).toDate())
-      const ends   = docs.map((d) => (d.end   as Timestamp).toDate())
-      return {
-        startDate: new Date(Math.min(...starts.map((d) => d.getTime()))),
-        endDate:   new Date(Math.max(...ends.map((d)   => d.getTime()))),
-      }
-    },
-    staleTime: 5 * 60_000,
-  })
-}
+import { dateToSlotKey, slotToDate } from '../../config/slots'
 
 export type BookingDoc = Booking & { id: string }
+
+export type SlotAvailabilityMap = Record<string, 'taken' | 'yours'>
 
 export function useMyBookings() {
   const { user } = useAuthContext()
@@ -61,48 +43,62 @@ export function useBooking(bookingId: string | undefined) {
 
 export function isUpcoming(booking: BookingDoc): boolean {
   if (!booking.segments?.length) return false
-  try {
-    const firstStart = (booking.segments[0] as { sessionId: string; programId: string; order: number } & { start?: Timestamp })?.start
-    if (!firstStart) return true
-    return firstStart.toDate() > new Date()
-  } catch {
-    return true
-  }
+  const seg = booking.segments[0]
+  if (!seg.date || seg.startHour == null) return true
+  return slotToDate(seg.date, seg.startHour) > new Date()
 }
 
-export function useTeacherBookingWindows(): { start: Date; end: Date }[] {
-  const { data: bookings = [] } = useMyBookings()
+/**
+ * Returns a map of slotKey → 'yours' | 'taken' for the given programs and date.
+ * 'yours' = current teacher holds this slot (any active status).
+ * 'taken' = another class holds this slot.
+ * Keys absent from the map = slot is available.
+ */
+export function useSlotAvailability(
+  programIds: ProgramId[],
+  date: string | null,
+): SlotAvailabilityMap {
+  const { user } = useAuthContext()
 
-  const activeSessionIds = useMemo(() => {
-    const ids: string[] = []
-    for (const b of bookings) {
-      if (b.status !== 'confirmed' && b.status !== 'approved' && b.status !== 'pending') continue
-      for (const seg of b.segments ?? []) {
-        if (seg.sessionId) ids.push(seg.sessionId)
-      }
-    }
-    return ids
-  }, [bookings])
-
-  const { data: windows = [] } = useQuery({
-    queryKey: ['teacher-session-windows', activeSessionIds.join(',')],
-    enabled: activeSessionIds.length > 0,
+  const { data } = useQuery({
+    queryKey: ['slot-availability', programIds.join(','), date],
+    enabled: !!user && !!date && programIds.length > 0,
     queryFn: async () => {
-      const snaps = await Promise.all(
-        activeSessionIds.map((id) => getDoc(doc(db, 'sessions', id)))
+      const activeStatuses = ['confirmed', 'approved', 'pending']
+      const results = await Promise.all(
+        programIds.map((pid) =>
+          getDocs(
+            query(
+              collection(db, 'bookings'),
+              where('status', 'in', activeStatuses),
+            ),
+          ).then((snap) =>
+            snap.docs
+              .map((d) => ({ id: d.id, ...d.data() }) as BookingDoc)
+              .filter((b) =>
+                (b.segments ?? []).some(
+                  (seg) => seg.programId === pid && seg.date === date,
+                ),
+              ),
+          ),
+        ),
       )
-      return snaps
-        .filter((s) => s.exists())
-        .map((s) => {
-          const d = s.data()!
-          return {
-            start: (d['start'] as Timestamp).toDate(),
-            end:   (d['end']   as Timestamp).toDate(),
+
+      const map: SlotAvailabilityMap = {}
+      for (const bookingList of results) {
+        for (const booking of bookingList) {
+          for (const seg of booking.segments ?? []) {
+            if (!programIds.includes(seg.programId as ProgramId)) continue
+            if (seg.date !== date) continue
+            const key = dateToSlotKey(date, seg.startHour)
+            map[key] = booking.teacherId === user!.uid ? 'yours' : 'taken'
           }
-        })
+        }
+      }
+      return map
     },
     staleTime: 30_000,
   })
 
-  return windows
+  return data ?? {}
 }
