@@ -13,8 +13,16 @@ function useBookProgramOptions() {
     { id: 'both', title: intl.formatMessage({ id: 'bookPrograms.both.title' }), sub: intl.formatMessage({ id: 'bookPrograms.both.sub' }), swatch: 'linear-gradient(135deg, var(--brand-mint) 50%, var(--brand-yellow) 50%)' },
   ]
   const orderOptions: { id: ProgramOrder; label: string; sub: string }[] = [
-    { id: 'cube-first', label: intl.formatMessage({ id: 'bookPrograms.order.cubeFirst.label' }), sub: 'Cube 09:00 → Lab 09:45' },
-    { id: 'lab-first',  label: intl.formatMessage({ id: 'bookPrograms.order.labFirst.label' }),  sub: 'Lab 09:00 → Cube 09:45' },
+    {
+      id: 'cube-first',
+      label: intl.formatMessage({ id: 'bookPrograms.order.cubeFirst.label' }),
+      sub: intl.formatMessage({ id: 'bookPrograms.order.sub' }),
+    },
+    {
+      id: 'lab-first',
+      label: intl.formatMessage({ id: 'bookPrograms.order.labFirst.label' }),
+      sub: intl.formatMessage({ id: 'bookPrograms.order.sub' }),
+    },
   ]
   return { options, orderOptions }
 }
