@@ -77,15 +77,7 @@ function AppRoutes() {
       <Route path="/book/*" element={<Navigate to="/home" replace />} />
 
       {/* Admin — role-guarded */}
-      <Route path="/admin" element={
-        <ProtectedRoute>
-          <AppShell>
-            <ProtectedRoute requireStaff>
-              <AdminDashboardPage />
-            </ProtectedRoute>
-          </AppShell>
-        </ProtectedRoute>
-      } />
+      <Route path="/admin" element={<ShellRoute element={<ProtectedRoute requireStaff><AdminDashboardPage /></ProtectedRoute>} />} />
       <Route path="/admin/scan" element={<ProtectedRoute requireStaff><QRScanPage /></ProtectedRoute>} />
       <Route path="/admin/verify/:bookingId" element={<ProtectedRoute requireStaff><BookingVerifyPage /></ProtectedRoute>} />
 

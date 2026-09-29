@@ -94,6 +94,7 @@ export interface Booking {
   truckParking?: string       // TOAD only
   status: BookingStatus
   declineReason?: string
+  bookingCode?: string        // generated at booking creation (e.g. 'CC-ABCD')
   holdExpiresAt?: Timestamp   // set during checkout
   arrivedAt?: Timestamp       // set when admin marks class as checked in
   createdAt: Timestamp

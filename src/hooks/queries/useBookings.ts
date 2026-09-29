@@ -129,8 +129,10 @@ export function useSlotAvailability(
  * Callers MUST be in a staff-gated component (isStaff === true).
  */
 export function useAllBookings(date?: string) {
+  const { user } = useAuthContext()
   return useQuery({
     queryKey: ['bookings', 'all', date ?? 'all'],
+    enabled: !!user?.uid,
     queryFn: async () => {
       // Firestore doesn't support querying nested array fields (segments[].date).
       // Fetch all active bookings and filter client-side by date if provided.
