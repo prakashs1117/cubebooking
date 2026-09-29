@@ -68,3 +68,20 @@ export function isUpcoming(booking: BookingDoc): boolean {
     return true
   }
 }
+
+export function useTeacherBookingWindows(): { start: Date; end: Date }[] {
+  const { data: bookings = [] } = useMyBookings()
+  const active = bookings.filter(
+    (b) => b.status === 'confirmed' || b.status === 'approved' || b.status === 'pending',
+  )
+  const windows: { start: Date; end: Date }[] = []
+  for (const booking of active) {
+    for (const seg of booking.segments ?? []) {
+      const s = seg as { sessionId: string; programId: string; order: number; start?: { toDate(): Date }; end?: { toDate(): Date } }
+      if (s.start && s.end) {
+        windows.push({ start: s.start.toDate(), end: s.end.toDate() })
+      }
+    }
+  }
+  return windows
+}
