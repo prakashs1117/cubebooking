@@ -1,3 +1,4 @@
+import { useMemo } from 'react'
 import { useQuery } from '@tanstack/react-query'
 import { collection, query, where, orderBy, getDocs, doc, getDoc } from 'firebase/firestore'
 import { db } from '../../shared/firebase'
@@ -71,17 +72,37 @@ export function isUpcoming(booking: BookingDoc): boolean {
 
 export function useTeacherBookingWindows(): { start: Date; end: Date }[] {
   const { data: bookings = [] } = useMyBookings()
-  const active = bookings.filter(
-    (b) => b.status === 'confirmed' || b.status === 'approved' || b.status === 'pending',
-  )
-  const windows: { start: Date; end: Date }[] = []
-  for (const booking of active) {
-    for (const seg of booking.segments ?? []) {
-      const s = seg as { sessionId: string; programId: string; order: number; start?: { toDate(): Date }; end?: { toDate(): Date } }
-      if (s.start && s.end) {
-        windows.push({ start: s.start.toDate(), end: s.end.toDate() })
+
+  const activeSessionIds = useMemo(() => {
+    const ids: string[] = []
+    for (const b of bookings) {
+      if (b.status !== 'confirmed' && b.status !== 'approved' && b.status !== 'pending') continue
+      for (const seg of b.segments ?? []) {
+        if (seg.sessionId) ids.push(seg.sessionId)
       }
     }
-  }
+    return ids
+  }, [bookings])
+
+  const { data: windows = [] } = useQuery({
+    queryKey: ['teacher-session-windows', activeSessionIds.join(',')],
+    enabled: activeSessionIds.length > 0,
+    queryFn: async () => {
+      const snaps = await Promise.all(
+        activeSessionIds.map((id) => getDoc(doc(db, 'sessions', id)))
+      )
+      return snaps
+        .filter((s) => s.exists())
+        .map((s) => {
+          const d = s.data()!
+          return {
+            start: (d['start'] as Timestamp).toDate(),
+            end:   (d['end']   as Timestamp).toDate(),
+          }
+        })
+    },
+    staleTime: 30_000,
+  })
+
   return windows
 }
