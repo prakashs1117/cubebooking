@@ -106,7 +106,7 @@ function Sidebar({ onClose }: { onClose?: () => void }) {
 
         {isStaff && (
           <Link
-            to="/admin/scan"
+            to="/admin"
             onClick={onClose}
             className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium tap"
             style={{
@@ -204,7 +204,7 @@ function TabletTopNav({ onMenuOpen }: { onMenuOpen: () => void }) {
       <div className="flex items-center gap-2">
         {isStaff && (
           <Link
-            to="/admin/scan"
+            to="/admin"
             className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-semibold tap"
             style={{ textDecoration: 'none', background: 'var(--muted)', color: 'var(--foreground)' }}
             aria-label={intl.formatMessage({ id: 'nav.scan' })}
@@ -289,7 +289,7 @@ function MobileTabBar({ currentPath }: { currentPath: string }) {
 
         {/* Centre: Scan for staff, Book FAB for teachers */}
         {isStaff ? (
-          <Link to="/admin/scan" aria-label={intl.formatMessage({ id: 'nav.scan' })}
+          <Link to="/admin" aria-label={intl.formatMessage({ id: 'nav.scan' })}
             className="flex flex-col items-center justify-center gap-0.5 tap"
             style={{
               textDecoration: 'none',
