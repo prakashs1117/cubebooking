@@ -67,25 +67,20 @@ const programs = {
   cube: {
     name: 'Curiosity Cube',
     type: 'onsite',
-    sessionMinutes: 45,
-    capacity: 30,
+    sessionMinutes: 60,
+    capacity: 1,
     openWeekdays: [1, 2, 3, 4, 5],
-    // BOTH Cube first AND Lab first support:
-    // Cube first:  Cube 09:00-09:45 + Lab 09:45-10:30
-    // Lab first:   Lab 09:00-09:45 + Cube 09:45-10:30
-    // So Cube needs both 09:00 AND 09:45 slots
-    dailyStartTimes: ['09:00', '09:45', '10:00', '10:45', '11:00', '11:45', '13:00', '13:45', '14:00', '14:45'],
+    dailyStartTimes: ['09:00', '10:00', '11:00', '12:00', '13:00'],
     needsApproval: false,
     serviceCities: [],
   },
   lab: {
     name: 'Curiosity Lab',
     type: 'onsite',
-    sessionMinutes: 45,
-    capacity: 30,
+    sessionMinutes: 60,
+    capacity: 1,
     openWeekdays: [1, 2, 3, 4, 5],
-    // Same staggered times to match Cube ends
-    dailyStartTimes: ['09:00', '09:45', '10:00', '10:45', '11:00', '11:45', '13:00', '13:45', '14:00', '14:45'],
+    dailyStartTimes: ['09:00', '10:00', '11:00', '12:00', '13:00'],
     needsApproval: false,
     serviceCities: [],
   },
