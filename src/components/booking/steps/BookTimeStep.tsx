@@ -61,7 +61,7 @@ interface Props {
 
 export function BookTimeStep({ onContinue }: Props) {
   const intl = useIntl()
-  const { programSelection, programOrder, selectedDate, setSelectedDate, setSlots, startHold } = useBookingStore()
+  const { programSelection, programOrder, selectedDate, setSelectedDate, setSlots } = useBookingStore()
 
   const [weekOffset, setWeekOffset] = useState(0)
 
@@ -160,7 +160,6 @@ export function BookTimeStep({ onContinue }: Props) {
       start: slotToDate(dateKey, h),
       end: slotEndDate(dateKey, h),
     }])
-    startHold()
     onContinue()
   }
 
@@ -170,7 +169,6 @@ export function BookTimeStep({ onContinue }: Props) {
       { programId: firstProg,  date: dateKey, startHour: h1, start: slotToDate(dateKey, h1), end: slotEndDate(dateKey, h1) },
       { programId: secondProg, date: dateKey, startHour: h2, start: slotToDate(dateKey, h2), end: slotEndDate(dateKey, h2) },
     ])
-    startHold()
     onContinue()
   }
 

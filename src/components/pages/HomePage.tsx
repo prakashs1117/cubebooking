@@ -1,5 +1,5 @@
-import { useState } from 'react'
-import { Link } from 'react-router-dom'
+import { useState, useEffect } from 'react'
+import { Link, useSearchParams, useNavigate } from 'react-router-dom'
 import { MapPin, Calendar, ChevronRight } from 'lucide-react'
 import { useAuthContext } from '../../context/AuthContext'
 import { useMyBookings } from '../../hooks/queries/useBookings'
@@ -96,11 +96,20 @@ export default function HomePage() {
   const name = profile?.displayName || 'there'
   const [modalOpen, setModalOpen] = useState(false)
   const [modalVisitType, setModalVisitType] = useState<VisitType | undefined>(undefined)
+  const [searchParams] = useSearchParams()
+  const navigate = useNavigate()
 
   const openBooking = (visitType?: VisitType) => {
     setModalVisitType(visitType)
     setModalOpen(true)
   }
+
+  useEffect(() => {
+    if (searchParams.get('book') === '1') {
+      openBooking()
+      navigate('/home', { replace: true })
+    }
+  }, [searchParams, navigate])
 
   const nextBooking = bookings.find((b) => {
     if (b.status === 'cancelled') return false

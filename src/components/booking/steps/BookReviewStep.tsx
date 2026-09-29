@@ -1,28 +1,12 @@
-import { useState, useEffect } from 'react'
-import { Timer, ShieldCheck } from 'lucide-react'
+import { useState } from 'react'
+import { ShieldCheck } from 'lucide-react'
 import { useIntl } from 'react-intl'
-import { collection, addDoc, serverTimestamp } from 'firebase/firestore'
-import { db } from '../../../shared/firebase'
+import { useQueryClient } from '@tanstack/react-query'
 import { useAuthContext } from '../../../context/AuthContext'
 import { useBookingStore } from '../../../stores/bookingStore'
 import { useNotificationStore } from '../../../stores/notificationStore'
 import { ContinueButton } from '../BookingLayout'
-
-function useCountdown(expiresAt: Date | null) {
-  const [remaining, setRemaining] = useState(() =>
-    expiresAt ? Math.max(0, Math.ceil((expiresAt.getTime() - Date.now()) / 1000)) : 600
-  )
-  useEffect(() => {
-    if (!expiresAt) return
-    const tick = () => setRemaining(Math.max(0, Math.ceil((expiresAt.getTime() - Date.now()) / 1000)))
-    tick()
-    const id = setInterval(tick, 1000)
-    return () => clearInterval(id)
-  }, [expiresAt])
-  const mins = Math.floor(remaining / 60)
-  const secs = remaining % 60
-  return { remaining, label: `${mins}:${secs.toString().padStart(2, '0')}` }
-}
+import { createBooking, SlotTakenError } from '../../../services/bookingService'
 
 function programLabel(id: string, intl: ReturnType<typeof useIntl>): string {
   if (id === 'cube') return intl.formatMessage({ id: 'program.cube' })
@@ -37,25 +21,18 @@ function makeBookingCode() {
 
 interface Props {
   onBack: () => void
-  onConfirmed: () => void
+  onConfirmed: (bookingId: string, bookingCode: string) => void
   onExpired: () => void
 }
 
-export function BookReviewStep({ onBack, onConfirmed, onExpired }: Props) {
+export function BookReviewStep({ onBack, onConfirmed, onExpired: _onExpired }: Props) {
   const intl = useIntl()
   const { user, profile } = useAuthContext()
-  const { visitType, programSelection, slots, holdExpiresAt, classDetails, reset } = useBookingStore()
+  const { visitType, programSelection, slots, classDetails, confirmSlots } = useBookingStore()
+  const queryClient = useQueryClient()
   const pushNotification = useNotificationStore((s) => s.push)
-  const { remaining, label: timerLabel } = useCountdown(holdExpiresAt)
   const [submitting, setSubmitting] = useState(false)
   const [error, setError] = useState<string | null>(null)
-
-  useEffect(() => {
-    if (holdExpiresAt && remaining === 0 && holdExpiresAt.getTime() < Date.now()) {
-      reset()
-      onExpired()
-    }
-  }, [remaining, holdExpiresAt, reset, onExpired])
 
   if (!slots.length || !user) return null
 
@@ -91,19 +68,17 @@ export function BookReviewStep({ onBack, onConfirmed, onExpired }: Props) {
         order: i + 1,
       }))
 
-      await addDoc(collection(db, 'bookings'), {
-        type: visitType ?? 'onsite',
-        teacherId: user.uid,
+      const { bookingId } = await createBooking({
+        uid: user.uid,
         teacherName: profile?.displayName ?? '',
         teacherEmail: user.email ?? '',
         schoolId: profile?.schoolId ?? '',
+        visitType: visitType ?? 'onsite',
         segments,
         grade: classDetails.grade,
         studentCount: classDetails.studentCount,
         accessNeeds: classDetails.accessNeeds ?? '',
-        status: visitType === 'toad' ? 'pending' : 'confirmed',
         bookingCode,
-        createdAt: serverTimestamp(),
       })
 
       const calFmt = (d: Date) => d.toISOString().replace(/[-:]/g, '').replace('.000', '')
@@ -124,14 +99,11 @@ export function BookReviewStep({ onBack, onConfirmed, onExpired }: Props) {
         bookingId: bookingCode,
       })
 
-      reset()
-      onConfirmed()
+      confirmSlots()
+      queryClient.invalidateQueries({ queryKey: ['bookings'] })
+      onConfirmed(bookingId, bookingCode)
     } catch (err: unknown) {
-      const message = (err as { message?: string })?.message ?? ''
-      const code = (err as { code?: string })?.code ?? ''
-      if (message.includes('teacher-conflict')) {
-        setError(intl.formatMessage({ id: 'review.teacherConflict' }))
-      } else if (message.includes('slots-unavailable') || code === 'failed-precondition') {
+      if (err instanceof SlotTakenError) {
         setError(intl.formatMessage({ id: 'review.conflict' }))
       } else {
         setError(intl.formatMessage({ id: 'review.error' }))
@@ -144,13 +116,6 @@ export function BookReviewStep({ onBack, onConfirmed, onExpired }: Props) {
 
   return (
     <>
-      {holdExpiresAt && (
-        <div className="flex items-center gap-2 text-sm font-semibold tabular-nums" style={{ color: remaining < 120 ? 'var(--destructive)' : 'var(--muted-foreground)' }}>
-          <Timer className="i i-sm" />
-          {timerLabel}
-        </div>
-      )}
-
       <h1 className="rise m-0 text-[28px] font-extrabold leading-[34px] tracking-tight" style={{ fontFamily: 'var(--font-display)' }}>
         {intl.formatMessage({ id: 'review.heading' })}
       </h1>

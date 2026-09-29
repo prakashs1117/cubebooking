@@ -60,15 +60,38 @@ service cloud.firestore {
       allow write: if isAdmin();
     }
 
+    // ── Slot locks (atomic double-booking prevention) ──────────────────────
+    // A slot doc existing means that hour/program is taken. The batch write
+    // creates booking + slots + teacherSlots together. "allow update: if false"
+    // makes Firestore deny the whole batch if any lock doc already exists.
+    match /slots/{slotId} {
+      allow read: if isSignedIn();
+      allow create: if isSignedIn()
+        && request.resource.data.teacherId == request.auth.uid;
+      allow update: if false;
+      allow delete: if isSignedIn() && resource.data.teacherId == request.auth.uid;
+      allow delete: if isAdmin();
+    }
+
+    // ── Teacher-hour locks (prevents teacher booking two programs at once) ──
+    match /teacherSlots/{slotId} {
+      allow read: if isSignedIn()
+        && resource.data.teacherId == request.auth.uid;
+      allow create: if isSignedIn()
+        && request.resource.data.teacherId == request.auth.uid;
+      allow update: if false;
+      allow delete: if isSignedIn() && resource.data.teacherId == request.auth.uid;
+      allow delete: if isAdmin();
+    }
+
     // ── Bookings ───────────────────────────────────────────────────────────
-    // Bookings are created exclusively by the confirmBooking Cloud Function
-    // (admin SDK bypasses rules). Teachers can only read their own and cancel.
+    // Teachers write bookings via writeBatch (booking + slot locks atomically).
     match /bookings/{bookingId} {
       allow read: if isSignedIn() && (
         resource.data.teacherId == request.auth.uid || isStaff()
       );
 
-      // Teachers can create their own bookings directly (Cloud Function not yet deployed)
+      // Teachers create bookings via writeBatch (booking + slot locks atomically)
       allow create: if isSignedIn()
         && request.resource.data.teacherId == request.auth.uid;
 

@@ -107,7 +107,7 @@ function Sidebar({ onClose }: { onClose?: () => void }) {
         <div className="h-px my-2" style={{ background: 'var(--border)' }} />
 
         <Link
-          to="/book"
+          to="/home?book=1"
           onClick={onClose}
           className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-semibold tap"
           style={{ textDecoration: 'none', background: 'var(--primary)', color: '#fff' }}
@@ -180,7 +180,7 @@ function TabletTopNav({ onMenuOpen }: { onMenuOpen: () => void }) {
       {/* Right: Book CTA + theme toggle + notification */}
       <div className="flex items-center gap-2">
         <Link
-          to="/book"
+          to="/home?book=1"
           className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-semibold tap"
           style={{ textDecoration: 'none', background: 'var(--primary)', color: '#fff' }}
         >
@@ -253,7 +253,7 @@ function MobileTabBar({ currentPath }: { currentPath: string }) {
         })}
 
         {/* Centre Book FAB */}
-        <Link to="/book" aria-label={intl.formatMessage({ id: 'nav.book' })}
+        <Link to="/home?book=1" aria-label={intl.formatMessage({ id: 'nav.book' })}
           className="flex items-center justify-center tap"
           style={{ textDecoration: 'none' }}
         >

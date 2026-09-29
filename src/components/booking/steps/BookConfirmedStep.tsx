@@ -2,8 +2,8 @@ import { useEffect } from 'react'
 import { CalendarPlus, Home } from 'lucide-react'
 import { useIntl } from 'react-intl'
 import { useBookingStore } from '../../../stores/bookingStore'
-import { useAuthContext } from '../../../context/AuthContext'
 import { trackBookingConfirmed } from '../../../services/analyticsService'
+import { BookingQRCode } from '../../ui/BookingQRCode'
 
 const BRAND_COLORS = [
   'var(--brand-mint)', 'var(--brand-yellow)', 'var(--brand-magenta)',
@@ -36,20 +36,20 @@ function makeCalendarUrl(title: string, start: Date, end: Date, desc = '') {
 }
 
 interface Props {
+  bookingId: string | null
+  bookingCode: string | null
   onDone: () => void
 }
 
-export function BookConfirmedStep({ onDone }: Props) {
+export function BookConfirmedStep({ bookingId, bookingCode, onDone }: Props) {
   const intl = useIntl()
   const { slots, classDetails, programSelection } = useBookingStore()
-  const { profile } = useAuthContext()
 
   useEffect(() => {
-    if (slots.length && programSelection) {
-      const bookingId = `booking_${Date.now()}`
+    if (slots.length && programSelection && bookingId) {
       trackBookingConfirmed(bookingId, programSelection)
     }
-  }, [slots.length, programSelection])
+  }, [slots.length, programSelection, bookingId])
 
   if (!slots.length) return null
 
@@ -70,8 +70,8 @@ export function BookConfirmedStep({ onDone }: Props) {
 
   return (
     <div
-      className="relative flex flex-col min-h-[480px] rounded-3xl overflow-hidden"
-      style={{ background: 'var(--brand-purple)', color: '#ffffff' }}
+      className="relative flex flex-col rounded-3xl overflow-hidden"
+      style={{ background: 'var(--brand-purple)', color: '#ffffff', margin: '0 -20px -32px' }}
     >
       <style>{`
         @keyframes cfFall {
@@ -98,7 +98,8 @@ export function BookConfirmedStep({ onDone }: Props) {
         />
       ))}
 
-      <div className="relative flex flex-col items-center text-center px-7 pt-12 pb-6 gap-3.5">
+      {/* Hero */}
+      <div className="relative flex flex-col items-center text-center px-7 pt-10 pb-6 gap-3">
         <span
           className="grid place-items-center w-20 h-20 rounded-full"
           style={{
@@ -112,7 +113,7 @@ export function BookConfirmedStep({ onDone }: Props) {
           </svg>
         </span>
 
-        <h1 className="rise-2 m-2 text-[30px] font-extrabold leading-9 tracking-tight" style={{ fontFamily: 'var(--font-display)' }}>
+        <h1 className="rise-2 m-2 text-[28px] font-extrabold leading-9 tracking-tight" style={{ fontFamily: 'var(--font-display)' }}>
           {intl.formatMessage({ id: 'confirmed.heading' })}
         </h1>
         <p className="rise-3 m-0 text-sm leading-6" style={{ color: 'rgba(255,255,255,0.88)' }}>
@@ -121,29 +122,47 @@ export function BookConfirmedStep({ onDone }: Props) {
         </p>
       </div>
 
+      {/* Booking code + QR card */}
       <div
-        className="rise-4 mx-5 p-[18px] rounded-3xl flex gap-4 items-center"
+        className="rise-4 mx-5 rounded-3xl overflow-hidden"
         style={{ background: 'var(--background)', color: 'var(--foreground)' }}
       >
-        <div className="flex-none grid place-items-center w-[72px] h-[72px] rounded-2xl" style={{ background: 'var(--muted)' }}>
-          <svg viewBox="0 0 24 24" width="36" height="36" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
-            <rect width="5" height="5" x="3" y="3" rx="1"/><rect width="5" height="5" x="16" y="3" rx="1"/>
-            <rect width="5" height="5" x="3" y="16" rx="1"/><path d="M21 16h-3a2 2 0 0 0-2 2v3"/>
-            <path d="M21 21v.01"/><path d="M12 7v3a2 2 0 0 1-2 2H7"/>
-            <path d="M3 12h.01"/><path d="M12 3h.01"/><path d="M12 16v.01"/>
-            <path d="M16 12h1"/><path d="M21 12v.01"/><path d="M12 21v-1"/>
-          </svg>
-        </div>
-        <div className="flex flex-col gap-0.5">
-          <span className="text-xs" style={{ color: 'var(--muted-foreground)' }}>{intl.formatMessage({ id: 'confirmed.code.label' })}</span>
-          <span className="text-[20px] font-extrabold tracking-widest" style={{ fontFamily: 'var(--font-display)', letterSpacing: '0.04em' }}>
-            {profile?.displayName ? `CC-${profile.displayName.slice(0, 2).toUpperCase()}${(1000 + (profile.displayName.charCodeAt(0) * 7 % 9000))}` : 'CC-1234'}
+        {/* Code row */}
+        <div className="flex items-center gap-4 px-[18px] py-[16px] border-b" style={{ borderColor: 'var(--border)' }}>
+          <div className="flex flex-col gap-0.5 flex-1">
+            <span className="text-xs font-medium" style={{ color: 'var(--muted-foreground)' }}>
+              {intl.formatMessage({ id: 'confirmed.code.label' })}
+            </span>
+            <span className="text-[20px] font-extrabold tracking-widest" style={{ fontFamily: 'var(--font-display)', letterSpacing: '0.04em' }}>
+              {bookingCode ?? '—'}
+            </span>
+            <span className="text-xs" style={{ color: 'var(--muted-foreground)' }}>
+              {intl.formatMessage({ id: 'confirmed.code.sub' })}
+            </span>
+          </div>
+          <span
+            className="self-start inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-bold shrink-0"
+            style={{ background: 'var(--tint-green, #dcfce7)', color: 'var(--brand-green, #16a34a)' }}
+          >
+            ✓ {intl.formatMessage({ id: 'confirmed.status' })}
           </span>
-          <span className="text-xs" style={{ color: 'var(--muted-foreground)' }}>{intl.formatMessage({ id: 'confirmed.code.sub' })}</span>
         </div>
+
+        {/* QR code */}
+        {bookingId && (
+          <div className="flex flex-col items-center gap-2.5 px-[18px] py-4">
+            <div className="p-3 rounded-2xl" style={{ background: '#ffffff' }}>
+              <BookingQRCode bookingId={bookingId} size={148} />
+            </div>
+            <p className="m-0 text-xs text-center" style={{ color: 'var(--muted-foreground)' }}>
+              {intl.formatMessage({ id: 'confirmed.qr.hint' })}
+            </p>
+          </div>
+        )}
       </div>
 
-      <div className="mt-auto px-5 pb-8 pt-5 flex flex-col gap-3">
+      {/* Actions */}
+      <div className="px-5 pb-8 pt-4 flex flex-col gap-3">
         <a
           href={calUrl}
           target="_blank"

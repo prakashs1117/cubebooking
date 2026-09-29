@@ -1,5 +1,5 @@
-import { useEffect, useState, forwardRef } from 'react'
-import { Timer, Minus, Plus } from 'lucide-react'
+import { useState, forwardRef } from 'react'
+import { Minus, Plus } from 'lucide-react'
 import { ChevronDownIcon, ChevronUpIcon, CheckIcon } from '@radix-ui/react-icons'
 import * as Select from '@radix-ui/react-select'
 import { useIntl } from 'react-intl'
@@ -35,38 +35,14 @@ const GradeSelectItem = forwardRef<
   </Select.Item>
 ))
 
-function useCountdown(expiresAt: Date | null) {
-  const [remaining, setRemaining] = useState(() =>
-    expiresAt ? Math.max(0, Math.ceil((expiresAt.getTime() - Date.now()) / 1000)) : 600
-  )
-  useEffect(() => {
-    if (!expiresAt) return
-    const tick = () => setRemaining(Math.max(0, Math.ceil((expiresAt.getTime() - Date.now()) / 1000)))
-    tick()
-    const id = setInterval(tick, 1000)
-    return () => clearInterval(id)
-  }, [expiresAt])
-  const mins = Math.floor(remaining / 60)
-  const secs = remaining % 60
-  return { remaining, label: `${mins}:${secs.toString().padStart(2, '0')}` }
-}
-
 interface Props {
   onContinue: () => void
-  onExpired: () => void
+  onExpired?: () => void
 }
 
-export function BookDetailsStep({ onContinue, onExpired }: Props) {
+export function BookDetailsStep({ onContinue }: Props) {
   const intl = useIntl()
-  const { slots, holdExpiresAt, classDetails, setClassDetails, reset } = useBookingStore()
-  const { remaining, label: timerLabel } = useCountdown(holdExpiresAt)
-
-  useEffect(() => {
-    if (holdExpiresAt && remaining === 0 && holdExpiresAt.getTime() < Date.now()) {
-      reset()
-      onExpired()
-    }
-  }, [remaining, holdExpiresAt, reset, onExpired])
+  const { slots, classDetails, setClassDetails } = useBookingStore()
 
   const slotSummary = slots.length > 0
     ? slots.map((s) => {
@@ -84,33 +60,6 @@ export function BookDetailsStep({ onContinue, onExpired }: Props) {
 
   return (
     <>
-      {holdExpiresAt && (
-        <div
-          className="flex items-center gap-3 p-3 px-3.5 rounded-2xl"
-          style={{ background: 'var(--tint-yellow)' }}
-          role="timer"
-          aria-live="off"
-        >
-          <span className="flex-none grid place-items-center w-10 h-10 rounded-xl" style={{ background: 'var(--brand-yellow)' }}>
-            <Timer className="i" />
-          </span>
-          <div className="flex-1 flex flex-col">
-            <span className="text-sm font-semibold">{intl.formatMessage({ id: 'bookDetails.timer.held' })}</span>
-            {dateSummary && slotSummary && (
-              <span className="text-xs" style={{ color: 'var(--foreground)' }}>
-                {dateSummary} · {slotSummary}
-              </span>
-            )}
-          </div>
-          <span
-            className="font-extrabold text-[22px] tabular-nums"
-            style={{ fontFamily: 'var(--font-display)', color: remaining < 120 ? 'var(--destructive)' : 'var(--foreground)' }}
-          >
-            {timerLabel}
-          </span>
-        </div>
-      )}
-
       <h1 className="m-0 text-[28px] font-extrabold leading-[34px] tracking-tight" style={{ fontFamily: 'var(--font-display)' }}>
         {intl.formatMessage({ id: 'bookDetails.heading' })}
       </h1>

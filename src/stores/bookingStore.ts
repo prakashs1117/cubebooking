@@ -29,7 +29,6 @@ interface BookingState {
   // Step 3
   selectedDate: Date | null
   slots: SelectedSlot[]        // 1 slot for single program, 2 for both
-  holdExpiresAt: Date | null   // 10-minute hold timer start
   // Step 4
   classDetails: ClassDetails
   // Optimistic cache: slot keys confirmed by this user in this session
@@ -41,7 +40,6 @@ interface BookingState {
   setProgramOrder: (o: ProgramOrder) => void
   setSelectedDate: (d: Date) => void
   setSlots: (slots: SelectedSlot[]) => void
-  startHold: () => void
   setClassDetails: (d: Partial<ClassDetails>) => void
   /** Call before reset() after a successful booking to lock slots immediately. */
   confirmSlots: () => void
@@ -60,7 +58,6 @@ export const useBookingStore = create<BookingState>((set, get) => ({
   programOrder: 'cube-first',
   selectedDate: null,
   slots: [],
-  holdExpiresAt: null,
   classDetails: DEFAULT_CLASS_DETAILS,
   bookedSlotKeys: new Set(),
 
@@ -69,7 +66,6 @@ export const useBookingStore = create<BookingState>((set, get) => ({
   setProgramOrder: (programOrder) => set({ programOrder }),
   setSelectedDate: (selectedDate) => set({ selectedDate }),
   setSlots: (slots) => set({ slots }),
-  startHold: () => set({ holdExpiresAt: new Date(Date.now() + 10 * 60 * 1000) }),
   setClassDetails: (patch) =>
     set((s) => ({ classDetails: { ...s.classDetails, ...patch } })),
   confirmSlots: () => {
@@ -85,7 +81,6 @@ export const useBookingStore = create<BookingState>((set, get) => ({
       programOrder: 'cube-first',
       selectedDate: null,
       slots: [],
-      holdExpiresAt: null,
       classDetails: DEFAULT_CLASS_DETAILS,
     }),
 }))

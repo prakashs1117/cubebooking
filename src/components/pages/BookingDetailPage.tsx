@@ -2,10 +2,10 @@ import { useState } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import { ChevronLeft, Share2, CalendarPlus, MapPin, Clock, Users, GraduationCap, QrCode, ChevronDown } from 'lucide-react'
 import { useIntl } from 'react-intl'
-import { doc, updateDoc } from 'firebase/firestore'
+import { doc, writeBatch, serverTimestamp } from 'firebase/firestore'
 import { db } from '../../shared/firebase'
 import { useBooking } from '../../hooks/queries/useBookings'
-import { slotToDate, slotEndDate } from '../../config/slots'
+import { slotToDate, slotEndDate, toSlotDocId, toTeacherSlotDocId } from '../../config/slots'
 import { trackBookingCancelled } from '../../services/analyticsService'
 import { CancelBookingDialog } from '../booking/CancelBookingDialog'
 import { BookingQRCode } from '../ui/BookingQRCode'
@@ -46,10 +46,20 @@ export default function BookingDetailPage() {
 
     setCancelling(true)
     try {
-      await updateDoc(doc(db, 'bookings', id), {
-        status: 'cancelled',
-        updatedAt: new Date(),
-      })
+      const batch = writeBatch(db)
+      batch.update(doc(db, 'bookings', id), { status: 'cancelled', updatedAt: serverTimestamp() })
+
+      for (const seg of booking.segments ?? []) {
+        batch.delete(doc(db, 'slots', toSlotDocId(seg.date, seg.programId, seg.startHour)))
+      }
+
+      const uniqueHours = [...new Set((booking.segments ?? []).map((s) => `${s.date}:${s.startHour}`))]
+      for (const key of uniqueHours) {
+        const [date, hourStr] = key.split(':')
+        batch.delete(doc(db, 'teacherSlots', toTeacherSlotDocId(booking.teacherId, date, Number(hourStr))))
+      }
+
+      await batch.commit()
       trackBookingCancelled(id, 'user_cancelled')
       setCancelDialogOpen(false)
       navigate('/bookings', { replace: true })

@@ -90,6 +90,8 @@ export function BookingModal({ open, onClose, initialVisitType }: BookingModalPr
 
   const firstStep: Step = initialVisitType ? 'programs' : 'type'
   const [step, setStep] = useState<Step>(firstStep)
+  const [confirmedBookingId, setConfirmedBookingId] = useState<string | null>(null)
+  const [confirmedBookingCode, setConfirmedBookingCode] = useState<string | null>(null)
 
   useEffect(() => {
     if (open) {
@@ -153,10 +155,14 @@ export function BookingModal({ open, onClose, initialVisitType }: BookingModalPr
           <BookDetailsStep onContinue={() => goTo('review')} onExpired={handleExpired} />
         )}
         {step === 'review' && (
-          <BookReviewStep onBack={() => goTo('details')} onConfirmed={() => goTo('confirmed')} onExpired={handleExpired} />
+          <BookReviewStep
+            onBack={() => goTo('details')}
+            onConfirmed={(id, code) => { setConfirmedBookingId(id); setConfirmedBookingCode(code); goTo('confirmed') }}
+            onExpired={handleExpired}
+          />
         )}
         {step === 'confirmed' && (
-          <BookConfirmedStep onDone={handleClose} />
+          <BookConfirmedStep bookingId={confirmedBookingId} bookingCode={confirmedBookingCode} onDone={handleClose} />
         )}
       </div>
     </Modal>

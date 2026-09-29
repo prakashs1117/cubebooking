@@ -20,3 +20,11 @@ export function slotEndDate(date: string, startHour: number): Date {
 export function dateToSlotKey(date: string, startHour: number): string {
   return `${date}T${startHour}`
 }
+
+export function toSlotDocId(date: string, programId: string, startHour: number): string {
+  return `${date}_${programId}_${String(startHour).padStart(2, '0')}00`
+}
+
+export function toTeacherSlotDocId(uid: string, date: string, startHour: number): string {
+  return `${uid}_${date}_${String(startHour).padStart(2, '0')}00`
+}

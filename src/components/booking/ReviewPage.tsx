@@ -1,30 +1,13 @@
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import { useNavigate, Link } from 'react-router-dom'
-import { Timer, ShieldCheck } from 'lucide-react'
+import { ShieldCheck } from 'lucide-react'
 import { useIntl } from 'react-intl'
-import { collection, addDoc, serverTimestamp } from 'firebase/firestore'
 import { useQueryClient } from '@tanstack/react-query'
-import { db } from '../../shared/firebase'
 import { useAuthContext } from '../../context/AuthContext'
 import { useBookingStore } from '../../stores/bookingStore'
 import { useNotificationStore } from '../../stores/notificationStore'
 import BookingLayout, { ContinueButton } from './BookingLayout'
-
-function useCountdown(expiresAt: Date | null) {
-  const [remaining, setRemaining] = useState(() =>
-    expiresAt ? Math.max(0, Math.ceil((expiresAt.getTime() - Date.now()) / 1000)) : 600
-  )
-  useEffect(() => {
-    if (!expiresAt) return
-    const tick = () => setRemaining(Math.max(0, Math.ceil((expiresAt.getTime() - Date.now()) / 1000)))
-    tick()
-    const id = setInterval(tick, 1000)
-    return () => clearInterval(id)
-  }, [expiresAt])
-  const mins = Math.floor(remaining / 60)
-  const secs = remaining % 60
-  return { remaining, label: `${mins}:${secs.toString().padStart(2, '0')}` }
-}
+import { createBooking, SlotTakenError } from '../../services/bookingService'
 
 function programLabel(id: string, intl: ReturnType<typeof useIntl>): string {
   if (id === 'cube') return intl.formatMessage({ id: 'program.cube' })
@@ -41,19 +24,11 @@ export default function ReviewPage() {
   const navigate = useNavigate()
   const intl = useIntl()
   const { user, profile } = useAuthContext()
-  const { visitType, programSelection, slots, holdExpiresAt, classDetails, confirmSlots, reset } = useBookingStore()
+  const { visitType, programSelection, slots, classDetails, confirmSlots } = useBookingStore()
   const queryClient = useQueryClient()
   const pushNotification = useNotificationStore((s) => s.push)
-  const { remaining, label: timerLabel } = useCountdown(holdExpiresAt)
   const [submitting, setSubmitting] = useState(false)
   const [error, setError] = useState<string | null>(null)
-
-  useEffect(() => {
-    if (holdExpiresAt && remaining === 0 && holdExpiresAt.getTime() < Date.now()) {
-      reset()
-      navigate('/book', { replace: true })
-    }
-  }, [remaining, holdExpiresAt, reset, navigate])
 
   if (!slots.length || !user) {
     navigate('/book', { replace: true })
@@ -94,19 +69,17 @@ export default function ReviewPage() {
         order: i + 1,
       }))
 
-      const docRef = await addDoc(collection(db, 'bookings'), {
-        type: visitType ?? 'onsite',
-        teacherId: user.uid,
+      const { bookingId } = await createBooking({
+        uid: user.uid,
         teacherName: profile?.displayName ?? '',
         teacherEmail: user.email ?? '',
         schoolId: profile?.schoolId ?? '',
+        visitType: visitType ?? 'onsite',
         segments,
         grade: classDetails.grade,
         studentCount: classDetails.studentCount,
         accessNeeds: classDetails.accessNeeds ?? '',
-        status: visitType === 'toad' ? 'pending' : 'confirmed',
         bookingCode,
-        createdAt: serverTimestamp(),
       })
 
       // Build calendar URL
@@ -129,16 +102,10 @@ export default function ReviewPage() {
       })
 
       confirmSlots()
-      queryClient.invalidateQueries({ queryKey: ['slot-availability'] })
       queryClient.invalidateQueries({ queryKey: ['bookings'] })
-      reset()
-      navigate('/book/confirmed', { state: { bookingId: docRef.id, bookingCode }, replace: true })
+      navigate('/book/confirmed', { state: { bookingId, bookingCode }, replace: true })
     } catch (err: unknown) {
-      const message = (err as { message?: string })?.message ?? ''
-      const code = (err as { code?: string })?.code ?? ''
-      if (message.includes('teacher-conflict')) {
-        setError(intl.formatMessage({ id: 'review.teacherConflict' }))
-      } else if (message.includes('slots-unavailable') || code === 'failed-precondition') {
+      if (err instanceof SlotTakenError) {
         setError(intl.formatMessage({ id: 'review.conflict' }))
       } else {
         setError(intl.formatMessage({ id: 'review.error' }))
@@ -161,14 +128,6 @@ export default function ReviewPage() {
         </ContinueButton>
       }
     >
-      {/* Timer */}
-      {holdExpiresAt && (
-        <div className="flex items-center gap-2 text-sm font-semibold tabular-nums" style={{ color: remaining < 120 ? 'var(--destructive)' : 'var(--muted-foreground)' }}>
-          <Timer className="i i-sm" />
-          {timerLabel}
-        </div>
-      )}
-
       <h1 className="rise m-0 text-[28px] font-extrabold leading-[34px] tracking-tight" style={{ fontFamily: 'var(--font-display)' }}>
         {intl.formatMessage({ id: 'review.heading' })}
       </h1>
