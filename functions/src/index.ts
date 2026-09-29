@@ -26,8 +26,7 @@ interface ConfirmBookingData {
 }
 
 function slotsOverlap(aDate: string, aHour: number, bDate: string, bHour: number): boolean {
-  // Two 1-hour slots overlap when they share the same date and startHours differ by less than 1
-  return aDate === bDate && Math.abs(aHour - bHour) < 1
+  return aDate === bDate && aHour === bHour
 }
 
 export const confirmBooking = onCall<ConfirmBookingData>(
@@ -44,60 +43,71 @@ export const confirmBooking = onCall<ConfirmBookingData>(
       throw new HttpsError('invalid-argument', 'segments are required.')
     }
 
-    const activeStatuses = ['confirmed', 'approved', 'pending']
+    const VALID_SLOT_HOURS = new Set([8, 9, 10, 11, 13, 14, 15, 16])
+    const VALID_PROGRAM_IDS = new Set(['cube', 'lab', 'toad'])
 
-    // ── Step A: check each slot is not already taken ──────────────────────────
     for (const seg of segments) {
-      const snap = await db.collection('bookings')
-        .where('status', 'in', activeStatuses)
-        .get()
-
-      const conflict = snap.docs.some((d) => {
-        const data = d.data()
-        return (data['segments'] as SegmentInput[] ?? []).some(
-          (s) => s.programId === seg.programId && s.date === seg.date && s.startHour === seg.startHour,
-        )
-      })
-
-      if (conflict) {
-        throw new HttpsError('failed-precondition', 'slots-unavailable')
+      if (!VALID_PROGRAM_IDS.has(seg.programId)) {
+        throw new HttpsError('invalid-argument', `Invalid programId: ${seg.programId}`)
+      }
+      if (!Number.isInteger(seg.startHour) || !VALID_SLOT_HOURS.has(seg.startHour)) {
+        throw new HttpsError('invalid-argument', `Invalid startHour: ${seg.startHour}`)
+      }
+      if (!/^\d{4}-\d{2}-\d{2}$/.test(seg.date)) {
+        throw new HttpsError('invalid-argument', `Invalid date format: ${seg.date}`)
       }
     }
 
-    // ── Step B: check teacher has no overlapping active booking ───────────────
-    const teacherSnap = await db.collection('bookings')
-      .where('teacherId', '==', teacherId)
-      .where('status', 'in', activeStatuses)
-      .get()
+    const bookingId = await db.runTransaction(async (tx) => {
+      // ── Step A: check each slot is not already taken ──────────────────────────
+      const activeStatuses = ['confirmed', 'approved', 'pending']
+      const allBookingsSnap = await tx.get(
+        db.collection('bookings').where('status', 'in', activeStatuses)
+      )
+      const allBookings = allBookingsSnap.docs.map((d) => d.data())
 
-    for (const d of teacherSnap.docs) {
-      const existingSegs: SegmentInput[] = d.data()['segments'] ?? []
-      for (const existing of existingSegs) {
-        for (const proposed of segments) {
-          if (slotsOverlap(proposed.date, proposed.startHour, existing.date, existing.startHour)) {
-            throw new HttpsError('failed-precondition', 'teacher-conflict')
+      for (const seg of segments) {
+        const conflict = allBookings.some((data) =>
+          (data['segments'] as SegmentInput[] ?? []).some(
+            (s) => s.programId === seg.programId && s.date === seg.date && s.startHour === seg.startHour
+          )
+        )
+        if (conflict) throw new HttpsError('failed-precondition', 'slots-unavailable')
+      }
+
+      // ── Step B: check teacher has no overlapping active booking ───────────────
+      const teacherBookings = allBookings.filter((data) => data['teacherId'] === teacherId)
+      for (const data of teacherBookings) {
+        const existingSegs: SegmentInput[] = data['segments'] ?? []
+        for (const existing of existingSegs) {
+          for (const proposed of segments) {
+            if (slotsOverlap(proposed.date, proposed.startHour, existing.date, existing.startHour)) {
+              throw new HttpsError('failed-precondition', 'teacher-conflict')
+            }
           }
         }
       }
-    }
 
-    // ── Step C: write the booking ─────────────────────────────────────────────
-    const bookingRef = db.collection('bookings').doc()
-    await bookingRef.set({
-      type: visitType,
-      teacherId,
-      teacherName,
-      teacherEmail,
-      schoolId,
-      segments,
-      grade,
-      studentCount,
-      accessNeeds: accessNeeds ?? '',
-      status: visitType === 'toad' ? 'pending' : 'confirmed',
-      bookingCode,
-      createdAt: FieldValue.serverTimestamp(),
+      // ── Step C: write the booking ─────────────────────────────────────────────
+      const bookingRef = db.collection('bookings').doc()
+      tx.set(bookingRef, {
+        type: visitType,
+        teacherId,
+        teacherName,
+        teacherEmail,
+        schoolId,
+        segments,
+        grade,
+        studentCount,
+        accessNeeds: accessNeeds ?? '',
+        status: visitType === 'toad' ? 'pending' : 'confirmed',
+        bookingCode,
+        createdAt: FieldValue.serverTimestamp(),
+      })
+
+      return bookingRef.id
     })
 
-    return { bookingId: bookingRef.id }
+    return { bookingId }
   },
 )

@@ -37,7 +37,7 @@ type Locale = typeof de
 
 function programLabel(booking: BookingDoc, intl: ReturnType<typeof useIntl>): string {
   const ids = [...new Set(booking.segments?.map((s) => s.programId) ?? [])]
-  if (ids.length === 0) return intl.formatMessage({ id: 'program.cube' })
+  if (ids.length === 0) return '—'
   if (ids.length === 1) return ids[0] === 'cube' ? intl.formatMessage({ id: 'program.cube' }) : ids[0] === 'lab' ? intl.formatMessage({ id: 'program.lab' }) : intl.formatMessage({ id: 'program.toad' })
   return intl.formatMessage({ id: 'program.both' })
 }
