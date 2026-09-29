@@ -162,6 +162,8 @@ const de: Record<string, string> = {
   'bookTime.full': 'Ausgebucht',
   'bookTime.loadError': 'Verfügbarkeit konnte nicht geladen werden. Verbindung prüfen und erneut versuchen.',
   'bookTime.teacherConflict': 'Sie haben bereits eine Buchung für diesen Zeitraum.',
+  'bookTime.slot.booked': 'Gebucht',
+  'bookTime.slot.yours': 'Ihre Buchung',
   // ── Book — details ────────────────────────────────────────────────────────
   'bookDetails.title': 'Klassendetails',
   'bookDetails.heading': 'Erzählen Sie uns von Ihrer Klasse',
@@ -259,6 +261,12 @@ const de: Record<string, string> = {
   'program.toad': 'TOAD-Truck',
   'program.both': 'Cube + Lab',
   'program.both.visit': 'Cube + Lab Besuch',
+
+  // ── Wartungsmodus ─────────────────────────────────────────────────────────
+  'maintenance.title': 'Geplante Wartung',
+  'maintenance.defaultMessage': 'Wir aktualisieren die App. In wenigen Minuten sind wir wieder da.',
+  'maintenance.checkBack': 'Bitte schau bald wieder vorbei.',
+  'maintenance.dismiss': 'Schließen',
 }
 
 export default de

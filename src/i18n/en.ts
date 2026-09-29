@@ -162,6 +162,8 @@ const en: Record<string, string> = {
   'bookTime.full': 'Full',
   'bookTime.loadError': 'Could not load availability. Check your connection and try again.',
   'bookTime.teacherConflict': 'You already have a booking at this time.',
+  'bookTime.slot.booked': 'Booked',
+  'bookTime.slot.yours': 'Your booking',
   // ── Book — details ────────────────────────────────────────────────────────
   'bookDetails.title': 'Class details',
   'bookDetails.heading': 'Tell us about your class',
@@ -259,6 +261,12 @@ const en: Record<string, string> = {
   'program.toad': 'TOAD Truck',
   'program.both': 'Cube + Lab',
   'program.both.visit': 'Cube + Lab visit',
+
+  // ── Maintenance mode ───────────────────────────────────────────────────────
+  'maintenance.title': 'Scheduled maintenance',
+  'maintenance.defaultMessage': "We're updating the app. We'll be back in a few minutes.",
+  'maintenance.checkBack': 'Please check back shortly.',
+  'maintenance.dismiss': 'Dismiss',
 }
 
 export default en

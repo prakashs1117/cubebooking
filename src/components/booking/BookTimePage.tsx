@@ -96,32 +96,34 @@ export default function BookTimePage() {
     const daySessions = sessionsByDay[key] ?? []
 
     if (programSelection !== 'both') {
-      // Deduplicate by start time (seed may have created duplicates)
       const seen = new Set<string>()
       return daySessions
         .filter((s) => {
-          const available = s.capacity - s.seatsTaken - s.seatsHeld
-          if (available <= 0) return false
           const timeKey = toDate(s.start).getTime().toString()
           if (seen.has(timeKey)) return false
           seen.add(timeKey)
-          const slotWindow = { start: toDate(s.start), end: toDate(s.end) }
-          if (slotsOverlapTeacherBookings([slotWindow], teacherWindows)) return false
           return true
         })
         .sort((a, b) => toDate(a.start).getTime() - toDate(b.start).getTime())
-        .map((s) => ({
-          label: intl.formatTime(toDate(s.start), { hour: '2-digit', minute: '2-digit' }),
-          endLabel: intl.formatTime(toDate(s.end), { hour: '2-digit', minute: '2-digit' }),
-          slots: [s],
-        }))
+        .map((s) => {
+          const slotWindow = { start: toDate(s.start), end: toDate(s.end) }
+          const isFull = s.capacity - s.seatsTaken - s.seatsHeld <= 0
+          const isYours = slotsOverlapTeacherBookings([slotWindow], teacherWindows)
+          return {
+            label: intl.formatTime(toDate(s.start), { hour: '2-digit', minute: '2-digit' }),
+            endLabel: intl.formatTime(toDate(s.end), { hour: '2-digit', minute: '2-digit' }),
+            slots: [s],
+            disabled: isFull || isYours,
+            reason: isYours ? 'yours' as const : isFull ? 'booked' as const : null,
+          }
+        })
     }
 
-    // "Both" — find pairs where second starts exactly when first ends
+    // "Both" — find non-overlapping pairs where second starts exactly when first ends
     const firstProg = programIds[0]
     const secondProg = programIds[1]
     const firsts = daySessions
-      .filter((s) => s.programId === firstProg && s.capacity - s.seatsTaken - s.seatsHeld > 0)
+      .filter((s) => s.programId === firstProg)
       .sort((a, b) => toDate(a.start).getTime() - toDate(b.start).getTime())
 
     const usedSessionIds = new Set<string>()
@@ -132,7 +134,6 @@ export default function BookTimePage() {
         (s) =>
           s.programId === secondProg &&
           toDate(s.start).getTime() === firstEnd &&
-          s.capacity - s.seatsTaken - s.seatsHeld > 0 &&
           !usedSessionIds.has(s.id),
       )
       if (!match) return []
@@ -142,11 +143,16 @@ export default function BookTimePage() {
         { start: toDate(first.start), end: toDate(first.end) },
         { start: toDate(match.start), end: toDate(match.end) },
       ]
-      if (slotsOverlapTeacherBookings(windows, teacherWindows)) return []
+      const isFull =
+        first.capacity - first.seatsTaken - first.seatsHeld <= 0 ||
+        match.capacity - match.seatsTaken - match.seatsHeld <= 0
+      const isYours = slotsOverlapTeacherBookings(windows, teacherWindows)
       return [{
         label: intl.formatTime(toDate(first.start), { hour: '2-digit', minute: '2-digit' }),
         endLabel: intl.formatTime(toDate(match.end), { hour: '2-digit', minute: '2-digit' }),
         slots: [first, match],
+        disabled: isFull || isYours,
+        reason: isYours ? 'yours' as const : isFull ? 'booked' as const : null,
       }]
     })
   }, [selectedDate, sessionsByDay, programSelection, programIds, intl, teacherWindows])
@@ -288,9 +294,8 @@ export default function BookTimePage() {
             </p>
           ) : (
             <div className="flex flex-col gap-2">
-              {availableTimes.map(({ label, endLabel, slots: slotDocs }) => {
-                const isSel = selectedSlotKey === slotDocs[0].id
-                // Calculate total duration in minutes across all segments
+              {availableTimes.map(({ label, endLabel, slots: slotDocs, disabled, reason }) => {
+                const isSel = !disabled && selectedSlotKey === slotDocs[0].id
                 const startMs = toDate(slotDocs[0].start).getTime()
                 const endMs   = toDate(slotDocs[slotDocs.length - 1].end).getTime()
                 const mins    = Math.round((endMs - startMs) / 60000)
@@ -300,12 +305,15 @@ export default function BookTimePage() {
                   <button
                     key={label}
                     type="button"
+                    disabled={disabled}
                     onClick={() => handleSelectTime(slotDocs as unknown as SessionDoc[])}
-                    className="tap flex items-center px-4 h-14 rounded-2xl border-2 text-sm"
+                    className="flex items-center px-4 h-14 rounded-2xl border-2 text-sm"
                     style={{
                       background: isSel ? 'var(--tint-purple)' : 'var(--card)',
                       borderColor: isSel ? 'var(--primary)' : 'var(--border)',
-                      color: 'var(--foreground)',
+                      color: disabled ? 'var(--muted-foreground)' : 'var(--foreground)',
+                      opacity: disabled ? 0.55 : 1,
+                      cursor: disabled ? 'default' : 'pointer',
                     }}
                   >
                     {/* Time range */}
@@ -322,10 +330,21 @@ export default function BookTimePage() {
                     >
                       {durLabel}
                     </span>
-                    {/* Radio indicator */}
-                    <span className="ml-auto w-5 h-5 rounded-full box-border flex-none transition-all"
-                      style={{ border: isSel ? '6px solid var(--primary)' : '2px solid var(--border)' }}
-                    />
+                    {/* Disabled reason pill */}
+                    {reason ? (
+                      <span className="ml-auto px-2 py-0.5 rounded-full text-xs font-medium"
+                        style={{ background: 'var(--muted)', color: 'var(--muted-foreground)' }}
+                      >
+                        {reason === 'yours'
+                          ? intl.formatMessage({ id: 'bookTime.slot.yours' })
+                          : intl.formatMessage({ id: 'bookTime.slot.booked' })}
+                      </span>
+                    ) : (
+                      /* Radio indicator — available slots only */
+                      <span className="ml-auto w-5 h-5 rounded-full box-border flex-none transition-all"
+                        style={{ border: isSel ? '6px solid var(--primary)' : '2px solid var(--border)' }}
+                      />
+                    )}
                   </button>
                 )
               })}
