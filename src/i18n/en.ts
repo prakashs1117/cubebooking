@@ -275,6 +275,26 @@ const en: Record<string, string> = {
   // ── Booking detail QR ──────────────────────────────────────────────────────
   'bookingDetail.qr.label': 'Show QR code',
   'bookingDetail.qr.hint': 'Show this code at the venue for quick check-in.',
+
+  // ── Admin / Coordinator ───────────────────────────────────────────────────
+  'nav.scan': 'Scan',
+  'adminScan.title': 'Scan Booking QR',
+  'adminScan.instruction': "Point the camera at the teacher's QR code",
+  'adminScan.cameraError': 'Camera unavailable. Enter booking ID below.',
+  'adminScan.noScanner': 'QR scanning not supported on this device. Enter booking ID below.',
+  'adminScan.or': 'or enter manually',
+  'adminScan.inputPlaceholder': 'Booking ID or code',
+  'adminScan.verify': 'Verify Booking',
+  'adminVerify.markError': 'Failed to update. Please try again.',
+  'adminVerify.notFound': 'Booking not found.',
+  'adminVerify.scanAgain': 'Scan again',
+  'adminVerify.status.arrived': 'Arrived',
+  'adminVerify.cta.arrived': 'Class Arrived ✓',
+  'adminVerify.cta.cancelled': 'Booking Cancelled',
+  'adminVerify.cta.markArrived': 'Mark as Arrived',
+  'adminDash.title': 'Today\'s Visits',
+  'adminDash.todayEmpty': 'No visits scheduled for today.',
+  'adminDash.scanCta': 'Scan QR',
 }
 
 export default en

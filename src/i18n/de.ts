@@ -275,6 +275,26 @@ const de: Record<string, string> = {
   // ── Buchungsdetail QR ──────────────────────────────────────────────────────
   'bookingDetail.qr.label': 'QR-Code anzeigen',
   'bookingDetail.qr.hint': 'Zeigen Sie diesen Code am Eingang für den schnellen Check-in.',
+
+  // ── Admin / Koordinator ───────────────────────────────────────────────────
+  'nav.scan': 'Scannen',
+  'adminScan.title': 'Buchungs-QR scannen',
+  'adminScan.instruction': 'Kamera auf den QR-Code der Lehrkraft richten',
+  'adminScan.cameraError': 'Kamera nicht verfügbar. Bitte Buchungs-ID unten eingeben.',
+  'adminScan.noScanner': 'QR-Scan auf diesem Gerät nicht unterstützt. Buchungs-ID unten eingeben.',
+  'adminScan.or': 'oder manuell eingeben',
+  'adminScan.inputPlaceholder': 'Buchungs-ID oder Code',
+  'adminScan.verify': 'Buchung prüfen',
+  'adminVerify.markError': 'Aktualisierung fehlgeschlagen. Bitte erneut versuchen.',
+  'adminVerify.notFound': 'Buchung nicht gefunden.',
+  'adminVerify.scanAgain': 'Erneut scannen',
+  'adminVerify.status.arrived': 'Angekommen',
+  'adminVerify.cta.arrived': 'Klasse angekommen ✓',
+  'adminVerify.cta.cancelled': 'Buchung storniert',
+  'adminVerify.cta.markArrived': 'Als angekommen markieren',
+  'adminDash.title': 'Heutige Besuche',
+  'adminDash.todayEmpty': 'Heute keine Besuche geplant.',
+  'adminDash.scanCta': 'QR scannen',
 }
 
 export default de
