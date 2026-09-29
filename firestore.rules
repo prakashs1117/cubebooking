@@ -54,24 +54,14 @@ service cloud.firestore {
     }
 
     // ── Bookings ───────────────────────────────────────────────────────────
-    // Onsite visits (type == 'onsite') are auto-confirmed by the teacher.
-    // TOAD visits (type == 'toad') require Merck admin approval.
+    // Bookings are created exclusively by the confirmBooking Cloud Function
+    // (admin SDK bypasses rules). Teachers can only read their own and cancel.
     match /bookings/{bookingId} {
       allow read: if isSignedIn() && (
         resource.data.teacherId == request.auth.uid || isAdmin()
       );
 
-      // Onsite: teacher creates with status 'confirmed'
-      allow create: if isSignedIn()
-        && request.resource.data.teacherId == request.auth.uid
-        && request.resource.data.type == 'onsite'
-        && request.resource.data.status == 'confirmed';
-
-      // TOAD: teacher creates with status 'pending' only
-      allow create: if isSignedIn()
-        && request.resource.data.teacherId == request.auth.uid
-        && request.resource.data.type == 'toad'
-        && request.resource.data.status == 'pending';
+      // No client-side create — handled by confirmBooking Cloud Function.
 
       // Teachers can cancel their own bookings (status → 'cancelled')
       allow update: if isSignedIn()
