@@ -2,8 +2,8 @@ import { useState, useEffect } from 'react'
 import { useNavigate, Link } from 'react-router-dom'
 import { Timer, ShieldCheck } from 'lucide-react'
 import { useIntl } from 'react-intl'
-import { collection, addDoc, serverTimestamp } from 'firebase/firestore'
-import { db } from '../../shared/firebase'
+import { getFunctions, httpsCallable } from 'firebase/functions'
+import app from '../../shared/firebase'
 import { useAuthContext } from '../../context/AuthContext'
 import { useBookingStore } from '../../stores/bookingStore'
 import { useNotificationStore } from '../../stores/notificationStore'
@@ -84,26 +84,44 @@ export default function ReviewPage() {
     setSubmitting(true)
     setError(null)
     try {
+      const functions = getFunctions(app, 'europe-west1')
+      const confirm = httpsCallable<
+        {
+          sessionIds: string[]
+          segments: { sessionId: string; programId: string; order: number }[]
+          visitType: string
+          teacherName: string
+          teacherEmail: string
+          schoolId: string
+          grade: string
+          studentCount: number
+          accessNeeds: string
+          bookingCode: string
+        },
+        { bookingId: string }
+      >(functions, 'confirmBooking')
+
       const bookingCode = makeBookingCode()
-      await addDoc(collection(db, 'bookings'), {
-        type: visitType,
-        teacherId: user.uid,
+      const sessionIds = slots.map((s) => s.sessionId)
+      const segments = slots.map((s, i) => ({
+        sessionId: s.sessionId,
+        programId: s.programId,
+        order: i + 1,
+      }))
+
+      await confirm({
+        sessionIds,
+        segments,
+        visitType: visitType ?? 'onsite',
         teacherName: profile?.displayName ?? '',
         teacherEmail: user.email ?? '',
         schoolId: profile?.schoolId ?? '',
-        segments: slots.map((s, i) => ({
-          sessionId: s.sessionId,
-          programId: s.programId,
-          order: i + 1,
-        })),
         grade: classDetails.grade,
         studentCount: classDetails.studentCount,
-        accessNeeds: classDetails.accessNeeds,
-        // Onsite visits confirm instantly; TOAD requires Merck approval
-        status: visitType === 'toad' ? 'pending' : 'confirmed',
+        accessNeeds: classDetails.accessNeeds ?? '',
         bookingCode,
-        createdAt: serverTimestamp(),
       })
+
       // Build calendar URL
       const calFmt = (d: Date) => d.toISOString().replace(/[-:]/g, '').replace('.000', '')
       const calParams = new URLSearchParams({
@@ -115,18 +133,26 @@ export default function ReviewPage() {
       })
       const calendarUrl = `https://calendar.google.com/calendar/render?${calParams}`
 
-      // Push real notification
       pushNotification({
         type: 'confirmed',
-        title: '🎉 Booking confirmed!',
+        title: intl.formatMessage({ id: 'review.notification.title' }),
         body: `${programTitle} · ${intl.formatDate(firstSlot.start, { weekday: 'short', day: 'numeric', month: 'short' })} · ${intl.formatDate(firstSlot.start, { hour: '2-digit', minute: '2-digit', hour12: false })}–${intl.formatDate(lastSlot.end, { hour: '2-digit', minute: '2-digit', hour12: false })} · Code ${bookingCode}`,
         calendarUrl,
         bookingId: bookingCode,
       })
 
+      reset()
       navigate('/book/confirmed', { replace: true })
-    } catch (err) {
-      setError('Could not confirm your booking. Please try again.')
+    } catch (err: unknown) {
+      const message = (err as { message?: string })?.message ?? ''
+      const code = (err as { code?: string })?.code ?? ''
+      if (message.includes('teacher-conflict')) {
+        setError(intl.formatMessage({ id: 'review.teacherConflict' }))
+      } else if (message.includes('slots-unavailable') || code === 'failed-precondition') {
+        setError(intl.formatMessage({ id: 'review.conflict' }))
+      } else {
+        setError(intl.formatMessage({ id: 'review.error' }))
+      }
       console.error(err)
     } finally {
       setSubmitting(false)
@@ -201,7 +227,7 @@ export default function ReviewPage() {
 
       {error && (
         <div className="px-4 py-3 rounded-xl text-sm font-medium" style={{ background: 'var(--tint-red)', color: 'var(--destructive)' }}>
-          {intl.formatMessage({ id: 'review.error' })}
+          {error}
         </div>
       )}
     </BookingLayout>
