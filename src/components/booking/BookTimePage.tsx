@@ -26,6 +26,7 @@ interface SingleSlotItem {
 interface ComboSlotItem {
   kind: 'combo'
   startHour: number
+  secondHour: number
   endHour: number
   firstProg: ProgramId
   secondProg: ProgramId
@@ -142,6 +143,7 @@ export default function BookTimePage() {
       return {
         kind: 'combo' as const,
         startHour: h1,
+        secondHour: h2,
         endHour: h2 + 1,
         firstProg,
         secondProg,
@@ -314,7 +316,7 @@ export default function BookTimePage() {
                       key={key}
                       type="button"
                       disabled={s.disabled}
-                      onClick={() => handleSelectCombo(s.startHour, s.startHour + 1, s.firstProg, s.secondProg)}
+                      onClick={() => handleSelectCombo(s.startHour, s.secondHour, s.firstProg, s.secondProg)}
                       className="flex items-center px-4 h-14 rounded-2xl border-2 text-sm"
                       style={{
                         background: isSel ? 'var(--tint-purple)' : 'var(--card)',
