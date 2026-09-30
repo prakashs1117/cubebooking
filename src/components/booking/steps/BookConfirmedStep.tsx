@@ -1,5 +1,5 @@
 import { useEffect } from 'react'
-import { CalendarPlus, Home } from 'lucide-react'
+import { CalendarPlus, Home, FileText } from 'lucide-react'
 import { useIntl } from 'react-intl'
 import { useBookingStore } from '../../../stores/bookingStore'
 import { trackBookingConfirmed } from '../../../services/analyticsService'
@@ -39,9 +39,10 @@ interface Props {
   bookingId: string | null
   bookingCode: string | null
   onDone: () => void
+  onViewBooking: () => void
 }
 
-export function BookConfirmedStep({ bookingId, bookingCode, onDone }: Props) {
+export function BookConfirmedStep({ bookingId, bookingCode, onDone, onViewBooking }: Props) {
   const intl = useIntl()
   const { slots, classDetails, programSelection } = useBookingStore()
 
@@ -173,6 +174,16 @@ export function BookConfirmedStep({ bookingId, bookingCode, onDone }: Props) {
           <CalendarPlus className="w-4 h-4" />
           {intl.formatMessage({ id: 'confirmed.addCalendar' })}
         </a>
+
+        <button
+          type="button"
+          onClick={onViewBooking}
+          className="tap w-full h-12 rounded-xl flex items-center justify-center gap-2 text-sm font-semibold"
+          style={{ background: 'rgba(255,255,255,0.92)', color: 'var(--foreground)' }}
+        >
+          <FileText className="w-4 h-4" />
+          {intl.formatMessage({ id: 'confirmed.viewBooking' })}
+        </button>
 
         <button
           type="button"

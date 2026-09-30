@@ -54,6 +54,16 @@ const en: Record<string, string> = {
   'home.card.toad.desc': 'Request the mobile TOAD lab to come directly to your school.',
   'home.card.toad.tag': 'Subject to approval',
   'home.card.bookNow': 'Book now',
+  'home.nextVisit.attended': '✓ Attended',
+  'home.nextVisit.showQr': 'Show QR code',
+  'home.nextVisit.hideQr': 'Hide QR code',
+  'home.nextVisit.code': 'Booking code',
+  'home.nextVisit.daysToGo': '{days} days to go',
+  'home.nextVisit.today': 'Today',
+  'home.upcoming.title': 'Upcoming visits',
+  'home.quickActions.bookings': 'Bookings',
+  'home.quickActions.kit': 'Visit kit',
+  'home.quickActions.newBooking': 'New booking',
   // ── Bookings list ─────────────────────────────────────────────────────────
   'bookings.title': 'My bookings',
   'bookings.tab.upcoming': 'Upcoming · {count}',
@@ -66,6 +76,7 @@ const en: Record<string, string> = {
   'bookings.status.confirmed': 'Confirmed',
   'bookings.status.pending': 'Pending',
   'bookings.status.cancelled': 'Cancelled',
+  'bookings.status.arrived': 'Attended',
   'bookings.card.meta': '{count} students · Grade {grade}',
   // ── Booking detail ────────────────────────────────────────────────────────
   'bookingDetail.loading': 'Loading…',
@@ -74,6 +85,8 @@ const en: Record<string, string> = {
   'bookingDetail.status.confirmed': 'Confirmed',
   'bookingDetail.status.pending': 'Pending approval',
   'bookingDetail.status.cancelled': 'Cancelled',
+  'bookingDetail.status.arrived': 'Attended',
+  'bookingDetail.arrivedAt': 'Checked in at {time}',
   'bookingDetail.row.dateTime': 'Date & time',
   'bookingDetail.row.location': 'Location',
   'bookingDetail.row.grade': 'Grade',
@@ -201,6 +214,7 @@ const en: Record<string, string> = {
   'confirmed.code.label': 'Booking code',
   'confirmed.code.sub': 'Show this on arrival',
   'confirmed.addCalendar': 'Add to calendar',
+  'confirmed.viewBooking': 'View booking',
   'confirmed.backHome': 'Back to home',
   // ── Shared dialog actions ─────────────────────────────────────────────────
   'dialog.close': 'Close',
@@ -295,6 +309,7 @@ const en: Record<string, string> = {
   'adminDash.title': 'Today\'s Visits',
   'adminDash.todayEmpty': 'No visits scheduled for today.',
   'adminDash.scanCta': 'Scan QR',
+  'adminDash.completedToday': 'Completed today',
 }
 
 export default en

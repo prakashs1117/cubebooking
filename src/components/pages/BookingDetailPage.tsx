@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
-import { ChevronLeft, Share2, CalendarPlus, MapPin, Clock, Users, GraduationCap, QrCode, ChevronDown } from 'lucide-react'
+import { ChevronLeft, Share2, CalendarPlus, MapPin, Clock, Users, GraduationCap, QrCode, ChevronDown, CheckCircle2 } from 'lucide-react'
 import { useIntl } from 'react-intl'
 import { doc, writeBatch, serverTimestamp } from 'firebase/firestore'
 import { db } from '../../shared/firebase'
@@ -103,9 +103,15 @@ export default function BookingDetailPage() {
 
   const statusLabel = booking.status === 'confirmed'
     ? intl.formatMessage({ id: 'bookingDetail.status.confirmed' })
+    : booking.status === 'arrived'
+    ? intl.formatMessage({ id: 'bookingDetail.status.arrived' })
     : booking.status === 'pending'
     ? intl.formatMessage({ id: 'bookingDetail.status.pending' })
     : intl.formatMessage({ id: 'bookingDetail.status.cancelled' })
+
+  const arrivedAtDate = booking.arrivedAt
+    ? new Date((booking.arrivedAt as unknown as { seconds: number }).seconds * 1000)
+    : null
 
   const rows = [
     ...(startDate ? [{
@@ -143,10 +149,14 @@ export default function BookingDetailPage() {
             className="self-start inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-bold"
             style={{
               background: 'var(--background)',
-              color: booking.status === 'confirmed' ? 'var(--brand-green)' : booking.status === 'pending' ? 'var(--brand-orange)' : 'var(--muted-foreground)',
+              color: booking.status === 'confirmed' || booking.status === 'arrived'
+                ? 'var(--brand-green)'
+                : booking.status === 'pending'
+                ? 'var(--brand-orange)'
+                : 'var(--muted-foreground)',
             }}
           >
-            {booking.status === 'confirmed' && '✓'} {statusLabel}
+            {(booking.status === 'confirmed' || booking.status === 'arrived') && '✓'} {statusLabel}
           </span>
           <h1 className="m-0 text-3xl font-extrabold tracking-tight" style={{ fontFamily: 'var(--font-display)', color: isBoth ? '#fff' : 'var(--foreground)' }}>
             {programTitle}
@@ -170,6 +180,22 @@ export default function BookingDetailPage() {
             </div>
           ))}
         </div>
+
+        {/* Attendance confirmation banner */}
+        {arrivedAtDate && (
+          <div
+            className="flex items-center gap-3 px-4 py-3 rounded-2xl"
+            style={{ background: 'rgba(1,136,76,0.08)', color: 'var(--brand-green)' }}
+          >
+            <CheckCircle2 className="w-5 h-5 flex-none" />
+            <span className="text-sm font-semibold">
+              {intl.formatMessage(
+                { id: 'bookingDetail.arrivedAt' },
+                { time: intl.formatDate(arrivedAtDate, { hour: '2-digit', minute: '2-digit', hour12: false }) }
+              )}
+            </span>
+          </div>
+        )}
 
         {/* QR code — expandable */}
         {id && booking.status !== 'cancelled' && (

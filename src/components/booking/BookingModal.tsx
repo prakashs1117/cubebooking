@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { ChevronLeft } from 'lucide-react'
 import { useIntl } from 'react-intl'
 import { Modal } from '../ui/Modal'
@@ -87,6 +88,7 @@ function StepHeader({
 export function BookingModal({ open, onClose, initialVisitType }: BookingModalProps) {
   const intl = useIntl()
   const { setVisitType, reset } = useBookingStore()
+  const navigate = useNavigate()
 
   const firstStep: Step = initialVisitType ? 'programs' : 'type'
   const [step, setStep] = useState<Step>(firstStep)
@@ -162,7 +164,16 @@ export function BookingModal({ open, onClose, initialVisitType }: BookingModalPr
           />
         )}
         {step === 'confirmed' && (
-          <BookConfirmedStep bookingId={confirmedBookingId} bookingCode={confirmedBookingCode} onDone={handleClose} />
+          <BookConfirmedStep
+            bookingId={confirmedBookingId}
+            bookingCode={confirmedBookingCode}
+            onDone={handleClose}
+            onViewBooking={() => {
+              const id = confirmedBookingId
+              handleClose()
+              if (id) navigate(`/bookings/${id}`)
+            }}
+          />
         )}
       </div>
     </Modal>

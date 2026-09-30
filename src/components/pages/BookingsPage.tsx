@@ -90,9 +90,15 @@ function BookingCard({ booking }: { booking: BookingDoc }) {
     return ''
   })()
 
-  const statusColor = booking.status === 'confirmed' ? 'var(--brand-green)' : booking.status === 'pending' ? 'var(--brand-orange)' : 'var(--muted-foreground)'
+  const statusColor = booking.status === 'confirmed' || booking.status === 'arrived'
+    ? 'var(--brand-green)'
+    : booking.status === 'pending'
+    ? 'var(--brand-orange)'
+    : 'var(--muted-foreground)'
   const statusLabel = booking.status === 'confirmed'
     ? intl.formatMessage({ id: 'bookings.status.confirmed' })
+    : booking.status === 'arrived'
+    ? intl.formatMessage({ id: 'bookings.status.arrived' })
     : booking.status === 'pending'
     ? intl.formatMessage({ id: 'bookings.status.pending' })
     : intl.formatMessage({ id: 'bookings.status.cancelled' })
@@ -120,7 +126,9 @@ function BookingCard({ booking }: { booking: BookingDoc }) {
       <div className="flex-1 min-w-0 flex flex-col justify-center gap-1">
         <div className="flex items-center justify-between gap-2">
           <span className="text-sm font-bold truncate">{label}</span>
-          <span className="text-xs font-semibold flex-none" style={{ color: statusColor }}>{statusLabel}</span>
+          <span className="text-xs font-semibold flex-none" style={{ color: statusColor }}>
+            {(booking.status === 'confirmed' || booking.status === 'arrived') && '✓ '}{statusLabel}
+          </span>
         </div>
         {dateLabel && (
           <div className="text-xs" style={{ color: 'var(--muted-foreground)' }}>

@@ -76,74 +76,96 @@ export default function AdminDashboardPage() {
           </p>
         )}
 
-        {sorted.map((booking) => {
-          const seg = booking.segments?.[0]
-          const lastSeg = booking.segments?.[booking.segments.length - 1]
-          const start = seg?.date && seg?.startHour != null ? slotToDate(seg.date, seg.startHour) : null
-          const end = lastSeg?.date && lastSeg?.startHour != null ? slotEndDate(lastSeg.date, lastSeg.startHour) : null
-          const ids = [...new Set(booking.segments?.map((s) => s.programId) ?? [])]
-          const isBoth = ids.length > 1
-          const accent = isBoth ? 'var(--brand-purple)'
-            : ids[0] === 'cube' ? 'var(--brand-mint)'
-            : ids[0] === 'lab' ? 'var(--brand-yellow)'
-            : 'var(--brand-magenta)'
-          const { label: statusLabel, color: statusColor, bg: statusBg } = statusChip(booking.status, intl)
-          const programTitle = isBoth
-            ? intl.formatMessage({ id: 'program.both' })
-            : ids[0] === 'cube' ? intl.formatMessage({ id: 'program.cube' })
-            : ids[0] === 'lab' ? intl.formatMessage({ id: 'program.lab' })
-            : intl.formatMessage({ id: 'program.toad' })
+        {(() => {
+          let shownCompletedDivider = false
+          return sorted.map((booking) => {
+            const isArrived = booking.status === 'arrived'
+            const showDivider = isArrived && !shownCompletedDivider
+            if (showDivider) shownCompletedDivider = true
 
-          return (
-            <button
-              key={booking.id}
-              type="button"
-              onClick={() => navigate(`/admin/verify/${booking.id}`)}
-              className="tap w-full text-left rounded-2xl border overflow-hidden"
-              style={{ background: 'var(--card)', borderColor: 'var(--border)', boxShadow: 'var(--shadow-xs)' }}
-            >
-              {/* Colour accent bar */}
-              <div className="h-1.5" style={{ background: accent }} />
+            const seg = booking.segments?.[0]
+            const lastSeg = booking.segments?.[booking.segments.length - 1]
+            const start = seg?.date && seg?.startHour != null ? slotToDate(seg.date, seg.startHour) : null
+            const end = lastSeg?.date && lastSeg?.startHour != null ? slotEndDate(lastSeg.date, lastSeg.startHour) : null
+            const ids = [...new Set(booking.segments?.map((s) => s.programId) ?? [])]
+            const isBoth = ids.length > 1
+            const accent = isBoth ? 'var(--brand-purple)'
+              : ids[0] === 'cube' ? 'var(--brand-mint)'
+              : ids[0] === 'lab' ? 'var(--brand-yellow)'
+              : 'var(--brand-magenta)'
+            const { label: statusLabel, color: statusColor, bg: statusBg } = statusChip(booking.status, intl)
+            const programTitle = isBoth
+              ? intl.formatMessage({ id: 'program.both' })
+              : ids[0] === 'cube' ? intl.formatMessage({ id: 'program.cube' })
+              : ids[0] === 'lab' ? intl.formatMessage({ id: 'program.lab' })
+              : intl.formatMessage({ id: 'program.toad' })
 
-              <div className="px-4 py-3.5 flex flex-col gap-2">
-                {/* Top row: program + status */}
-                <div className="flex items-start justify-between gap-2">
-                  <span className="text-sm font-bold">{programTitle}</span>
-                  <span
-                    className="text-[11px] font-semibold px-2 py-0.5 rounded-full flex-none"
-                    style={{ background: statusBg, color: statusColor }}
-                  >
-                    {statusLabel}
-                  </span>
-                </div>
-
-                {/* Teacher name */}
-                <span className="text-xs font-medium" style={{ color: 'var(--muted-foreground)' }}>
-                  {booking.teacherName}
-                </span>
-
-                {/* Detail chips */}
-                <div className="flex flex-wrap gap-3">
-                  {start && (
-                    <span className="flex items-center gap-1 text-xs" style={{ color: 'var(--muted-foreground)' }}>
-                      <Clock className="w-3 h-3" />
-                      {intl.formatDate(start, { hour: '2-digit', minute: '2-digit', hour12: false })}
-                      {end && `–${intl.formatDate(end, { hour: '2-digit', minute: '2-digit', hour12: false })}`}
+            return (
+              <div key={booking.id}>
+                {showDivider && (
+                  <div className="flex items-center gap-2 mt-1 mb-1">
+                    <span className="flex-1 h-px" style={{ background: 'var(--border)' }} />
+                    <span className="text-[11px] font-semibold uppercase tracking-widest" style={{ color: 'var(--muted-foreground)' }}>
+                      {intl.formatMessage({ id: 'adminDash.completedToday' })}
                     </span>
-                  )}
-                  <span className="flex items-center gap-1 text-xs" style={{ color: 'var(--muted-foreground)' }}>
-                    <GraduationCap className="w-3 h-3" />
-                    {intl.formatMessage({ id: 'bookingDetail.grade.value' }, { grade: booking.grade })}
-                  </span>
-                  <span className="flex items-center gap-1 text-xs" style={{ color: 'var(--muted-foreground)' }}>
-                    <Users className="w-3 h-3" />
-                    {intl.formatMessage({ id: 'bookingDetail.students.value' }, { count: booking.studentCount })}
-                  </span>
-                </div>
+                    <span className="flex-1 h-px" style={{ background: 'var(--border)' }} />
+                  </div>
+                )}
+                <button
+                  type="button"
+                  onClick={() => navigate(`/admin/verify/${booking.id}`)}
+                  className="tap w-full text-left rounded-2xl border overflow-hidden"
+                  style={{
+                    background: 'var(--card)',
+                    borderColor: 'var(--border)',
+                    boxShadow: 'var(--shadow-xs)',
+                    opacity: isArrived ? 0.72 : 1,
+                  }}
+                >
+                  {/* Colour accent bar */}
+                  <div className="h-1.5" style={{ background: accent }} />
+
+                  <div className="px-4 py-3.5 flex flex-col gap-2">
+                    {/* Top row: program + status */}
+                    <div className="flex items-start justify-between gap-2">
+                      <span className="text-sm font-bold">{programTitle}</span>
+                      <span
+                        className="text-[11px] font-semibold px-2 py-0.5 rounded-full flex-none"
+                        style={{ background: statusBg, color: statusColor }}
+                      >
+                        {statusLabel}
+                      </span>
+                    </div>
+
+                    {/* Teacher name */}
+                    <span className="text-xs font-medium" style={{ color: 'var(--muted-foreground)' }}>
+                      {booking.teacherName}
+                    </span>
+
+                    {/* Detail chips */}
+                    <div className="flex flex-wrap gap-3">
+                      {start && (
+                        <span className="flex items-center gap-1 text-xs" style={{ color: 'var(--muted-foreground)' }}>
+                          <Clock className="w-3 h-3" />
+                          {intl.formatDate(start, { hour: '2-digit', minute: '2-digit', hour12: false })}
+                          {end && `–${intl.formatDate(end, { hour: '2-digit', minute: '2-digit', hour12: false })}`}
+                        </span>
+                      )}
+                      <span className="flex items-center gap-1 text-xs" style={{ color: 'var(--muted-foreground)' }}>
+                        <GraduationCap className="w-3 h-3" />
+                        {intl.formatMessage({ id: 'bookingDetail.grade.value' }, { grade: booking.grade })}
+                      </span>
+                      <span className="flex items-center gap-1 text-xs" style={{ color: 'var(--muted-foreground)' }}>
+                        <Users className="w-3 h-3" />
+                        {intl.formatMessage({ id: 'bookingDetail.students.value' }, { count: booking.studentCount })}
+                      </span>
+                    </div>
+                  </div>
+                </button>
               </div>
-            </button>
-          )
-        })}
+            )
+          })
+        })()}
       </main>
     </div>
   )

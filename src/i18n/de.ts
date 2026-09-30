@@ -54,6 +54,16 @@ const de: Record<string, string> = {
   'home.card.toad.desc': 'Das mobile TOAD-Labor kommt direkt zu Ihrer Schule.',
   'home.card.toad.tag': 'Genehmigung erforderlich',
   'home.card.bookNow': 'Jetzt buchen',
+  'home.nextVisit.attended': '✓ Teilgenommen',
+  'home.nextVisit.showQr': 'QR-Code anzeigen',
+  'home.nextVisit.hideQr': 'QR-Code ausblenden',
+  'home.nextVisit.code': 'Buchungscode',
+  'home.nextVisit.daysToGo': '{days} Tage verbleibend',
+  'home.nextVisit.today': 'Heute',
+  'home.upcoming.title': 'Bevorstehende Besuche',
+  'home.quickActions.bookings': 'Buchungen',
+  'home.quickActions.kit': 'Besuchs-Kit',
+  'home.quickActions.newBooking': 'Neue Buchung',
   // ── Bookings list ─────────────────────────────────────────────────────────
   'bookings.title': 'Meine Buchungen',
   'bookings.tab.upcoming': 'Bevorstehend · {count}',
@@ -66,6 +76,7 @@ const de: Record<string, string> = {
   'bookings.status.confirmed': 'Bestätigt',
   'bookings.status.pending': 'Ausstehend',
   'bookings.status.cancelled': 'Storniert',
+  'bookings.status.arrived': 'Teilgenommen',
   'bookings.card.meta': '{count} Schüler · Klasse {grade}',
   // ── Booking detail ────────────────────────────────────────────────────────
   'bookingDetail.loading': 'Wird geladen…',
@@ -74,6 +85,8 @@ const de: Record<string, string> = {
   'bookingDetail.status.confirmed': 'Bestätigt',
   'bookingDetail.status.pending': 'Genehmigung ausstehend',
   'bookingDetail.status.cancelled': 'Storniert',
+  'bookingDetail.status.arrived': 'Teilgenommen',
+  'bookingDetail.arrivedAt': 'Eingecheckt um {time}',
   'bookingDetail.row.dateTime': 'Datum & Uhrzeit',
   'bookingDetail.row.location': 'Ort',
   'bookingDetail.row.grade': 'Klasse',
@@ -201,6 +214,7 @@ const de: Record<string, string> = {
   'confirmed.code.label': 'Buchungscode',
   'confirmed.code.sub': 'Bei der Ankunft vorzeigen',
   'confirmed.addCalendar': 'Zum Kalender hinzufügen',
+  'confirmed.viewBooking': 'Buchung ansehen',
   'confirmed.backHome': 'Zur Startseite',
   // ── Shared dialog actions ─────────────────────────────────────────────────
   'dialog.close': 'Schließen',
@@ -295,6 +309,7 @@ const de: Record<string, string> = {
   'adminDash.title': 'Heutige Besuche',
   'adminDash.todayEmpty': 'Heute keine Besuche geplant.',
   'adminDash.scanCta': 'QR scannen',
+  'adminDash.completedToday': 'Heute abgeschlossen',
 }
 
 export default de
