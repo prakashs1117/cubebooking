@@ -1,4 +1,4 @@
-import { Link, useNavigate } from 'react-router-dom'
+import { Link, useLocation, useNavigate } from 'react-router-dom'
 import {
   Home, CalendarCheck, Package, User, Plus, X,
   LogOut, Shield, ChevronRight, QrCode,
@@ -8,7 +8,6 @@ import { useAuthContext } from '../../context/AuthContext'
 import MerckLogo from '../auth/MerckLogo'
 import NotificationPopover from './NotificationPopover'
 import ThemeToggle from '../ui/ThemeToggle'
-import { useLocation } from 'react-router-dom'
 
 // ─── Nav hook — returns translated items on each render ──────────────────────
 function useNav() {
@@ -138,7 +137,6 @@ export function TabletTopNav({ onMenuOpen, showBookCta }: { onMenuOpen: () => vo
   const location = useLocation()
   const intl = useIntl()
   const nav = useNav()
-  const { isStaff } = useAuthContext()
   return (
     <header
       className="hidden md:flex lg:hidden sticky top-0 z-30 items-center border-b px-4"
@@ -177,19 +175,8 @@ export function TabletTopNav({ onMenuOpen, showBookCta }: { onMenuOpen: () => vo
         })}
       </nav>
 
-      {/* Right: optional Book CTA + Scan for staff + theme toggle + notification */}
+      {/* Right: optional Book CTA + theme toggle + notification */}
       <div className="flex items-center gap-2">
-        {isStaff && (
-          <Link
-            to="/admin"
-            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-semibold tap"
-            style={{ textDecoration: 'none', background: 'var(--muted)', color: 'var(--foreground)' }}
-            aria-label={intl.formatMessage({ id: 'nav.scan' })}
-          >
-            <QrCode style={{ width: 15, height: 15 }} />
-            {intl.formatMessage({ id: 'nav.scan' })}
-          </Link>
-        )}
         {showBookCta && (
           <Link
             to="/home?book=1"
@@ -209,7 +196,7 @@ export function TabletTopNav({ onMenuOpen, showBookCta }: { onMenuOpen: () => vo
 
 // ─── Teacher drawer content (renamed from Sidebar) ────────────────────────────
 export function TeacherDrawerContent({ onClose }: { onClose: () => void }) {
-  const { profile, logout, isStaff } = useAuthContext()
+  const { profile, logout } = useAuthContext()
   const navigate = useNavigate()
   const location = useLocation()
   const intl = useIntl()
@@ -282,28 +269,6 @@ export function TeacherDrawerContent({ onClose }: { onClose: () => void }) {
             </Link>
           )
         })}
-
-        {isStaff && (
-          <Link
-            to="/admin"
-            onClick={onClose}
-            className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium tap"
-            style={{
-              textDecoration: 'none',
-              background: isActive('/admin/scan', location.pathname) || isActive('/admin', location.pathname)
-                ? 'var(--tint-purple)' : 'transparent',
-              color: isActive('/admin/scan', location.pathname) || isActive('/admin', location.pathname)
-                ? 'var(--brand-purple)' : 'var(--foreground)',
-              fontWeight: isActive('/admin/scan', location.pathname) || isActive('/admin', location.pathname) ? 600 : 400,
-            }}
-          >
-            <QrCode style={{ width: 18, height: 18, flexShrink: 0 }} />
-            <span className="flex-1">{intl.formatMessage({ id: 'nav.scan' })}</span>
-            {(isActive('/admin/scan', location.pathname) || isActive('/admin', location.pathname)) && (
-              <ChevronRight style={{ width: 14, height: 14, opacity: 0.4 }} />
-            )}
-          </Link>
-        )}
 
         <div className="h-px my-2" style={{ background: 'var(--border)' }} />
 
