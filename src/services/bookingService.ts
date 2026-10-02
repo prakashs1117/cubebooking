@@ -21,10 +21,11 @@ export interface CreateBookingParams {
   studentCount: number
   accessNeeds: string
   bookingCode: string
+  truckParking?: string
 }
 
 export async function createBooking(params: CreateBookingParams): Promise<{ bookingId: string }> {
-  const { uid, teacherName, teacherEmail, schoolId, visitType, segments, grade, studentCount, accessNeeds, bookingCode } = params
+  const { uid, teacherName, teacherEmail, schoolId, visitType, segments, grade, studentCount, accessNeeds, bookingCode, truckParking } = params
 
   const batch = writeBatch(db)
   const bookingRef = doc(collection(db, 'bookings'))
@@ -41,34 +42,37 @@ export async function createBooking(params: CreateBookingParams): Promise<{ book
     accessNeeds,
     status: visitType === 'toad' ? 'pending' : 'confirmed',
     bookingCode,
+    ...(truckParking ? { truckParking } : {}),
     createdAt: serverTimestamp(),
   })
 
-  for (const seg of segments) {
-    const slotId = toSlotDocId(seg.date, seg.programId, seg.startHour)
-    batch.set(doc(db, 'slots', slotId), {
-      teacherId: uid,
-      bookingId: bookingRef.id,
-      programId: seg.programId,
-      date: seg.date,
-      startHour: seg.startHour,
-      createdAt: serverTimestamp(),
-    })
-  }
+  if (visitType !== 'toad') {
+    for (const seg of segments) {
+      const slotId = toSlotDocId(seg.date, seg.programId, seg.startHour)
+      batch.set(doc(db, 'slots', slotId), {
+        teacherId: uid,
+        bookingId: bookingRef.id,
+        programId: seg.programId,
+        date: seg.date,
+        startHour: seg.startHour,
+        createdAt: serverTimestamp(),
+      })
+    }
 
-  // One teacherSlots lock per unique hour (prevents teacher double-booking across programs)
-  const uniqueHours = [...new Set(segments.map((s) => `${s.date}:${s.startHour}`))]
-  for (const key of uniqueHours) {
-    const [date, hourStr] = key.split(':')
-    const startHour = Number(hourStr)
-    const teacherSlotId = toTeacherSlotDocId(uid, date, startHour)
-    batch.set(doc(db, 'teacherSlots', teacherSlotId), {
-      teacherId: uid,
-      bookingId: bookingRef.id,
-      date,
-      startHour,
-      createdAt: serverTimestamp(),
-    })
+    // One teacherSlots lock per unique hour (prevents teacher double-booking across programs)
+    const uniqueHours = [...new Set(segments.map((s) => `${s.date}:${s.startHour}`))]
+    for (const key of uniqueHours) {
+      const [date, hourStr] = key.split(':')
+      const startHour = Number(hourStr)
+      const teacherSlotId = toTeacherSlotDocId(uid, date, startHour)
+      batch.set(doc(db, 'teacherSlots', teacherSlotId), {
+        teacherId: uid,
+        bookingId: bookingRef.id,
+        date,
+        startHour,
+        createdAt: serverTimestamp(),
+      })
+    }
   }
 
   try {
