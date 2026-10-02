@@ -363,6 +363,7 @@ const en: Record<string, string> = {
   'toad.approvals.daysAgo': '{days, plural, one {# day ago} other {# days ago}}',
   'toad.approvals.today': 'Today',
   'toad.approvals.parking': 'Parking',
+  'toad.approvals.actionDone': 'Done',
   // ── Booking detail — TOAD additions ──────────────────────────────────────
   'bookingDetail.row.parking': 'Parking',
   'bookingDetail.status.approved': 'Approved',

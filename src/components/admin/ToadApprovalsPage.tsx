@@ -23,7 +23,7 @@ function DateBadge({ dateStr }: { dateStr?: string }) {
   )
 }
 
-function BookingCard({ booking, onApprove, onDecline }: { booking: BookingDoc; onApprove: () => void; onDecline: (reason: string) => void }) {
+function BookingCard({ booking, onApprove, onDecline, submitting }: { booking: BookingDoc; onApprove: () => void; onDecline: (reason: string) => void; submitting?: boolean }) {
   const intl = useIntl()
   const [declining, setDeclining] = useState(false)
   const [reason, setReason] = useState('')
@@ -60,16 +60,18 @@ function BookingCard({ booking, onApprove, onDecline }: { booking: BookingDoc; o
           <button
             type="button"
             onClick={() => setDeclining(true)}
+            disabled={submitting}
             className="tap flex-1 h-9 rounded-xl text-xs font-semibold border"
-            style={{ background: 'transparent', borderColor: 'var(--border)', color: 'var(--muted-foreground)', cursor: 'pointer', fontFamily: 'inherit' }}
+            style={{ background: 'transparent', borderColor: 'var(--border)', color: 'var(--muted-foreground)', cursor: submitting ? 'not-allowed' : 'pointer', fontFamily: 'inherit', opacity: submitting ? 0.5 : 1 }}
           >
             {intl.formatMessage({ id: 'toad.approvals.decline' })}
           </button>
           <button
             type="button"
             onClick={onApprove}
+            disabled={submitting}
             className="tap flex-1 h-9 rounded-xl text-xs font-semibold flex items-center justify-center gap-1.5"
-            style={{ background: 'var(--primary)', color: '#fff', border: 'none', cursor: 'pointer', fontFamily: 'inherit' }}
+            style={{ background: 'var(--primary)', color: '#fff', border: 'none', cursor: submitting ? 'not-allowed' : 'pointer', fontFamily: 'inherit', opacity: submitting ? 0.5 : 1 }}
           >
             <Check style={{ width: 14, height: 14 }} />
             {intl.formatMessage({ id: 'toad.approvals.approve' })}
@@ -109,7 +111,7 @@ function RecentCard({ booking }: { booking: BookingDoc }) {
       <DateBadge dateStr={date} />
       <div className="flex-1 min-w-0">
         <span className="text-sm font-semibold truncate block">{booking.teacherName}</span>
-        <span className="text-xs" style={{ color: 'var(--muted-foreground)' }}>{intl.formatMessage({ id: 'review.row.grade' })} {booking.grade} · {booking.studentCount} students</span>
+        <span className="text-xs" style={{ color: 'var(--muted-foreground)' }}>{intl.formatMessage({ id: 'review.row.grade' })} {booking.grade} · {booking.studentCount} {intl.formatMessage({ id: 'review.row.students' }).toLowerCase()}</span>
       </div>
       <span className="text-xs font-bold px-2.5 py-1 rounded-full" style={{ background: isApproved ? 'rgba(1,136,76,0.12)' : 'var(--tint-red)', color: isApproved ? 'var(--brand-green)' : 'var(--destructive)' }}>
         {isApproved ? intl.formatMessage({ id: 'bookingDetail.status.approved' }) : intl.formatMessage({ id: 'bookings.status.cancelled' })}
@@ -122,21 +124,41 @@ export default function ToadApprovalsPage() {
   const intl = useIntl()
   const bookings = useAllToadBookings()
   const [undoQueue, setUndoQueue] = useState<Record<string, BookingDoc['status']>>({})
+  const [submittingIds, setSubmittingIds] = useState<Set<string>>(new Set())
 
   const pending = bookings.filter((b) => b.status === 'pending')
     .sort((a, b) => ((a.createdAt as { seconds: number })?.seconds ?? 0) - ((b.createdAt as { seconds: number })?.seconds ?? 0))
-  const recent = bookings.filter((b) => b.status === 'approved' || b.status === 'declined').slice(0, 20)
+  const recent = bookings
+    .filter((b) => b.status === 'approved' || b.status === 'declined')
+    .sort((a, b) => {
+      const aTs = (a.updatedAt as { seconds: number } | undefined)?.seconds ?? 0
+      const bTs = (b.updatedAt as { seconds: number } | undefined)?.seconds ?? 0
+      return bTs - aTs
+    })
+    .slice(0, 20)
 
   const approve = async (booking: BookingDoc) => {
-    setUndoQueue((q) => ({ ...q, [booking.id]: 'pending' }))
-    await updateDoc(doc(db, 'bookings', booking.id), { status: 'approved', updatedAt: serverTimestamp() })
-    setTimeout(() => setUndoQueue((q) => { const n = { ...q }; delete n[booking.id]; return n }), 5000)
+    if (submittingIds.has(booking.id)) return
+    setSubmittingIds((s) => new Set(s).add(booking.id))
+    try {
+      setUndoQueue((q) => ({ ...q, [booking.id]: 'pending' }))
+      await updateDoc(doc(db, 'bookings', booking.id), { status: 'approved', updatedAt: serverTimestamp() })
+      setTimeout(() => setUndoQueue((q) => { const n = { ...q }; delete n[booking.id]; return n }), 5000)
+    } finally {
+      setSubmittingIds((s) => { const n = new Set(s); n.delete(booking.id); return n })
+    }
   }
 
   const decline = async (booking: BookingDoc, reason: string) => {
-    setUndoQueue((q) => ({ ...q, [booking.id]: 'pending' }))
-    await updateDoc(doc(db, 'bookings', booking.id), { status: 'declined', declineReason: reason, updatedAt: serverTimestamp() })
-    setTimeout(() => setUndoQueue((q) => { const n = { ...q }; delete n[booking.id]; return n }), 5000)
+    if (submittingIds.has(booking.id)) return
+    setSubmittingIds((s) => new Set(s).add(booking.id))
+    try {
+      setUndoQueue((q) => ({ ...q, [booking.id]: 'pending' }))
+      await updateDoc(doc(db, 'bookings', booking.id), { status: 'declined', declineReason: reason, updatedAt: serverTimestamp() })
+      setTimeout(() => setUndoQueue((q) => { const n = { ...q }; delete n[booking.id]; return n }), 5000)
+    } finally {
+      setSubmittingIds((s) => { const n = new Set(s); n.delete(booking.id); return n })
+    }
   }
 
   const undo = async (bookingId: string) => {
@@ -155,7 +177,7 @@ export default function ToadApprovalsPage() {
       {/* Undo toasts */}
       {Object.keys(undoQueue).map((id) => (
         <div key={id} className="flex items-center gap-3 px-4 py-3 rounded-2xl" style={{ background: 'var(--foreground)', color: 'var(--background)' }}>
-          <span className="flex-1 text-sm font-medium">{intl.formatMessage({ id: 'toad.approvals.title' })}</span>
+          <span className="flex-1 text-sm font-medium">{intl.formatMessage({ id: 'toad.approvals.actionDone' })}</span>
           <button type="button" onClick={() => undo(id)} className="tap flex items-center gap-1.5 text-sm font-semibold" style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--background)', fontFamily: 'inherit' }}>
             <RotateCcw style={{ width: 14, height: 14 }} />
             {intl.formatMessage({ id: 'toad.approvals.undo' })}
@@ -181,6 +203,7 @@ export default function ToadApprovalsPage() {
               booking={b}
               onApprove={() => approve(b)}
               onDecline={(reason) => decline(b, reason)}
+              submitting={submittingIds.has(b.id)}
             />
           ))
         )}

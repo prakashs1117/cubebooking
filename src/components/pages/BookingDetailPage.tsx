@@ -49,14 +49,16 @@ export default function BookingDetailPage() {
       const batch = writeBatch(db)
       batch.update(doc(db, 'bookings', id), { status: 'cancelled', updatedAt: serverTimestamp() })
 
-      for (const seg of booking.segments ?? []) {
-        batch.delete(doc(db, 'slots', toSlotDocId(seg.date, seg.programId, seg.startHour)))
-      }
+      if (booking.type !== 'toad') {
+        for (const seg of booking.segments ?? []) {
+          batch.delete(doc(db, 'slots', toSlotDocId(seg.date, seg.programId, seg.startHour)))
+        }
 
-      const uniqueHours = [...new Set((booking.segments ?? []).map((s) => `${s.date}:${s.startHour}`))]
-      for (const key of uniqueHours) {
-        const [date, hourStr] = key.split(':')
-        batch.delete(doc(db, 'teacherSlots', toTeacherSlotDocId(booking.teacherId, date, Number(hourStr))))
+        const uniqueHours = [...new Set((booking.segments ?? []).map((s) => `${s.date}:${s.startHour}`))]
+        for (const key of uniqueHours) {
+          const [date, hourStr] = key.split(':')
+          batch.delete(doc(db, 'teacherSlots', toTeacherSlotDocId(booking.teacherId, date, Number(hourStr))))
+        }
       }
 
       await batch.commit()
