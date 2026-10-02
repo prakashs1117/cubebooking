@@ -76,7 +76,7 @@ export default function BookingVerifyPage() {
 
   const isArrived = booking.status === 'arrived'
   const isCancelled = booking.status === 'cancelled'
-  const canMarkArrived = !isArrived && !isCancelled && !marking
+  const canMarkArrived = !isArrived && !isCancelled && !marking && !(booking.type === 'toad' && booking.status === 'pending')
 
   const statusLabel = isArrived
     ? intl.formatMessage({ id: 'adminVerify.status.arrived' }, { defaultMessage: 'Arrived' })
@@ -103,6 +103,8 @@ export default function BookingVerifyPage() {
     { icon: Users, label: intl.formatMessage({ id: 'bookingDetail.row.students' }), value: intl.formatMessage({ id: 'bookingDetail.students.value' }, { count: booking.studentCount }) },
     ...(booking.accessNeeds ? [{ icon: Users, label: intl.formatMessage({ id: 'bookingDetail.row.access' }), value: booking.accessNeeds }] : []),
   ]
+
+  const isToadPending = booking.type === 'toad' && booking.status === 'pending'
 
   return (
     <div
@@ -156,7 +158,21 @@ export default function BookingVerifyPage() {
               <span className="flex-1 text-sm font-semibold">{row.value}</span>
             </div>
           ))}
+          {booking.type === 'toad' && booking.truckParking && (
+            <div className="flex items-start gap-3 min-h-[48px] py-3 border-b" style={{ borderColor: 'var(--border)' }}>
+              <span className="w-[110px] text-[13px] shrink-0 mt-0.5" style={{ color: 'var(--muted-foreground)' }}>
+                {intl.formatMessage({ id: 'bookingDetail.row.parking' })}
+              </span>
+              <span className="flex-1 text-sm font-semibold leading-relaxed">{booking.truckParking}</span>
+            </div>
+          )}
         </div>
+
+        {isToadPending && (
+          <div className="px-4 py-3 rounded-xl text-sm font-medium" style={{ background: 'var(--tint-yellow)', color: 'var(--foreground)' }}>
+            {intl.formatMessage({ id: 'adminVerify.toad.pendingWarning' })}
+          </div>
+        )}
 
         {markError && (
           <div className="px-4 py-3 rounded-xl text-sm font-medium" style={{ background: 'var(--tint-red)', color: 'var(--destructive)' }}>
@@ -165,8 +181,8 @@ export default function BookingVerifyPage() {
         )}
       </div>
 
-      {/* Sticky CTA */}
-      <div className="fixed bottom-0 left-0 right-0 px-5 pb-8 pt-4" style={{ background: 'var(--app-ground)', borderTop: '1px solid var(--border)' }}>
+      {/* Sticky CTA — hidden for TOAD bookings awaiting approval */}
+      {!isToadPending && <div className="fixed bottom-0 left-0 right-0 px-5 pb-8 pt-4" style={{ background: 'var(--app-ground)', borderTop: '1px solid var(--border)' }}>
         <button
           type="button"
           onClick={handleMarkArrived}
@@ -191,7 +207,7 @@ export default function BookingVerifyPage() {
             </>
           )}
         </button>
-      </div>
+      </div>}
     </div>
   )
 }

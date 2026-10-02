@@ -107,6 +107,8 @@ export default function BookingDetailPage() {
     ? intl.formatMessage({ id: 'bookingDetail.status.arrived' })
     : booking.status === 'pending'
     ? intl.formatMessage({ id: 'bookingDetail.status.pending' })
+    : booking.status === 'approved'
+    ? intl.formatMessage({ id: 'bookingDetail.status.approved' })
     : intl.formatMessage({ id: 'bookingDetail.status.cancelled' })
 
   const arrivedAtDate = booking.arrivedAt
@@ -123,6 +125,7 @@ export default function BookingDetailPage() {
     { icon: GraduationCap, label: intl.formatMessage({ id: 'bookingDetail.row.grade' }), value: intl.formatMessage({ id: 'bookingDetail.grade.value' }, { grade: booking.grade }) },
     { icon: Users, label: intl.formatMessage({ id: 'bookingDetail.row.students' }), value: intl.formatMessage({ id: 'bookingDetail.students.value' }, { count: booking.studentCount }) },
     ...(booking.accessNeeds ? [{ icon: Users, label: intl.formatMessage({ id: 'bookingDetail.row.access' }), value: booking.accessNeeds }] : []),
+    ...(booking.type === 'toad' && booking.truckParking ? [{ icon: MapPin, label: intl.formatMessage({ id: 'bookingDetail.row.parking' }), value: booking.truckParking }] : []),
   ]
 
   return (
@@ -149,15 +152,37 @@ export default function BookingDetailPage() {
             className="self-start inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-bold"
             style={{
               background: 'var(--background)',
-              color: booking.status === 'confirmed' || booking.status === 'arrived'
+              color: booking.status === 'confirmed' || booking.status === 'arrived' || booking.status === 'approved'
                 ? 'var(--brand-green)'
                 : booking.status === 'pending'
                 ? 'var(--brand-orange)'
                 : 'var(--muted-foreground)',
             }}
           >
-            {(booking.status === 'confirmed' || booking.status === 'arrived') && '✓'} {statusLabel}
+            {(booking.status === 'confirmed' || booking.status === 'arrived' || booking.status === 'approved') && '✓'} {statusLabel}
           </span>
+          {booking.type === 'toad' && booking.status === 'pending' && (
+            <p className="m-0 text-sm" style={{ color: 'var(--muted-foreground)' }}>
+              {intl.formatMessage({ id: 'bookingDetail.toad.pendingNote' })}
+            </p>
+          )}
+          {booking.type === 'toad' && booking.status === 'approved' && (
+            <p className="m-0 text-sm" style={{ color: 'var(--brand-green)' }}>
+              {intl.formatMessage({ id: 'bookingDetail.toad.approvedNote' })}
+            </p>
+          )}
+          {booking.type === 'toad' && booking.status === 'declined' && (
+            <>
+              <p className="m-0 text-sm font-medium" style={{ color: 'var(--destructive)' }}>
+                {intl.formatMessage({ id: 'bookingDetail.toad.declinedNote' })}
+              </p>
+              {booking.declineReason && (
+                <p className="m-0 text-sm" style={{ color: 'var(--muted-foreground)' }}>
+                  {booking.declineReason}
+                </p>
+              )}
+            </>
+          )}
           <h1 className="m-0 text-3xl font-extrabold tracking-tight" style={{ fontFamily: 'var(--font-display)', color: isBoth ? '#fff' : 'var(--foreground)' }}>
             {programTitle}
           </h1>
@@ -197,8 +222,9 @@ export default function BookingDetailPage() {
           </div>
         )}
 
-        {/* QR code — expandable */}
-        {id && booking.status !== 'cancelled' && (
+        {/* QR code — expandable (for TOAD: only show after approval; for onsite: all non-cancelled) */}
+        {id && booking.status !== 'cancelled' && booking.status !== 'declined'
+          && !(booking.type === 'toad' && booking.status === 'pending') && (
           <div className="rounded-2xl border overflow-hidden" style={{ background: 'var(--card)', borderColor: 'var(--border)' }}>
             <button
               type="button"
