@@ -152,28 +152,31 @@ export function TabletTopNav({ onMenuOpen, showBookCta }: { onMenuOpen: () => vo
         <MerckLogo width={44} height={21} />
       </button>
 
-      {/* Tab links */}
-      <nav className="flex items-center gap-1 flex-1">
-        {nav.map((item) => {
-          const active = isActive(item.href, location.pathname)
-          return (
-            <Link
-              key={item.href}
-              to={item.href}
-              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm tap"
-              style={{
-                textDecoration: 'none',
-                fontWeight: active ? 600 : 400,
-                color: active ? 'var(--brand-purple)' : 'var(--muted-foreground)',
-                background: active ? 'var(--tint-purple)' : 'transparent',
-              }}
-            >
-              <item.icon style={{ width: 16, height: 16, flexShrink: 0 }} />
-              {item.label}
-            </Link>
-          )
-        })}
-      </nav>
+      {/* Tab links — hidden for staff (they use the sidebar instead) */}
+      {showBookCta && (
+        <nav className="flex items-center gap-1 flex-1">
+          {nav.map((item) => {
+            const active = isActive(item.href, location.pathname)
+            return (
+              <Link
+                key={item.href}
+                to={item.href}
+                className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm tap"
+                style={{
+                  textDecoration: 'none',
+                  fontWeight: active ? 600 : 400,
+                  color: active ? 'var(--brand-purple)' : 'var(--muted-foreground)',
+                  background: active ? 'var(--tint-purple)' : 'transparent',
+                }}
+              >
+                <item.icon style={{ width: 16, height: 16, flexShrink: 0 }} />
+                {item.label}
+              </Link>
+            )
+          })}
+        </nav>
+      )}
+      {!showBookCta && <div className="flex-1" />}
 
       {/* Right: optional Book CTA + theme toggle + notification */}
       <div className="flex items-center gap-2">

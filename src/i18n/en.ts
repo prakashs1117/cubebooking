@@ -42,6 +42,7 @@ const en: Record<string, string> = {
   'nav.impact': 'Impact overview',
   'nav.toadApprovals': 'TOAD approvals',
   'nav.calendarRules': 'Calendar rules',
+  'nav.ariaNavigation': 'Navigation',
   'desktop.topbar.search': 'Search bookings',
   'desktop.topbar.book': 'Book a visit',
   'home.desktop.daysToGo': 'days to go',

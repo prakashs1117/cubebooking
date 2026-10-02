@@ -52,7 +52,7 @@ export default function AdminSidebar({ onClose }: { onClose?: () => void }) {
 
   return (
     <aside
-      aria-label={intl.formatMessage({ id: 'nav.home' })}
+      aria-label={intl.formatMessage({ id: 'nav.ariaNavigation' })}
       className="flex flex-col h-full"
       style={{
         width: 264,

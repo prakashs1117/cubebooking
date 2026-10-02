@@ -764,7 +764,7 @@ export default function HomePage() {
         {isStaff && <div className="lg:hidden"><StaffScanBanner /></div>}
 
         {/* Desktop: two-column hero grid */}
-        <DesktopHeroGrid nextBooking={nextBooking} onOpenModal={() => openBooking()} />
+        <DesktopHeroGrid nextBooking={nextBooking} onOpenModal={(vt) => openBooking(vt)} />
 
         {/* Mobile/tablet: next visit hero */}
         <div className="lg:hidden">

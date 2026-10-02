@@ -22,7 +22,7 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
 
         {/* Desktop: persistent 264px sidebar */}
         <aside className="hidden lg:flex flex-col shrink-0 sticky top-0 h-screen overflow-hidden"
-          style={{ width: 264, borderRight: '1px solid var(--border)' }}
+          style={{ width: 264 }}
         >
           <AdminSidebar />
         </aside>

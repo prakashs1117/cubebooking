@@ -61,7 +61,8 @@ export default function DesktopTopBar({ onBook }: { onBook: () => void }) {
       <div className="flex-1" />
 
       {/* Search — visual only in Phase 1; wired in a later phase */}
-      <label
+      <div
+        role="search"
         className="hidden xl:flex items-center gap-2 px-3.5"
         style={{
           width: 260,
@@ -75,7 +76,7 @@ export default function DesktopTopBar({ onBook }: { onBook: () => void }) {
       >
         <Search style={{ width: 15, height: 15, flexShrink: 0 }} />
         <span className="text-sm">{intl.formatMessage({ id: 'desktop.topbar.search' })}</span>
-      </label>
+      </div>
 
       {/* Book CTA */}
       <button

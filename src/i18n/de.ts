@@ -42,6 +42,7 @@ const de: Record<string, string> = {
   'nav.impact': 'Übersicht',
   'nav.toadApprovals': 'TOAD-Anfragen',
   'nav.calendarRules': 'Kalenderregeln',
+  'nav.ariaNavigation': 'Navigation',
   'desktop.topbar.search': 'Buchungen suchen',
   'desktop.topbar.book': 'Besuch buchen',
   'home.desktop.daysToGo': 'Tage noch',
