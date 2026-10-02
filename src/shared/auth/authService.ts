@@ -32,12 +32,13 @@ function toAppUser(firebaseUser: User, role: AppUser['role'] = null, schoolId?: 
 }
 
 export async function createUserDoc(firebaseUser: User): Promise<void> {
+  // Never include `role` here — omitting it preserves any admin/coordinator role
+  // already set in Firestore. New users get role: null (fail-closed) until manually assigned.
   await setDoc(doc(db, 'users', firebaseUser.uid), {
     uid: firebaseUser.uid,
     email: firebaseUser.email ?? '',
     displayName: firebaseUser.displayName ?? '',
     photoURL: firebaseUser.photoURL ?? '',
-    role: 'teacher',
     language: 'en',
     createdAt: serverTimestamp(),
     updatedAt: serverTimestamp(),
