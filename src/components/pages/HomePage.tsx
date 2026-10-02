@@ -445,7 +445,7 @@ function DesktopHeroGrid({
         /* No booking state */
         <button
           type="button"
-          onClick={onOpenModal}
+          onClick={() => onOpenModal()}
           className="relative overflow-hidden flex flex-col justify-end gap-3 tap"
           style={{
             minHeight: 260,

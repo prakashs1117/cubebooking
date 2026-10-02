@@ -1,4 +1,4 @@
-import { useState, forwardRef } from 'react'
+import { forwardRef } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { Minus, Plus } from 'lucide-react'
 import { ChevronDownIcon, ChevronUpIcon, CheckIcon } from '@radix-ui/react-icons'
@@ -48,7 +48,7 @@ const GradeSelectItem = forwardRef<
 export default function BookDetailsPage() {
   const navigate = useNavigate()
   const intl = useIntl()
-  const { slots, classDetails, setClassDetails } = useBookingStore()
+  const { classDetails, setClassDetails } = useBookingStore()
 
   const isValid = classDetails.grade && classDetails.studentCount >= 1
 

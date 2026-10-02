@@ -12,6 +12,7 @@
 		761780ED2CA45674006654EE /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 761780EC2CA45674006654EE /* AppDelegate.swift */; };
 		81AB9BB82411601600AC10FF /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 81AB9BB72411601600AC10FF /* LaunchScreen.storyboard */; };
 		99A2657B091CEB40BABE33F0 /* Pods_TodoAppRN.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D7CD8482F6401F961D512231 /* Pods_TodoAppRN.framework */; };
+		C3FC4CA0306FC67600AACCFD /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = C3FC4C9F306FC67600AACCFD /* GoogleService-Info.plist */; };
 		C3FCFE25305428F20044B39E /* Urbanist-Regular.ttf in Resources */ = {isa = PBXBuildFile; fileRef = C3FCFE23305428F20044B39E /* Urbanist-Regular.ttf */; };
 		C3FCFE26305428F20044B39E /* poppins.light.ttf in Resources */ = {isa = PBXBuildFile; fileRef = C3FCFE20305428F20044B39E /* poppins.light.ttf */; };
 		C3FCFE27305428F20044B39E /* Poppins-SemiBold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = C3FCFE1E305428F20044B39E /* Poppins-SemiBold.ttf */; };
@@ -20,7 +21,6 @@
 		C3FCFE2A305428F20044B39E /* poppins.extralight.ttf in Resources */ = {isa = PBXBuildFile; fileRef = C3FCFE1F305428F20044B39E /* poppins.extralight.ttf */; };
 		C3FCFE2B305428F20044B39E /* Urbanist-Thin.ttf in Resources */ = {isa = PBXBuildFile; fileRef = C3FCFE24305428F20044B39E /* Urbanist-Thin.ttf */; };
 		C3FCFE2C305428F20044B39E /* poppins.thin.ttf in Resources */ = {isa = PBXBuildFile; fileRef = C3FCFE21305428F20044B39E /* poppins.thin.ttf */; };
-		CD77639E3007E35F00A7DDB1 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = CD77639D3007E35E00A7DDB1 /* GoogleService-Info.plist */; };
 		CF266FD11FE20D9856CEC87C /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = 13B07FB81A68108700A75B9A /* PrivacyInfo.xcprivacy */; };
 		F22E0085C4754CFB9DE0DF5A /* BootSplash.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 00818C87C678423299A33B3D /* BootSplash.storyboard */; };
 /* End PBXBuildFile section */
@@ -35,6 +35,7 @@
 		193A5B91F8DF4BAF8DF4779B /* Colors.xcassets */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = folder.assetcatalog; name = Colors.xcassets; path = TodoAppRN/Colors.xcassets; sourceTree = "<group>"; };
 		761780EC2CA45674006654EE /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = AppDelegate.swift; path = TodoAppRN/AppDelegate.swift; sourceTree = "<group>"; };
 		81AB9BB72411601600AC10FF /* LaunchScreen.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; name = LaunchScreen.storyboard; path = TodoAppRN/LaunchScreen.storyboard; sourceTree = "<group>"; };
+		C3FC4C9F306FC67600AACCFD /* GoogleService-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
 		C3FCFE1D305428F20044B39E /* Poppins-Medium.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Poppins-Medium.ttf"; sourceTree = "<group>"; };
 		C3FCFE1E305428F20044B39E /* Poppins-SemiBold.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Poppins-SemiBold.ttf"; sourceTree = "<group>"; };
 		C3FCFE1F305428F20044B39E /* poppins.extralight.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = poppins.extralight.ttf; sourceTree = "<group>"; };
@@ -43,7 +44,6 @@
 		C3FCFE22305428F20044B39E /* Urbanist-Light.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Urbanist-Light.ttf"; sourceTree = "<group>"; };
 		C3FCFE23305428F20044B39E /* Urbanist-Regular.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Urbanist-Regular.ttf"; sourceTree = "<group>"; };
 		C3FCFE24305428F20044B39E /* Urbanist-Thin.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Urbanist-Thin.ttf"; sourceTree = "<group>"; };
-		CD77639D3007E35E00A7DDB1 /* GoogleService-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
 		D7CD8482F6401F961D512231 /* Pods_TodoAppRN.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_TodoAppRN.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		E05BDFE791AA264387A8312E /* Pods-TodoAppRN.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-TodoAppRN.release.xcconfig"; path = "Target Support Files/Pods-TodoAppRN/Pods-TodoAppRN.release.xcconfig"; sourceTree = "<group>"; };
 		ED297162215061F000B7C4FE /* JavaScriptCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = JavaScriptCore.framework; path = System/Library/Frameworks/JavaScriptCore.framework; sourceTree = SDKROOT; };
@@ -64,7 +64,7 @@
 		13B07FAE1A68108700A75B9A /* TodoAppRN */ = {
 			isa = PBXGroup;
 			children = (
-				CD77639D3007E35E00A7DDB1 /* GoogleService-Info.plist */,
+				C3FC4C9F306FC67600AACCFD /* GoogleService-Info.plist */,
 				13B07FB51A68108700A75B9A /* Images.xcassets */,
 				761780EC2CA45674006654EE /* AppDelegate.swift */,
 				13B07FB61A68108700A75B9A /* Info.plist */,
@@ -215,7 +215,7 @@
 				CF266FD11FE20D9856CEC87C /* PrivacyInfo.xcprivacy in Resources */,
 				F22E0085C4754CFB9DE0DF5A /* BootSplash.storyboard in Resources */,
 				31827F53A3364EA8B668A915 /* Colors.xcassets in Resources */,
-				CD77639E3007E35F00A7DDB1 /* GoogleService-Info.plist in Resources */,
+				C3FC4CA0306FC67600AACCFD /* GoogleService-Info.plist in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

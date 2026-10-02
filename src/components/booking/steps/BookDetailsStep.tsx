@@ -1,4 +1,4 @@
-import { useState, forwardRef } from 'react'
+import { forwardRef } from 'react'
 import { Minus, Plus } from 'lucide-react'
 import { ChevronDownIcon, ChevronUpIcon, CheckIcon } from '@radix-ui/react-icons'
 import * as Select from '@radix-ui/react-select'
@@ -42,19 +42,7 @@ interface Props {
 
 export function BookDetailsStep({ onContinue }: Props) {
   const intl = useIntl()
-  const { slots, classDetails, setClassDetails } = useBookingStore()
-
-  const slotSummary = slots.length > 0
-    ? slots.map((s) => {
-        const programName = intl.formatMessage({ id: `program.${s.programId}` })
-        const time = intl.formatDate(s.start, { hour: '2-digit', minute: '2-digit', hour12: false })
-        return `${programName} ${time}`
-      }).join(' → ')
-    : ''
-
-  const dateSummary = slots.length > 0
-    ? intl.formatDate(slots[0].start, { weekday: 'short', day: 'numeric', month: 'short' })
-    : ''
+  const { classDetails, setClassDetails } = useBookingStore()
 
   const isValid = classDetails.grade && classDetails.studentCount >= 1
 
