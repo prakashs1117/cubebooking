@@ -336,7 +336,7 @@ function DesktopHeroGrid({
   onOpenModal,
 }: {
   nextBooking: BookingDoc | null
-  onOpenModal: () => void
+  onOpenModal: (visitType?: VisitType) => void
 }) {
   const intl = useIntl()
   const times  = nextBooking ? bookingTimes(nextBooking) : null
@@ -388,7 +388,7 @@ function DesktopHeroGrid({
               >
                 ✓ {intl.formatMessage({ id: 'home.nextVisit.confirmed' })}
               </span>
-              <span className="text-xs font-semibold uppercase tracking-widest opacity-85">
+              <span className="text-xs font-semibold uppercase tracking-widest" style={{ opacity: 0.85 }}>
                 {intl.formatMessage({ id: 'home.desktop.yourNextVisit' })}
               </span>
               <span className="font-extrabold leading-tight" style={{ fontFamily: 'var(--font-display)', fontSize: 36, lineHeight: '40px' }}>
@@ -485,11 +485,11 @@ function DesktopHeroGrid({
           { labelKey: 'program.cube', subKey: 'home.card.onsite.tag', bg: 'var(--brand-mint)',    visitType: 'onsite' as const },
           { labelKey: 'program.lab',  subKey: 'home.card.onsite.tag', bg: 'var(--brand-yellow)',  visitType: 'onsite' as const },
           { labelKey: 'program.toad', subKey: 'home.card.toad.tag',   bg: 'var(--brand-magenta)', visitType: 'toad'   as const },
-        ].map(({ labelKey, subKey, bg }) => (
+        ].map(({ labelKey, subKey, bg, visitType }) => (
           <button
             key={labelKey}
             type="button"
-            onClick={() => onOpenModal()}
+            onClick={() => onOpenModal(visitType)}
             className="tap flex items-center gap-3.5 text-left"
             style={{
               padding: '14px 16px',
@@ -632,7 +632,7 @@ function DesktopBookingsTable({ bookings }: { bookings: BookingDoc[] }) {
                 </span>
               </span>
             </span>
-            <span className="text-sm">{b.grade ? `Grade ${b.grade} · ${b.studentCount ?? '—'} students` : '—'}</span>
+            <span className="text-sm">{b.grade ? intl.formatMessage({ id: 'bookings.card.meta' }, { count: b.studentCount ?? '—', grade: b.grade ?? '—' }) : '—'}</span>
             <span>
               <span className="px-2.5 py-1 rounded-full text-xs font-bold" style={{ background: chip.bg, color: chip.color }}>
                 {chip.label}
@@ -761,7 +761,7 @@ export default function HomePage() {
         </div>
 
         {/* Staff scanner shortcut — mobile/tablet only (staff have sidebar on desktop) */}
-        {isStaff && <StaffScanBanner />}
+        {isStaff && <div className="lg:hidden"><StaffScanBanner /></div>}
 
         {/* Desktop: two-column hero grid */}
         <DesktopHeroGrid nextBooking={nextBooking} onOpenModal={() => openBooking()} />
