@@ -17,6 +17,7 @@ import ProfilePage from './components/pages/ProfilePage'
 import QRScanPage from './components/admin/QRScanPage'
 import BookingVerifyPage from './components/admin/BookingVerifyPage'
 import AdminDashboardPage from './components/admin/AdminDashboardPage'
+import ToadApprovalsPage from './components/admin/ToadApprovalsPage'
 import ProgramsPage from './components/pages/ProgramsPage'
 
 const queryClient = new QueryClient({
@@ -90,6 +91,7 @@ function AppRoutes() {
       <Route path="/admin" element={<ShellRoute element={<ProtectedRoute requireStaff><AdminDashboardPage /></ProtectedRoute>} />} />
       <Route path="/admin/scan" element={<ProtectedRoute requireStaff><QRScanPage /></ProtectedRoute>} />
       <Route path="/admin/verify/:bookingId" element={<ProtectedRoute requireStaff><BookingVerifyPage /></ProtectedRoute>} />
+      <Route path="/admin/toad" element={<ShellRoute element={<ProtectedRoute requireStaff><ToadApprovalsPage /></ProtectedRoute>} />} />
 
       {/* Future routes */}
       {/* <Route path="/toad" element={<ProtectedRoute><ToadRequestPage /></ProtectedRoute>} /> */}

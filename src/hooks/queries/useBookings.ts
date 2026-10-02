@@ -159,3 +159,26 @@ export function useAllBookings(date?: string) {
   useDebugValue(result.data, (d) => `useAllBookings(${date ?? 'all'}): ${d?.length ?? 0} bookings`)
   return result
 }
+
+/**
+ * Staff-only: real-time listener for all TOAD bookings (pending, approved, declined).
+ */
+export function useAllToadBookings(): BookingDoc[] {
+  const { user } = useAuthContext()
+  const [bookings, setBookings] = useState<BookingDoc[]>([])
+
+  useEffect(() => {
+    if (!user) return
+    const q = query(
+      collection(db, 'bookings'),
+      where('type', '==', 'toad'),
+      where('status', 'in', ['pending', 'approved', 'declined']),
+      orderBy('createdAt', 'desc'),
+    )
+    return onSnapshot(q, (snap) => {
+      setBookings(snap.docs.map((d) => ({ id: d.id, ...d.data() }) as BookingDoc))
+    })
+  }, [user])
+
+  return bookings
+}
