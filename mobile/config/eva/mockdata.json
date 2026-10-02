@@ -1,0 +1,200 @@
+[
+  {
+    "id": 1,
+    "title": "Checkout all the contents",
+    "data": [
+      {
+        "id": 1,
+        "key": "logical-reasoning",
+        "title": "Logical Reasoning",
+        "description": "The ability to analyze and evaluate arguments and reasoning."
+      },
+      {
+        "id": 2,
+        "key": "quantitative-aptitude",
+        "title": "Quantitative Aptitude",
+        "description": "Skills related to mathematical and numerical reasoning."
+      },
+      {
+        "id": 3,
+        "key": "verbal-ability",
+        "title": "Verbal Ability",
+        "description": "The capacity to understand and analyze written information."
+      },
+      {
+        "id": 4,
+        "key": "communication-skills",
+        "title": "Communication Skills",
+        "description": "The ability to convey information effectively, both verbally and in writing."
+      },
+      {
+        "id": 5,
+        "key": "career",
+        "title": "Career",
+        "description": "Guidance and planning for professional development and job opportunities."
+      },
+      {
+        "id": 6,
+        "key": "teamwork",
+        "title": "Teamwork",
+        "description": "The ability to work collaboratively with others towards a common goal."
+      },
+      {
+        "id": 7,
+        "key": "leadership",
+        "title": "Leadership",
+        "description": "The ability to guide, motivate, and inspire a group or team."
+      },
+      {
+        "id": 8,
+        "key": "values",
+        "title": "Values",
+        "description": "Core principles that guide behavior and decision-making."
+      },
+      {
+        "id": 9,
+        "key": "c-sharp",
+        "title": "C Sharp",
+        "description": "A modern programming language used for developing a wide range of applications."
+      },
+      {
+        "id": 10,
+        "key": "c-programming",
+        "title": "C Programming",
+        "description": "A foundational programming language known for its performance and efficiency."
+      },
+      {
+        "id": 11,
+        "key": "java",
+        "title": "Java",
+        "description": "A versatile programming language widely used in enterprise applications."
+      },
+      {
+        "id": 12,
+        "key": "python",
+        "title": "Python",
+        "description": "A popular programming language known for its readability and versatility."
+      },
+      {
+        "id": 13,
+        "key": "web-technology",
+        "title": "Web Technology",
+        "description": "Tools and frameworks used for developing web applications."
+      },
+      {
+        "id": 14,
+        "key": "mern-stack",
+        "title": "MERN Stack",
+        "description": "A JavaScript stack used for building full-stack web applications."
+      },
+      {
+        "id": 15,
+        "key": "mean-stack",
+        "title": "Mean Stack",
+        "description": "A collection of JavaScript technologies used for web development."
+      },
+      {
+        "id": 16,
+        "key": "lamp-stack",
+        "title": "Lamp Stack",
+        "description": "A set of open-source software used for web development."
+      },
+      {
+        "id": 17,
+        "key": "ruby",
+        "title": "Ruby",
+        "description": "A dynamic programming language known for its simplicity and productivity."
+      },
+      {
+        "id": 18,
+        "key": "agile",
+        "title": "Agile",
+        "description": "A project management methodology that promotes iterative development."
+      },
+      {
+        "id": 19,
+        "key": "cloud",
+        "title": "Cloud",
+        "description": "Technologies and services that allow for remote data storage and computing."
+      },
+      {
+        "id": 20,
+        "key": "audit",
+        "title": "Audit",
+        "description": "The process of examining financial records and operations for accuracy."
+      },
+      {
+        "id": 21,
+        "key": "banking",
+        "title": "Banking",
+        "description": "The industry involved in managing financial transactions and services."
+      },
+      {
+        "id": 22,
+        "key": "cloud-computing",
+        "title": "Cloud Computing",
+        "description": "The delivery of computing services over the internet."
+      },
+      {
+        "id": 23,
+        "key": "deveops",
+        "title": "DevOps",
+        "description": "A set of practices that combines software development and IT operations."
+      },
+      {
+        "id": 24,
+        "key": "digital-marketing",
+        "title": "Digital Marketing",
+        "description": "Marketing that utilizes digital channels to reach consumers."
+      },
+      {
+        "id": 25,
+        "key": "finance",
+        "title": "Finance",
+        "description": "Management of money, investments, and financial services."
+      },
+      {
+        "id": 26,
+        "key": "hr",
+        "title": "HR",
+        "description": "Human Resources management including recruitment and employee relations."
+      },
+      {
+        "id": 27,
+        "key": "insurance",
+        "title": "Insurance",
+        "description": "A financial product that provides protection against financial loss."
+      },
+      {
+        "id": 28,
+        "key": "law",
+        "title": "Law",
+        "description": "The system of rules that are created and enforced through social or governmental institutions."
+      },
+      {
+        "id": 29,
+        "key": "project-management",
+        "title": "Project Management",
+        "description": "The discipline of planning, executing, and closing projects."
+      },
+      {
+        "id": 30,
+        "key": "sales",
+        "title": "Sales",
+        "description": "The activities involved in selling products or services."
+      },
+      {
+        "id": 31,
+        "key": "quality-management",
+        "title": "Quality Management",
+        "description": "The act of overseeing all activities and tasks needed to maintain a desired level of excellence."
+      },
+      {
+        "id": 32,
+        "key": "software-engineering",
+        "title": "Software Engineering",
+        "description": "The application of engineering principles to software development."
+      }
+    ]
+  }
+]

@@ -1,0 +1,39 @@
+{
+  "carouselItems": [
+    {
+      "id": "1",
+      "title": "Welcome to the App",
+      "description": "Discover amazing features and functionality",
+      "imageUrl": "",
+      "backgroundColor": "#4A90E2"
+    },
+    {
+      "id": "2",
+      "title": "Stay Connected",
+      "description": "Keep track of your important events",
+      "imageUrl": "",
+      "backgroundColor": "#50C878"
+    },
+    {
+      "id": "3",
+      "title": "Customize Your Experience",
+      "description": "Personalize settings to match your style",
+      "imageUrl": "",
+      "backgroundColor": "#E67E22"
+    },
+    {
+      "id": "4",
+      "title": "Track Progress",
+      "description": "Monitor your achievements and milestones",
+      "imageUrl": "",
+      "backgroundColor": "#9B59B6"
+    },
+    {
+      "id": "5",
+      "title": "Get Started",
+      "description": "Begin your journey with us today",
+      "imageUrl": "",
+      "backgroundColor": "#E74C3C"
+    }
+  ]
+}

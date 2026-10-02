@@ -1,5 +1,5 @@
 // src/hooks/queries/useBookings.ts
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useDebugValue } from 'react'
 import { useQuery } from '@tanstack/react-query'
 import { collection, query, where, getDocs, doc, getDoc, orderBy, onSnapshot } from 'firebase/firestore'
 import { db } from '../../shared/firebase'
@@ -14,7 +14,7 @@ export type SlotAvailabilityMap = Record<string, 'taken' | 'yours'>
 
 export function useMyBookings() {
   const { user } = useAuthContext()
-  return useQuery({
+  const result = useQuery({
     queryKey: ['bookings', user?.uid],
     enabled: !!user?.uid,
     queryFn: async () => {
@@ -28,10 +28,12 @@ export function useMyBookings() {
     },
     staleTime: 30_000,
   })
+  useDebugValue(result.data, (d) => `useMyBookings: ${d?.length ?? 0} bookings, status=${result.status}`)
+  return result
 }
 
 export function useBooking(bookingId: string | undefined) {
-  return useQuery({
+  const result = useQuery({
     queryKey: ['booking', bookingId],
     enabled: !!bookingId,
     queryFn: async () => {
@@ -41,6 +43,8 @@ export function useBooking(bookingId: string | undefined) {
     },
     staleTime: 60_000,
   })
+  useDebugValue(result.data, (d) => `useBooking(${bookingId}): status=${d?.status ?? 'none'}`)
+  return result
 }
 
 export function isUpcoming(booking: BookingDoc): boolean {
@@ -121,6 +125,8 @@ export function useSlotAvailability(
   for (const key of bookedSlotKeys) {
     if (merged[key] !== 'yours') merged[key] = 'yours'
   }
+  useDebugValue({ date, programIds, takenCount: Object.keys(merged).length },
+    (v) => `useSlotAvailability(${v.date ?? 'none'}): ${v.takenCount} slots locked`)
   return merged
 }
 
@@ -130,7 +136,7 @@ export function useSlotAvailability(
  */
 export function useAllBookings(date?: string) {
   const { user } = useAuthContext()
-  return useQuery({
+  const result = useQuery({
     queryKey: ['bookings', 'all', date ?? 'all'],
     enabled: !!user?.uid,
     queryFn: async () => {
@@ -148,5 +154,8 @@ export function useAllBookings(date?: string) {
       return all.filter((b) => b.segments?.some((s) => s.date === date))
     },
     staleTime: 30_000,
+    refetchInterval: 60_000, // admin dashboard polls every 60s for new arrivals
   })
+  useDebugValue(result.data, (d) => `useAllBookings(${date ?? 'all'}): ${d?.length ?? 0} bookings`)
+  return result
 }

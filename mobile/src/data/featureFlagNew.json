@@ -1,0 +1,325 @@
+{
+  "flags": [
+    {
+      "id": "mc_food_ordering",
+      "key": "food_ordering",
+      "name": "Food Ordering",
+      "description": "Enable the food ordering tab for employees to book meals",
+      "category": "feature",
+      "type": "boolean",
+      "enabled": true,
+      "defaultValue": true,
+      "targeting": {
+        "environments": ["production", "staging", "development"],
+        "rolloutPercentage": 100
+      },
+      "config": null,
+      "metadata": {
+        "tags": ["food", "ordering", "cafeteria"],
+        "owner": "product-team",
+        "priority": "critical"
+      }
+    },
+    {
+      "id": "mc_vendor_panel",
+      "key": "vendor_panel",
+      "name": "Vendor Panel",
+      "description": "Show the Vendor tab for cafeteria staff to manage menus and scan QR passes",
+      "category": "feature",
+      "type": "boolean",
+      "enabled": true,
+      "defaultValue": true,
+      "targeting": {
+        "environments": ["production", "staging", "development"],
+        "rolloutPercentage": 100
+      },
+      "config": null,
+      "metadata": {
+        "tags": ["vendor", "cafeteria", "menu-management"],
+        "owner": "ops-team",
+        "priority": "critical"
+      }
+    },
+    {
+      "id": "mc_push_notifications",
+      "key": "push_notifications",
+      "name": "Push Notifications",
+      "description": "Send push notifications for order confirmations, pickup reminders, and announcements",
+      "category": "feature",
+      "type": "boolean",
+      "enabled": true,
+      "defaultValue": true,
+      "targeting": {
+        "environments": ["production", "staging", "development"],
+        "rolloutPercentage": 100
+      },
+      "config": {
+        "channels": ["order_confirmed", "pickup_ready", "announcements"]
+      },
+      "metadata": {
+        "tags": ["notifications", "orders", "engagement"],
+        "owner": "mobile-team",
+        "priority": "high"
+      }
+    },
+    {
+      "id": "mc_dark_mode",
+      "key": "dark_mode",
+      "name": "Dark Mode",
+      "description": "Allow users to switch between light and dark themes",
+      "category": "ui",
+      "type": "boolean",
+      "enabled": true,
+      "defaultValue": true,
+      "targeting": {
+        "environments": ["production", "staging", "development"],
+        "rolloutPercentage": 100
+      },
+      "config": null,
+      "metadata": {
+        "tags": ["theme", "ui", "accessibility"],
+        "owner": "frontend-team",
+        "priority": "medium"
+      }
+    },
+    {
+      "id": "mc_multi_language",
+      "key": "multi_language",
+      "name": "Multi-Language Support",
+      "description": "Enable support for multiple languages (English, French, Arabic)",
+      "category": "feature",
+      "type": "boolean",
+      "enabled": true,
+      "defaultValue": true,
+      "targeting": {
+        "environments": ["production", "staging", "development"],
+        "rolloutPercentage": 100
+      },
+      "config": {
+        "defaultLanguage": "en",
+        "supportedLanguages": ["en", "fr", "ar"]
+      },
+      "metadata": {
+        "tags": ["i18n", "language", "localization"],
+        "owner": "frontend-team",
+        "priority": "high"
+      }
+    },
+    {
+      "id": "mc_faq",
+      "key": "faq_screen",
+      "name": "FAQ Screen",
+      "description": "Show the FAQ screen in the drawer navigation",
+      "category": "ui",
+      "type": "boolean",
+      "enabled": true,
+      "defaultValue": true,
+      "targeting": {
+        "environments": ["production", "staging", "development"],
+        "rolloutPercentage": 100
+      },
+      "config": null,
+      "metadata": {
+        "tags": ["help", "faq", "support"],
+        "owner": "support-team",
+        "priority": "medium"
+      }
+    },
+    {
+      "id": "mc_feedback",
+      "key": "feedback_screen",
+      "name": "Feedback Screen",
+      "description": "Allow employees to submit feedback about the app and cafeteria",
+      "category": "ui",
+      "type": "boolean",
+      "enabled": true,
+      "defaultValue": true,
+      "targeting": {
+        "environments": ["production", "staging", "development"],
+        "rolloutPercentage": 100
+      },
+      "config": null,
+      "metadata": {
+        "tags": ["feedback", "support", "ux"],
+        "owner": "product-team",
+        "priority": "medium"
+      }
+    },
+    {
+      "id": "mc_weekend_ordering",
+      "key": "weekend_ordering",
+      "name": "Weekend Ordering",
+      "description": "Allow employees to order meals for weekend days (Saturday, Sunday)",
+      "category": "feature",
+      "type": "boolean",
+      "enabled": false,
+      "defaultValue": false,
+      "targeting": {
+        "environments": ["staging", "development"],
+        "rolloutPercentage": 0
+      },
+      "config": null,
+      "metadata": {
+        "tags": ["food", "ordering", "weekend"],
+        "owner": "ops-team",
+        "priority": "low"
+      }
+    },
+    {
+      "id": "mc_meal_ratings",
+      "key": "meal_ratings",
+      "name": "Meal Ratings",
+      "description": "Allow employees to rate their meals after pickup",
+      "category": "feature",
+      "type": "boolean",
+      "enabled": true,
+      "defaultValue": true,
+      "targeting": {
+        "environments": ["production", "staging", "development"],
+        "rolloutPercentage": 100
+      },
+      "config": null,
+      "metadata": {
+        "tags": ["food", "ratings", "feedback"],
+        "owner": "product-team",
+        "priority": "medium"
+      }
+    },
+    {
+      "id": "mc_qr_checkin",
+      "key": "qr_checkin",
+      "name": "QR Pickup Pass",
+      "description": "Generate QR codes for meal pickup verification at the cafeteria counter",
+      "category": "feature",
+      "type": "boolean",
+      "enabled": true,
+      "defaultValue": true,
+      "targeting": {
+        "environments": ["production", "staging", "development"],
+        "rolloutPercentage": 100
+      },
+      "config": null,
+      "metadata": {
+        "tags": ["qr", "checkin", "cafeteria", "pickup"],
+        "owner": "ops-team",
+        "priority": "critical"
+      }
+    },
+    {
+      "id": "mc_force_update",
+      "key": "force_update",
+      "name": "Force App Update",
+      "description": "Force employees to update to the latest version of Merck Connect",
+      "category": "feature",
+      "type": "boolean",
+      "enabled": false,
+      "defaultValue": false,
+      "targeting": {
+        "environments": ["production"],
+        "rolloutPercentage": 100
+      },
+      "config": {
+        "minimumVersion": "1.0.0",
+        "storeUrl": {
+          "ios": "",
+          "android": ""
+        }
+      },
+      "metadata": {
+        "tags": ["update", "version", "maintenance"],
+        "owner": "mobile-team",
+        "priority": "high"
+      }
+    },
+    {
+      "id": "mc_maintenance_mode",
+      "key": "maintenance_mode",
+      "name": "Maintenance Mode",
+      "description": "Show a maintenance screen while the backend is being updated",
+      "category": "feature",
+      "type": "boolean",
+      "enabled": false,
+      "defaultValue": false,
+      "targeting": {
+        "environments": ["production", "staging"],
+        "rolloutPercentage": 100
+      },
+      "config": {
+        "message": "Merck Connect is undergoing scheduled maintenance. Please check back soon."
+      },
+      "metadata": {
+        "tags": ["maintenance", "downtime", "ops"],
+        "owner": "ops-team",
+        "priority": "high"
+      }
+    },
+    {
+      "id": "mc_analytics",
+      "key": "analytics_tracking",
+      "name": "Analytics Tracking",
+      "description": "Track usage patterns to improve the food ordering experience",
+      "category": "analytics",
+      "type": "boolean",
+      "enabled": true,
+      "defaultValue": false,
+      "targeting": {
+        "environments": ["production"],
+        "rolloutPercentage": 100
+      },
+      "config": {
+        "provider": "firebase",
+        "anonymize": true
+      },
+      "metadata": {
+        "tags": ["analytics", "tracking"],
+        "owner": "data-team",
+        "priority": "medium"
+      }
+    },
+    {
+      "id": "mc_crash_reporting",
+      "key": "crash_reporting",
+      "name": "Crash Reporting",
+      "description": "Automatically report crashes to help fix issues faster",
+      "category": "analytics",
+      "type": "boolean",
+      "enabled": true,
+      "defaultValue": true,
+      "targeting": {
+        "environments": ["production", "staging"],
+        "rolloutPercentage": 100
+      },
+      "config": {
+        "provider": "firebase",
+        "sampleRate": 1
+      },
+      "metadata": {
+        "tags": ["crash", "errors", "monitoring"],
+        "owner": "platform-team",
+        "priority": "high"
+      }
+    },
+    {
+      "id": "mc_bulk_ordering",
+      "key": "bulk_ordering",
+      "name": "Bulk Meal Ordering",
+      "description": "Allow employees to order meals for multiple days in a single cart checkout",
+      "category": "feature",
+      "type": "boolean",
+      "enabled": true,
+      "defaultValue": true,
+      "targeting": {
+        "environments": ["production", "staging", "development"],
+        "rolloutPercentage": 100
+      },
+      "config": {
+        "maxDaysAhead": 3
+      },
+      "metadata": {
+        "tags": ["food", "ordering", "bulk"],
+        "owner": "product-team",
+        "priority": "high"
+      }
+    }
+  ]
+}

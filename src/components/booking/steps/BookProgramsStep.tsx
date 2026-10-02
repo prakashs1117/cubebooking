@@ -51,7 +51,7 @@ export function BookProgramsStep({ onContinue }: Props) {
         {intl.formatMessage({ id: 'bookPrograms.heading' })}
       </h1>
 
-      <div className="rise-2 flex flex-col gap-2.5" role="radiogroup" aria-label="Programs">
+      <div className="rise-2 flex flex-col gap-2" role="radiogroup" aria-label="Programs">
         {options.map((opt) => {
           const isSelected = programSelection === opt.id
           return (
@@ -59,16 +59,16 @@ export function BookProgramsStep({ onContinue }: Props) {
               key={opt.id}
               type="button"
               onClick={() => handleSelectProgram(opt.id)}
-              className="tap flex items-center gap-3.5 p-3.5 rounded-[20px] border-2 text-left"
+              className="tap flex items-center gap-3 p-3 md:p-3.5 rounded-2xl border-2 text-left"
               style={{
                 background: 'var(--card)',
                 borderColor: isSelected ? 'var(--primary)' : 'var(--border)',
               }}
             >
-              <span className="flex-none w-[52px] h-[52px] rounded-2xl" style={{ background: opt.swatch }} />
+              <span className="flex-none w-9 h-9 md:w-[52px] md:h-[52px] rounded-xl md:rounded-2xl" style={{ background: opt.swatch }} />
               <span className="flex-1 flex flex-col gap-0.5">
-                <span className="text-base font-bold">{opt.title}</span>
-                <span className="text-[13px]" style={{ color: 'var(--muted-foreground)' }}>{opt.sub}</span>
+                <span className="text-sm md:text-base font-bold">{opt.title}</span>
+                <span className="text-xs md:text-[13px]" style={{ color: 'var(--muted-foreground)' }}>{opt.sub}</span>
               </span>
               <span className="flex-none text-lg" style={{ color: 'var(--muted-foreground)' }}>›</span>
             </button>

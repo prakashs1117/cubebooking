@@ -70,7 +70,7 @@ export default function SignInPage() {
       }
     >
       {/* Header */}
-      <div className="flex justify-between items-center mb-8">
+      <div className="flex justify-between items-center mb-4 sm:mb-8">
         <div className="bg-white rounded-2xl p-2.5 px-3.5 shadow-lg">
           <MerckLogo />
         </div>
@@ -97,22 +97,22 @@ export default function SignInPage() {
       </div>
 
       {/* Hero text */}
-      <div className="rise mb-8">
-        <div className="text-xs font-semibold uppercase tracking-widest mb-3" style={{ color: 'var(--brand-mint)', letterSpacing: '0.14em' }}>
+      <div className="rise mb-4 sm:mb-8">
+        <div className="text-xs font-semibold uppercase tracking-widest mb-2 sm:mb-3" style={{ color: 'var(--brand-mint)', letterSpacing: '0.14em' }}>
           {intl.formatMessage({ id: 'auth.tagline' })}
         </div>
-        <h1 className="m-0 text-4xl md:text-5xl font-extrabold leading-tight tracking-tight text-white mb-3" style={{ fontFamily: 'var(--font-display)' }}>
+        <h1 className="m-0 text-3xl sm:text-4xl md:text-5xl font-extrabold leading-tight tracking-tight text-white mb-2 sm:mb-3" style={{ fontFamily: 'var(--font-display)' }}>
           {intl.formatMessage({ id: 'auth.hero.title' }).split('\n').map((line, i) => (
             <span key={i}>{line}{i === 0 && <br />}</span>
           ))}
         </h1>
-        <p className="text-base leading-relaxed" style={{ color: 'rgba(255,255,255,0.72)', maxWidth: 280 }}>
+        <p className="text-sm sm:text-base leading-relaxed hidden sm:block" style={{ color: 'rgba(255,255,255,0.72)', maxWidth: 280 }}>
           {intl.formatMessage({ id: 'auth.hero.sub' })}
         </p>
       </div>
 
       {/* Auth card */}
-      <div className="rise-2 rounded-3xl p-6 md:p-8 shadow-xl" style={{ background: 'var(--background)' }}>
+      <div className="rise-2 rounded-3xl p-5 sm:p-6 md:p-8 shadow-xl" style={{ background: 'var(--background)' }}>
         {magicSent ? (
           <div className="text-center py-4">
             <div className="text-4xl mb-4">✉️</div>
@@ -142,7 +142,7 @@ export default function SignInPage() {
               </div>
             ) : null}
 
-            <form onSubmit={handleSubmit} noValidate className="flex flex-col gap-4">
+            <form onSubmit={handleSubmit} noValidate className="flex flex-col gap-3 sm:gap-4">
               {/* Email */}
               <div className="flex flex-col gap-1.5">
                 <label htmlFor="email" className="text-sm font-medium" style={{ color: 'var(--foreground)' }}>
@@ -234,7 +234,7 @@ export default function SignInPage() {
             <button
               type="button"
               onClick={() => { setMode(mode === 'password' ? 'magic-link' : 'password'); setError(null) }}
-              className="w-full mt-3 text-xs font-semibold tap text-center"
+              className="w-full mt-2 sm:mt-3 text-xs font-semibold tap text-center"
               style={{ color: 'var(--muted-foreground)' }}
             >
               {mode === 'password'

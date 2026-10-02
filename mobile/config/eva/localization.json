@@ -1,0 +1,80 @@
+{
+  "en-US": {
+    "how": "[en-US] How do you want your egg today? en_US",
+    "boiledEgg": "[en-US] Boiled egg",
+    "softBoiledEgg": "[en-US] Soft-boiled egg",
+    "choice": "[en-US] How to choose the egg",
+    "firstLaunch": [
+      {
+        "key": 1,
+        "title": "Portable Scanner on your Phone [en-us]",
+        "text": "Scan any document and convert into text in excellent quality",
+        "image": "https://legacy.reactjs.org/logo-og.png"
+      },
+      {
+        "key": 2,
+        "title": "Portable Scanner on your Phone 2[en-us]",
+        "text": "Scan any document and convert into text in excellent quality",
+        "image": "https://legacy.reactjs.org/logo-og.png"
+      },
+      {
+        "key": 3,
+        "title": "Portable Scanner on your Phone 3[en-us]",
+        "text": "Scan any document and convert into text in excellent quality",
+        "image": "https://legacy.reactjs.org/logo-og.png"
+      }
+    ]
+  },
+  "en": {
+    "how": "[en] How do you want your egg today _ En?",
+    "boiledEgg": "[en] Boiled egg",
+    "softBoiledEgg": "[en] Soft-boiled egg",
+    "choice": "[en] How to choose the egg",
+    "firstLaunch": [
+      {
+        "key": 1,
+        "title": "Learning never exhausts the mind—it fuels it for greater challenges ahead.",
+        "text": "Examination is more than just questions; they are opportunities to grow and test the knowledge. Every attempt of learning brings confidence and success to career",
+        "image": "https://legacy.reactjs.org/logo-og.png"
+      },
+      {
+        "key": 2,
+        "title": "The future belongs to those who prepare for it today.",
+        "text": "Embrace the challenge and unlock your potential by experiencing the journey of modules",
+        "image": "https://legacy.reactjs.org/logo-og.png"
+      },
+      {
+        "key": 3,
+        "title": "Success is the sum of small efforts, repeated day in and day out.",
+        "text": "Stay consistent, stay determined, and watch as your dedication paves the way to achieving your dreams.",
+        "image": "https://legacy.reactjs.org/logo-og.png"
+      }
+    ]
+  },
+  "it": {
+    "how": "[it] Come vuoi il tuo uovo oggi?_ it",
+    "boiledEgg": "[it] Uovo sodo",
+    "softBoiledEgg": "[it] Uovo alla coque",
+    "choice": "[it] Come scegliere l'uovo",
+    "firstLaunch": [
+      {
+        "key": 1,
+        "title": "Portable Scanner on your Phone[it]",
+        "text": "Scan any document and convert into text in excellent quality",
+        "image": "https://legacy.reactjs.org/logo-og.png"
+      },
+      {
+        "key": 2,
+        "title": "Portable Scanner on your Phone 2[it]",
+        "text": "Scan any document and convert into text in excellent quality",
+        "image": "https://legacy.reactjs.org/logo-og.png"
+      },
+      {
+        "key": 3,
+        "title": "Portable Scanner on your Phone 3[it]",
+        "text": "Scan any document and convert into text in excellent quality",
+        "image": "https://legacy.reactjs.org/logo-og.png"
+      }
+    ]
+  }
+}

@@ -21,7 +21,13 @@ import ProgramsPage from './components/pages/ProgramsPage'
 
 const queryClient = new QueryClient({
   defaultOptions: {
-    queries: { staleTime: 30_000, retry: 1 },
+    queries: {
+      staleTime: 30_000,  // default: 30s; overridden per-query where appropriate
+      retry: 1,
+      gcTime: 5 * 60_000, // 5 min — explicit, matches TanStack default
+      refetchOnWindowFocus: true,
+      refetchOnReconnect: true,
+    },
   },
 })
 

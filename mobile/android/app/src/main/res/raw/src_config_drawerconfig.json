@@ -1,0 +1,60 @@
+{
+  "drawerItems": [
+    {
+      "id": "tabs",
+      "label": "navigation.home",
+      "icon": "home",
+      "screen": "Tabs",
+      "featureFlag": null,
+      "group": "main"
+    },
+    {
+      "type": "divider"
+    },
+    {
+      "type": "group",
+      "label": "navigation.tools",
+      "items": [
+        {
+          "id": "iconGallery",
+          "label": "navigation.iconGallery",
+          "icon": "component",
+          "screen": "IconGallery",
+          "featureFlag": "ENABLE_ICON_GALLERY"
+        },
+        {
+          "id": "featureFlags",
+          "label": "navigation.featureFlags",
+          "icon": "vibrant",
+          "screen": "FeatureFlags",
+          "featureFlag": "ENABLE_FEATURE_FLAGS_SCREEN"
+        },
+        {
+          "id": "about",
+          "label": "navigation.about",
+          "icon": "alert-circle",
+          "screen": "About",
+          "featureFlag": "ENABLE_ABOUT_SCREEN"
+        },
+        {
+          "id": "faq",
+          "label": "navigation.faq",
+          "icon": "info-circle",
+          "screen": "FAQ",
+          "featureFlag": null
+        }
+      ]
+    },
+    {
+      "type": "divider"
+    },
+    {
+      "id": "settings",
+      "label": "navigation.settings",
+      "icon": "settings",
+      "screen": "Settings",
+      "featureFlag": null,
+      "group": "other"
+    }
+  ]
+}

@@ -1,0 +1,174 @@
+{
+  "version": "1.0",
+  "lastUpdated": "2026-02-28",
+  "languages": {
+    "en": {
+      "title": "Privacy Policy",
+      "lastUpdatedLabel": "Last Updated",
+      "lastUpdatedDate": "February 28, 2026",
+      "sections": [
+        {
+          "id": "introduction",
+          "order": 1,
+          "title": "1. Introduction",
+          "content": "We respect your privacy and are committed to protecting your personal data. This privacy policy will inform you about how we look after your personal data when you visit our application and tell you about your privacy rights and how the law protects you.",
+          "icon": "shield-check"
+        },
+        {
+          "id": "informationCollection",
+          "order": 2,
+          "title": "2. Information We Collect",
+          "content": "We may collect, use, store and transfer different kinds of personal data about you including identity data (name, username), contact data (email address, phone number), technical data (device information, IP address), and usage data (how you use our application).",
+          "icon": "document"
+        },
+        {
+          "id": "dataUsage",
+          "order": 3,
+          "title": "3. How We Use Your Data",
+          "content": "We use your personal data to provide and improve our services, manage your account, send you important updates, respond to your inquiries, and comply with legal obligations. We will only use your personal data when the law allows us to.",
+          "icon": "settings"
+        },
+        {
+          "id": "dataProtection",
+          "order": 4,
+          "title": "4. Data Security",
+          "content": "We have implemented appropriate security measures to prevent your personal data from being accidentally lost, used, or accessed in an unauthorized way. We use encryption, secure servers, and regular security audits to protect your information.",
+          "icon": "shield-check"
+        },
+        {
+          "id": "thirdPartyServices",
+          "order": 5,
+          "title": "5. Third-Party Services",
+          "content": "We may share your data with trusted third-party service providers who assist us in operating our application, conducting our business, or serving our users. These third parties are obligated to keep your information secure and confidential.",
+          "icon": "globe"
+        },
+        {
+          "id": "yourRights",
+          "order": 6,
+          "title": "6. Your Rights",
+          "content": "You have the right to access, correct, or delete your personal data. You can also object to processing, request restrictions, request data portability, and withdraw consent at any time. To exercise these rights, please contact us through the app settings.",
+          "icon": "user"
+        },
+        {
+          "id": "contact",
+          "order": 7,
+          "title": "7. Contact Us",
+          "content": "If you have any questions about this privacy policy or our privacy practices, please contact us at privacy@todoapp.com or through the app's help section.",
+          "icon": "info-circle"
+        }
+      ]
+    },
+    "fr": {
+      "title": "Politique de confidentialité",
+      "lastUpdatedLabel": "Dernière mise à jour",
+      "lastUpdatedDate": "28 février 2026",
+      "sections": [
+        {
+          "id": "introduction",
+          "order": 1,
+          "title": "1. Introduction",
+          "content": "Nous respectons votre vie privée et nous nous engageons à protéger vos données personnelles. Cette politique de confidentialité vous informera sur la manière dont nous prenons soin de vos données personnelles lorsque vous visitez notre application et vous informera de vos droits en matière de confidentialité et de la manière dont la loi vous protège.",
+          "icon": "shield-check"
+        },
+        {
+          "id": "informationCollection",
+          "order": 2,
+          "title": "2. Informations que nous collectons",
+          "content": "Nous pouvons collecter, utiliser, stocker et transférer différents types de données personnelles vous concernant, notamment les données d'identité (nom, nom d'utilisateur), les données de contact (adresse e-mail, numéro de téléphone), les données techniques (informations sur l'appareil, adresse IP) et les données d'utilisation (comment vous utilisez notre application).",
+          "icon": "document"
+        },
+        {
+          "id": "dataUsage",
+          "order": 3,
+          "title": "3. Comment nous utilisons vos données",
+          "content": "Nous utilisons vos données personnelles pour fournir et améliorer nos services, gérer votre compte, vous envoyer des mises à jour importantes, répondre à vos demandes et respecter nos obligations légales. Nous n'utiliserons vos données personnelles que lorsque la loi nous y autorise.",
+          "icon": "settings"
+        },
+        {
+          "id": "dataProtection",
+          "order": 4,
+          "title": "4. Sécurité des données",
+          "content": "Nous avons mis en place des mesures de sécurité appropriées pour empêcher que vos données personnelles ne soient accidentellement perdues, utilisées ou consultées de manière non autorisée. Nous utilisons le cryptage, des serveurs sécurisés et des audits de sécurité réguliers pour protéger vos informations.",
+          "icon": "shield-check"
+        },
+        {
+          "id": "thirdPartyServices",
+          "order": 5,
+          "title": "5. Services tiers",
+          "content": "Nous pouvons partager vos données avec des prestataires de services tiers de confiance qui nous aident à exploiter notre application, à gérer notre activité ou à servir nos utilisateurs. Ces tiers sont tenus de garder vos informations sécurisées et confidentielles.",
+          "icon": "globe"
+        },
+        {
+          "id": "yourRights",
+          "order": 6,
+          "title": "6. Vos droits",
+          "content": "Vous avez le droit d'accéder, de corriger ou de supprimer vos données personnelles. Vous pouvez également vous opposer au traitement, demander des restrictions, demander la portabilité des données et retirer votre consentement à tout moment. Pour exercer ces droits, veuillez nous contacter via les paramètres de l'application.",
+          "icon": "user"
+        },
+        {
+          "id": "contact",
+          "order": 7,
+          "title": "7. Nous contacter",
+          "content": "Si vous avez des questions concernant cette politique de confidentialité ou nos pratiques de confidentialité, veuillez nous contacter à privacy@todoapp.com ou via la section d'aide de l'application.",
+          "icon": "info-circle"
+        }
+      ]
+    },
+    "ar": {
+      "title": "سياسة الخصوصية",
+      "lastUpdatedLabel": "آخر تحديث",
+      "lastUpdatedDate": "28 فبراير 2026",
+      "sections": [
+        {
+          "id": "introduction",
+          "order": 1,
+          "title": "1. المقدمة",
+          "content": "نحن نحترم خصوصيتك ونلتزم بحماية بياناتك الشخصية. ستخبرك سياسة الخصوصية هذه عن كيفية اهتمامنا ببياناتك الشخصية عند زيارة تطبيقنا وتخبرك بحقوق الخصوصية الخاصة بك وكيف يحميك القانون.",
+          "icon": "shield-check"
+        },
+        {
+          "id": "informationCollection",
+          "order": 2,
+          "title": "2. المعلومات التي نجمعها",
+          "content": "قد نجمع ونستخدم ونخزن وننقل أنواعاً مختلفة من البيانات الشخصية عنك بما في ذلك بيانات الهوية (الاسم، اسم المستخدم)، وبيانات الاتصال (عنوان البريد الإلكتروني، رقم الهاتف)، والبيانات الفنية (معلومات الجهاز، عنوان IP)، وبيانات الاستخدام (كيفية استخدامك لتطبيقنا).",
+          "icon": "document"
+        },
+        {
+          "id": "dataUsage",
+          "order": 3,
+          "title": "3. كيف نستخدم بياناتك",
+          "content": "نستخدم بياناتك الشخصية لتوفير خدماتنا وتحسينها، وإدارة حسابك، وإرسال تحديثات مهمة لك، والرد على استفساراتك، والامتثال للالتزامات القانونية. سنستخدم بياناتك الشخصية فقط عندما يسمح لنا القانون بذلك.",
+          "icon": "settings"
+        },
+        {
+          "id": "dataProtection",
+          "order": 4,
+          "title": "4. أمان البيانات",
+          "content": "لقد نفذنا تدابير أمنية مناسبة لمنع فقدان بياناتك الشخصية أو استخدامها أو الوصول إليها بطريقة غير مصرح بها. نستخدم التشفير والخوادم الآمنة وعمليات التدقيق الأمني المنتظمة لحماية معلوماتك.",
+          "icon": "shield-check"
+        },
+        {
+          "id": "thirdPartyServices",
+          "order": 5,
+          "title": "5. خدمات الطرف الثالث",
+          "content": "قد نشارك بياناتك مع مزودي خدمات موثوقين من طرف ثالث يساعدوننا في تشغيل تطبيقنا، أو إدارة أعمالنا، أو خدمة مستخدمينا. هؤلاء الأطراف الثالثة ملزمون بالحفاظ على معلوماتك آمنة وسرية.",
+          "icon": "globe"
+        },
+        {
+          "id": "yourRights",
+          "order": 6,
+          "title": "6. حقوقك",
+          "content": "لديك الحق في الوصول إلى بياناتك الشخصية أو تصحيحها أو حذفها. يمكنك أيضاً الاعتراض على المعالجة، وطلب القيود، وطلب نقل البيانات، وسحب الموافقة في أي وقت. لممارسة هذه الحقوق، يرجى الاتصال بنا من خلال إعدادات التطبيق.",
+          "icon": "user"
+        },
+        {
+          "id": "contact",
+          "order": 7,
+          "title": "7. اتصل بنا",
+          "content": "إذا كان لديك أي أسئلة حول سياسة الخصوصية هذه أو ممارسات الخصوصية الخاصة بنا، يرجى الاتصال بنا على privacy@todoapp.com أو من خلال قسم المساعدة في التطبيق.",
+          "icon": "info-circle"
+        }
+      ]
+    }
+  }
+}

@@ -41,8 +41,16 @@
     <script>
       if ('serviceWorker' in navigator) {
         navigator.serviceWorker.getRegistrations().then(function(registrations) {
-          for (var r of registrations) r.unregister();
+          for (var r of registrations) {
+            r.unregister();
+          }
         });
+        // Purge all workbox/PWA caches so stale assets don't block the app
+        if ('caches' in window) {
+          caches.keys().then(function(keys) {
+            keys.forEach(function(key) { caches.delete(key); });
+          });
+        }
       }
     </script>
     <script type="module" src="/src/main.tsx"></script>

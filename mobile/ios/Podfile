@@ -1,0 +1,114 @@
+# Resolve react_native_pods.rb with node to allow for hoisting
+require Pod::Executable.execute_command('node', ['-p',
+  'require.resolve(
+    "react-native/scripts/react_native_pods.rb",
+    {paths: [process.argv[1]]},
+  )', __dir__]).strip
+
+platform :ios, min_ios_version_supported
+use_modular_headers!
+prepare_react_native_project!
+
+# 1. Flags must be set BEFORE use_frameworks! for Firebase to catch them
+$RNFirebaseAsStaticFramework = true
+$RNFirebaseDisableSPM = true
+use_frameworks! :linkage => :static
+
+linkage = ENV['USE_FRAMEWORKS']
+if linkage != nil
+  Pod::UI.puts "Configuring Pod with #{linkage}ally linked Frameworks".green
+  use_frameworks! :linkage => linkage.to_sym
+end
+
+target 'TodoAppRN' do
+  config = use_native_modules!
+
+  use_react_native!(
+    :path => config[:reactNativePath],
+    # An absolute path to your application root.
+    :app_path => "#{Pod::Config.instance.installation_root}/.."
+  )
+
+  # Single, unified post_install block
+  post_install do |installer|
+    # Run the core React Native configurations first
+    react_native_post_install(
+      installer,
+      config[:reactNativePath],
+      :mac_catalyst_enabled => false
+    )
+
+    # pnpm's symlinked node_modules breaks header_mappings_dir: CocoaPods
+    # resolves header paths through .pnpm, producing copy destinations like
+    # "$(PUBLIC_HEADERS_FOLDER_PATH)/../../../../.pnpm/..." that escape the
+    # framework, leaving worklets/reanimated frameworks without headers.
+    # Rewrite them back to paths relative to the header_mappings_dir.
+    header_mappings = {
+      'react-native-worklets' => ['Common/cpp/worklets', 'apple/worklets'],
+      'react-native-reanimated' => ['Common/cpp/reanimated', 'apple/reanimated', 'Common/NativeView'],
+    }
+    installer.pods_project.targets.each do |target|
+      target.build_phases.grep(Xcodeproj::Project::Object::PBXCopyFilesBuildPhase).each do |phase|
+        header_mappings.each do |pkg, dirs|
+          dirs.each do |dir|
+            pattern = %r{\A\$\((PUBLIC|PRIVATE)_HEADERS_FOLDER_PATH\)(?:/\.\.)+/\.pnpm/[^/]+/node_modules/#{Regexp.escape(pkg)}/#{Regexp.escape(dir)}(/.*)?\z}
+            if (m = (phase.dst_path || '').match(pattern))
+              phase.dst_path = "$(#{m[1]}_HEADERS_FOLDER_PATH)#{m[2]}"
+            end
+          end
+        end
+      end
+    end
+
+    # Loop through targets once to apply all compiler & modular header fixes safely
+    installer.pods_project.targets.each do |target|
+      
+      # Enforce module definitions override at the target level
+      if target.name.start_with?('RNFB') || target.name.start_with?('React')
+        target.instance_variable_set(:@defines_module, false)
+      end
+
+      target.build_configurations.each do |config|
+        # Fix C++ compiler standard required by modern React Native architectures
+        config.build_settings['CLANG_CXX_LANGUAGE_STANDARD'] = 'c++20'
+        
+        # Explicitly allow non-modular headers (fixing both variations of the Xcode flag)
+        config.build_settings['CLANG_ALLOW_NON_MODULAR_INCLUDES_IN_FRAMEWORK_MODULES'] = 'YES'
+        config.build_settings['ALLOW_NON_MODULAR_INCLUDES_IN_FRAMEWORK_MODULES'] = 'YES'
+        config.build_settings['GCC_TREAT_WARNINGS_AS_ERRORS'] = 'NO'
+
+        # Prevent strict header map constraints specifically on Firebase modules
+        if target.name.start_with?('RNFB')
+          config.build_settings['DEFINES_MODULE'] = 'NO'
+        end
+
+        # Keep your existing Release profile optimizations
+        if config.name == 'Release'
+          config.build_settings['DEBUG_INFORMATION_FORMAT'] = 'dwarf-with-dsym'
+          config.build_settings['GCC_GENERATE_DEBUGGING_SYMBOLS'] = 'YES'
+          config.build_settings['COPY_PHASE_STRIP'] = 'NO'
+          config.build_settings['STRIP_INSTALLED_PRODUCT'] = 'NO'
+        end
+      end
+    end
+
+    # Apply non-modular settings to aggregate targets (e.g. Pods-TodoAppRN) and their xcconfigs
+    installer.aggregate_targets.each do |aggregate_target|
+      aggregate_target.xcconfigs.each do |config_name, config_file|
+        config_file.attributes['CLANG_ALLOW_NON_MODULAR_INCLUDES_IN_FRAMEWORK_MODULES'] = 'YES'
+        config_file.attributes['ALLOW_NON_MODULAR_INCLUDES_IN_FRAMEWORK_MODULES'] = 'YES'
+        xcconfig_path = aggregate_target.xcconfig_path(config_name)
+        config_file.save_as(Pathname.new(xcconfig_path))
+      end
+    end
+
+    # Apply to individual pod targets' installation results too
+    installer.target_installation_results.pod_target_installation_results.each do |pod_name, result|
+      result.native_target.build_configurations.each do |config|
+        config.build_settings['CLANG_ALLOW_NON_MODULAR_INCLUDES_IN_FRAMEWORK_MODULES'] = 'YES'
+        config.build_settings['ALLOW_NON_MODULAR_INCLUDES_IN_FRAMEWORK_MODULES'] = 'YES'
+      end
+    end
+
+  end
+end

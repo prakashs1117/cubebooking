@@ -1,0 +1,1189 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Employee Connect — Merck Design System</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans:ital,wght@0,400;0,500;0,600;0,700;0,900&display=swap');
+
+/* ============ MERCK LIQUID DESIGN TOKENS ============ */
+:root{
+  --radius:.625rem;
+  --font:"Noto Sans",-apple-system,"Segoe UI",sans-serif;
+
+  /* Brand — Merck vibrant palette */
+  --vibrant-green:#149B5F;
+  --vibrant-green-600:#01884C;
+  --vibrant-cyan:#2DBECD;
+  --vibrant-yellow:#FFC832;
+
+  /* Light theme (default) */
+  --background:#FFFFFF;
+  --foreground:#09090B;
+  --card:#FFFFFF;
+  --card-foreground:#09090B;
+  --muted:#F4F4F5;
+  --muted-foreground:#71717B;
+  --subtle-foreground:#A1A1AA;
+  --border:#E4E4E7;
+  --input:#E4E4E7;
+  --primary:var(--vibrant-green);
+  --primary-foreground:#FAFAFA;
+  --secondary-brand:var(--vibrant-cyan);
+  --secondary-brand-fg:#FFFFFF;
+  --tertiary-brand:var(--vibrant-yellow);
+  --accent:#ECFDF3;
+  --accent-cyan:#E9FAFC;
+  --accent-yellow:#FFF8E1;
+  --destructive:#DC2626;
+  --alert-warning:#FEFCE8;
+  --sidebar:#FAFAFA;
+  --sidebar-border:#E4E4E7;
+  --ring:var(--vibrant-green);
+  --shadow-sm:0 1px 3px 0 rgba(0,0,0,.08),0 1px 2px -1px rgba(0,0,0,.06);
+  --shadow-lg:0 10px 30px -6px rgba(9,9,11,.14);
+  --overlay:rgba(9,9,11,.45);
+}
+.dark{
+  --background:#09090B;
+  --foreground:#FAFAFA;
+  --card:#18181B;
+  --card-foreground:#FAFAFA;
+  --muted:#27272A;
+  --muted-foreground:#A1A1AA;
+  --subtle-foreground:#71717B;
+  --border:rgba(255,255,255,.10);
+  --input:rgba(255,255,255,.15);
+  --primary:#34C383;
+  --primary-foreground:#0B2A1B;
+  --secondary-brand:#5ED0DE;
+  --secondary-brand-fg:#062A2F;
+  --tertiary-brand:#FFD75E;
+  --accent:rgba(20,155,95,.16);
+  --accent-cyan:rgba(45,190,205,.14);
+  --accent-yellow:rgba(255,200,50,.12);
+  --destructive:#F87171;
+  --alert-warning:rgba(255,200,50,.10);
+  --sidebar:#101012;
+  --sidebar-border:rgba(255,255,255,.08);
+  --shadow-sm:0 1px 3px 0 rgba(0,0,0,.5);
+  --shadow-lg:0 14px 36px -8px rgba(0,0,0,.65);
+  --overlay:rgba(0,0,0,.6);
+}
+
+*{box-sizing:border-box;margin:0;padding:0}
+html{font-size:16px}
+body{
+  font-family:var(--font);
+  background:
+    radial-gradient(1100px 500px at 12% -8%, rgba(20,155,95,.12), transparent 60%),
+    radial-gradient(900px 480px at 92% 0%, rgba(45,190,205,.12), transparent 55%),
+    var(--page-bg,#F6F7F8);
+  color:#18181B;
+  min-height:100vh;
+  transition:background .35s ease;
+}
+body.dark{
+  --page-bg:#0C0C0E;
+  color:#FAFAFA;
+}
+
+svg{display:block}
+button{font-family:inherit;border:0;background:none;cursor:pointer;color:inherit}
+::-webkit-scrollbar{width:0;height:0}
+
+/* ============ STAGE / PAGE CHROME ============ */
+.stage-header{
+  max-width:1480px;margin:0 auto;padding:28px 32px 8px;
+  display:flex;align-items:flex-end;justify-content:space-between;gap:16px;flex-wrap:wrap;
+}
+.stage-title .eyebrow{
+  display:inline-flex;align-items:center;gap:8px;
+  font-size:11px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;
+  color:var(--vibrant-green);
+}
+.eyebrow .dot{width:8px;height:8px;border-radius:99px;background:var(--vibrant-green);box-shadow:0 0 0 4px rgba(20,155,95,.18)}
+.stage-title h1{font-size:clamp(22px,3vw,30px);font-weight:900;letter-spacing:-.02em;margin-top:6px}
+.stage-title h1 .tri{background:linear-gradient(90deg,#149B5F 0%,#2DBECD 55%,#FFC832 110%);-webkit-background-clip:text;background-clip:text;color:transparent}
+.stage-title p{font-size:13.5px;color:#71717B;margin-top:4px;max-width:560px}
+body.dark .stage-title p{color:#A1A1AA}
+
+.theme-toggle{
+  display:flex;align-items:center;gap:10px;
+  background:var(--card);border:1px solid var(--border);border-radius:99px;
+  padding:6px;box-shadow:var(--shadow-sm);
+}
+.theme-toggle button{
+  display:flex;align-items:center;gap:7px;
+  padding:8px 16px;border-radius:99px;font-size:13px;font-weight:600;
+  color:var(--muted-foreground);transition:all .2s ease;
+}
+.theme-toggle button.active{background:var(--primary);color:var(--primary-foreground);box-shadow:var(--shadow-sm)}
+
+.devices{
+  max-width:1480px;margin:0 auto;padding:24px 32px 64px;
+  display:flex;gap:44px;align-items:flex-start;justify-content:center;flex-wrap:wrap;
+}
+.device-label{
+  text-align:center;font-size:12px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;
+  color:#71717B;margin-bottom:14px;display:flex;align-items:center;justify-content:center;gap:8px;
+}
+body.dark .device-label{color:#A1A1AA}
+.device-label .pill{font-size:10px;padding:3px 9px;border-radius:99px;background:var(--accent);color:var(--vibrant-green-600);letter-spacing:.04em}
+body.dark .device-label .pill{color:#34C383}
+
+/* ============ DEVICE FRAMES ============ */
+.phone-frame{
+  width:392px;height:824px;border-radius:54px;padding:12px;
+  background:linear-gradient(160deg,#2A2A2E,#0E0E10 60%);
+  box-shadow:0 30px 70px -18px rgba(0,0,0,.45),inset 0 0 0 2px rgba(255,255,255,.07);
+  position:relative;flex-shrink:0;
+}
+.tablet-frame{
+  width:880px;max-width:96vw;height:660px;border-radius:34px;padding:14px;
+  background:linear-gradient(160deg,#2A2A2E,#0E0E10 60%);
+  box-shadow:0 30px 70px -18px rgba(0,0,0,.45),inset 0 0 0 2px rgba(255,255,255,.07);
+  position:relative;
+}
+.screen{
+  width:100%;height:100%;border-radius:42px;overflow:hidden;position:relative;
+  background:var(--background);color:var(--foreground);
+  display:flex;flex-direction:column;
+  transition:background .3s ease,color .3s ease;
+}
+.tablet-frame .screen{border-radius:22px;flex-direction:row}
+.notch{
+  position:absolute;top:24px;left:50%;transform:translateX(-50%);
+  width:118px;height:34px;border-radius:99px;background:#0E0E10;z-index:60;
+}
+
+/* ============ STATUS BAR ============ */
+.statusbar{
+  height:54px;flex-shrink:0;display:flex;align-items:flex-end;justify-content:space-between;
+  padding:0 28px 6px;font-size:13px;font-weight:600;
+}
+.statusbar .right{display:flex;align-items:center;gap:5px}
+
+/* ============ APP HEADER (phone) ============ */
+.app-header{
+  padding:10px 18px 14px;display:flex;align-items:center;gap:12px;flex-shrink:0;
+}
+.icon-btn{
+  width:42px;height:42px;border-radius:14px;display:flex;align-items:center;justify-content:center;
+  background:var(--muted);color:var(--foreground);position:relative;flex-shrink:0;
+  transition:background .2s ease;
+}
+.icon-btn:hover{background:var(--accent)}
+.icon-btn svg{width:20px;height:20px}
+.badge-dot{
+  position:absolute;top:9px;right:9px;width:9px;height:9px;border-radius:99px;
+  background:var(--vibrant-yellow);border:2px solid var(--background);
+}
+.greeting{flex:1;min-width:0}
+.greeting .hi{font-size:12px;color:var(--muted-foreground);font-weight:500}
+.greeting .name{font-size:17px;font-weight:800;letter-spacing:-.01em;line-height:1.2}
+.avatar{
+  width:42px;height:42px;border-radius:99px;flex-shrink:0;
+  background:linear-gradient(135deg,#149B5F,#2DBECD);
+  display:flex;align-items:center;justify-content:center;
+  color:#fff;font-weight:800;font-size:14px;
+  box-shadow:0 0 0 2px var(--background),0 0 0 4px var(--vibrant-green);
+}
+
+/* ============ SEARCH ============ */
+.search{
+  margin:0 18px 4px;height:46px;border-radius:14px;
+  background:var(--muted);display:flex;align-items:center;gap:10px;padding:0 14px;
+  color:var(--muted-foreground);font-size:14px;flex-shrink:0;
+  border:1px solid transparent;transition:border .2s;
+}
+.search:focus-within{border-color:var(--ring)}
+.search svg{width:17px;height:17px;flex-shrink:0}
+.search input{border:0;background:none;outline:none;flex:1;font:inherit;color:var(--foreground)}
+.kbd{font-size:10px;font-weight:700;background:var(--background);border:1px solid var(--border);border-radius:6px;padding:2px 6px;color:var(--subtle-foreground)}
+
+/* ============ SCROLL BODY ============ */
+.scroll-body{flex:1;overflow-y:auto;padding:14px 0 96px;scroll-behavior:smooth}
+.tablet-frame .scroll-body{padding:0 0 24px}
+
+.section{padding:0 18px;margin-bottom:22px}
+.section-head{display:flex;align-items:baseline;justify-content:space-between;margin-bottom:12px}
+.section-head h2{font-size:16px;font-weight:800;letter-spacing:-.01em}
+.section-head a{font-size:12.5px;font-weight:700;color:var(--primary);text-decoration:none;display:flex;align-items:center;gap:2px}
+.section-head a svg{width:14px;height:14px}
+
+/* ============ ANNOUNCEMENT BANNER ============ */
+.announce{
+  margin:6px 18px 22px;border-radius:var(--radius);overflow:hidden;position:relative;
+  background:linear-gradient(118deg,#0B5A37 0%,#149B5F 48%,#1FB1A4 100%);
+  color:#fff;padding:18px 18px 16px;flex-shrink:0;box-shadow:var(--shadow-lg);
+}
+.announce::after{
+  content:"";position:absolute;right:-46px;top:-46px;width:170px;height:170px;border-radius:99px;
+  background:radial-gradient(circle,rgba(255,200,50,.5),rgba(255,200,50,0) 65%);
+}
+.announce::before{
+  content:"";position:absolute;right:26px;bottom:-58px;width:130px;height:130px;border-radius:99px;
+  border:22px solid rgba(45,190,205,.35);
+}
+.announce .tag{
+  display:inline-flex;align-items:center;gap:6px;font-size:10px;font-weight:800;letter-spacing:.12em;
+  text-transform:uppercase;background:rgba(255,255,255,.18);backdrop-filter:blur(4px);
+  padding:5px 10px;border-radius:99px;margin-bottom:10px;
+}
+.announce .tag svg{width:12px;height:12px}
+.announce h3{font-size:17px;font-weight:800;line-height:1.3;margin-bottom:5px;position:relative;z-index:1}
+.announce p{font-size:12.5px;opacity:.88;line-height:1.5;position:relative;z-index:1;max-width:88%}
+.announce .cta{
+  margin-top:13px;display:inline-flex;align-items:center;gap:7px;
+  background:#fff;color:#0B5A37;font-weight:800;font-size:12.5px;
+  padding:9px 15px;border-radius:99px;position:relative;z-index:1;
+}
+.announce .cta svg{width:14px;height:14px}
+
+/* ============ QUICK ACTIONS ============ */
+.quick-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+.quick{
+  background:var(--card);border:1px solid var(--border);border-radius:var(--radius);
+  padding:13px 6px 11px;display:flex;flex-direction:column;align-items:center;gap:8px;
+  transition:transform .15s ease,box-shadow .15s ease;
+}
+.quick:hover{transform:translateY(-2px);box-shadow:var(--shadow-sm)}
+.quick .qi{width:40px;height:40px;border-radius:13px;display:flex;align-items:center;justify-content:center}
+.quick .qi svg{width:19px;height:19px}
+.quick span{font-size:10.5px;font-weight:700;color:var(--muted-foreground)}
+.qi.g{background:var(--accent);color:var(--vibrant-green)}
+.qi.c{background:var(--accent-cyan);color:var(--secondary-brand)}
+.qi.y{background:var(--accent-yellow);color:#B07B00}
+body.dark .qi.y{color:var(--tertiary-brand)}
+.qi.n{background:var(--muted);color:var(--foreground)}
+
+/* ============ EVENT CARDS (horizontal) ============ */
+.h-scroll{display:flex;gap:12px;overflow-x:auto;padding:2px 18px 8px;scroll-snap-type:x mandatory}
+.event-card{
+  min-width:236px;scroll-snap-align:start;border-radius:var(--radius);
+  background:var(--card);border:1px solid var(--border);overflow:hidden;
+  box-shadow:var(--shadow-sm);display:flex;flex-direction:column;
+}
+.event-cover{height:86px;position:relative;display:flex;align-items:flex-end;padding:10px}
+.event-cover.ec1{background:linear-gradient(125deg,#149B5F,#2DBECD)}
+.event-cover.ec2{background:linear-gradient(125deg,#0F69AF,#2DBECD)}
+.event-cover.ec3{background:linear-gradient(125deg,#C2780A,#FFC832)}
+.event-cover .pattern{position:absolute;inset:0;opacity:.25;background-image:radial-gradient(rgba(255,255,255,.8) 1.2px,transparent 1.2px);background-size:14px 14px}
+.event-date{
+  background:rgba(255,255,255,.95);border-radius:10px;padding:5px 9px;text-align:center;line-height:1.05;
+  color:#0B5A37;position:relative;
+}
+.event-date .d{font-size:16px;font-weight:900}
+.event-date .m{font-size:9px;font-weight:800;letter-spacing:.1em;text-transform:uppercase}
+.event-body{padding:12px 13px 13px;display:flex;flex-direction:column;gap:8px;flex:1}
+.event-body h4{font-size:13.5px;font-weight:800;line-height:1.3}
+.event-meta{font-size:11px;color:var(--muted-foreground);display:flex;align-items:center;gap:5px}
+.event-meta svg{width:12px;height:12px;flex-shrink:0}
+.event-foot{display:flex;align-items:center;justify-content:space-between;margin-top:auto}
+.seats{font-size:10.5px;font-weight:700;color:var(--vibrant-green)}
+.seats.low{color:#B07B00}
+body.dark .seats.low{color:var(--tertiary-brand)}
+.btn-sm{
+  font-size:11.5px;font-weight:800;padding:7px 13px;border-radius:99px;
+  background:var(--primary);color:var(--primary-foreground);transition:filter .15s;
+}
+.btn-sm:hover{filter:brightness(1.08)}
+.btn-sm.ghost{background:var(--muted);color:var(--foreground)}
+.avatars{display:flex}
+.avatars .a{
+  width:20px;height:20px;border-radius:99px;border:2px solid var(--card);margin-left:-7px;
+  font-size:8px;font-weight:800;color:#fff;display:flex;align-items:center;justify-content:center;
+}
+.avatars .a:first-child{margin-left:0}
+
+/* ============ FEED POSTS ============ */
+.post{
+  background:var(--card);border:1px solid var(--border);border-radius:var(--radius);
+  padding:15px;margin-bottom:12px;box-shadow:var(--shadow-sm);
+}
+.post-head{display:flex;align-items:center;gap:11px;margin-bottom:11px}
+.p-avatar{width:38px;height:38px;border-radius:99px;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:800;font-size:12.5px;flex-shrink:0}
+.post-head .who{flex:1;min-width:0}
+.post-head .who b{font-size:13.5px;display:block}
+.post-head .who span{font-size:11px;color:var(--muted-foreground)}
+.chip{
+  font-size:9.5px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;
+  padding:4px 9px;border-radius:99px;flex-shrink:0;
+}
+.chip.blog{background:var(--accent-cyan);color:#0E7A87}
+body.dark .chip.blog{color:var(--secondary-brand)}
+.chip.kudos{background:var(--accent-yellow);color:#9A6B00}
+body.dark .chip.kudos{color:var(--tertiary-brand)}
+.chip.news{background:var(--accent);color:var(--vibrant-green-600)}
+body.dark .chip.news{color:var(--primary)}
+.post p{font-size:13px;line-height:1.55;color:var(--card-foreground)}
+.post .post-media{
+  margin-top:11px;border-radius:12px;height:120px;position:relative;overflow:hidden;
+  display:flex;align-items:center;justify-content:center;
+}
+.post-media.m1{background:linear-gradient(115deg,#0B5A37,#149B5F 55%,#2DBECD)}
+.post-media .glyph{color:rgba(255,255,255,.92);display:flex;align-items:center;gap:10px;font-weight:800;font-size:13px}
+.post-media .glyph svg{width:26px;height:26px}
+.kudos-strip{
+  margin-top:11px;border-radius:12px;padding:12px 14px;display:flex;align-items:center;gap:12px;
+  background:linear-gradient(100deg,var(--accent-yellow),transparent 80%);
+  border:1px dashed rgba(255,200,50,.55);
+}
+.kudos-strip .medal{width:36px;height:36px;border-radius:12px;background:var(--vibrant-yellow);display:flex;align-items:center;justify-content:center;color:#7A5200;flex-shrink:0}
+.kudos-strip .medal svg{width:18px;height:18px}
+.kudos-strip b{font-size:12.5px;display:block}
+.kudos-strip span{font-size:11px;color:var(--muted-foreground)}
+.post-actions{display:flex;align-items:center;gap:4px;margin-top:12px;padding-top:11px;border-top:1px solid var(--border)}
+.pact{
+  display:flex;align-items:center;gap:6px;font-size:11.5px;font-weight:700;color:var(--muted-foreground);
+  padding:7px 11px;border-radius:99px;transition:all .15s;
+}
+.pact svg{width:15px;height:15px}
+.pact:hover{background:var(--muted);color:var(--foreground)}
+.pact.liked{color:var(--vibrant-green)}
+.pact.save{margin-left:auto}
+
+/* ============ BOTTOM TAB BAR ============ */
+.tabbar{
+  position:absolute;bottom:0;left:0;right:0;z-index:40;
+  padding:8px 14px calc(14px + 8px);
+}
+.tabbar .bar{
+  background:color-mix(in srgb,var(--card) 86%,transparent);
+  backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);
+  border:1px solid var(--border);border-radius:24px;box-shadow:var(--shadow-lg);
+  display:flex;align-items:center;justify-content:space-around;height:66px;position:relative;
+}
+.tab{
+  display:flex;flex-direction:column;align-items:center;gap:3px;width:58px;
+  color:var(--muted-foreground);font-size:10px;font-weight:700;padding-top:4px;
+  transition:color .2s;position:relative;
+}
+.tab svg{width:21px;height:21px}
+.tab.active{color:var(--primary)}
+.tab.active::before{
+  content:"";position:absolute;top:-9px;width:26px;height:3.5px;border-radius:99px;
+  background:linear-gradient(90deg,var(--vibrant-green),var(--vibrant-cyan));
+}
+.tab .n-badge{
+  position:absolute;top:0;right:10px;min-width:15px;height:15px;border-radius:99px;
+  background:var(--destructive);color:#fff;font-size:8.5px;font-weight:800;
+  display:flex;align-items:center;justify-content:center;padding:0 4px;
+  border:2px solid var(--card);
+}
+.fab{
+  width:54px;height:54px;border-radius:19px;flex-shrink:0;margin-top:-26px;
+  background:linear-gradient(135deg,#149B5F,#0FA88F);color:#fff;
+  display:flex;align-items:center;justify-content:center;
+  box-shadow:0 10px 22px -6px rgba(20,155,95,.55),inset 0 1px 0 rgba(255,255,255,.25);
+  transition:transform .15s;
+}
+.fab:hover{transform:scale(1.06) rotate(90deg)}
+.fab svg{width:24px;height:24px}
+
+/* ============ DRAWER (side menu, phone) ============ */
+.drawer-overlay{
+  position:absolute;inset:0;background:var(--overlay);z-index:50;
+  opacity:0;pointer-events:none;transition:opacity .28s ease;
+}
+.drawer-overlay.open{opacity:1;pointer-events:auto}
+.drawer{
+  position:absolute;top:0;bottom:0;left:0;width:81%;max-width:316px;z-index:55;
+  background:var(--sidebar);border-right:1px solid var(--sidebar-border);
+  transform:translateX(-103%);transition:transform .32s cubic-bezier(.32,.72,.25,1);
+  display:flex;flex-direction:column;padding:64px 0 22px;
+  border-radius:42px 0 0 42px;
+}
+.drawer.open{transform:translateX(0)}
+.drawer-profile{padding:6px 22px 18px;display:flex;align-items:center;gap:13px;border-bottom:1px solid var(--sidebar-border)}
+.drawer-profile .avatar{width:50px;height:50px;font-size:16px}
+.drawer-profile b{font-size:15px;display:block}
+.drawer-profile span{font-size:11.5px;color:var(--muted-foreground)}
+.drawer-nav{flex:1;overflow-y:auto;padding:14px 14px}
+.dlabel{font-size:10px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;color:var(--subtle-foreground);padding:12px 12px 7px}
+.ditem{
+  display:flex;align-items:center;gap:13px;padding:11px 12px;border-radius:12px;
+  font-size:13.5px;font-weight:600;color:var(--muted-foreground);width:100%;text-align:left;
+  transition:all .15s;
+}
+.ditem svg{width:18px;height:18px;flex-shrink:0}
+.ditem:hover{background:var(--muted);color:var(--foreground)}
+.ditem.active{background:var(--accent);color:var(--vibrant-green-600);font-weight:800}
+body.dark .ditem.active{color:var(--primary)}
+.ditem .count{margin-left:auto;font-size:10px;font-weight:800;background:var(--muted);padding:3px 8px;border-radius:99px;color:var(--muted-foreground)}
+.ditem.active .count{background:var(--primary);color:var(--primary-foreground)}
+.drawer-foot{padding:12px 14px 0;border-top:1px solid var(--sidebar-border)}
+.drawer-foot .ditem{color:var(--destructive)}
+
+/* ============ SCREENS / TAB SWITCHING ============ */
+.app-screen{display:none;flex-direction:column;flex:1;min-height:0}
+.app-screen.active{display:flex}
+.page-title{padding:6px 18px 14px;flex-shrink:0}
+.page-title h1{font-size:24px;font-weight:900;letter-spacing:-.02em}
+.page-title p{font-size:12.5px;color:var(--muted-foreground);margin-top:2px}
+
+/* Events screen */
+.seg{
+  margin:0 18px 16px;background:var(--muted);border-radius:13px;padding:4px;
+  display:flex;gap:4px;flex-shrink:0;
+}
+.seg button{
+  flex:1;padding:8px 0;border-radius:10px;font-size:12px;font-weight:700;color:var(--muted-foreground);
+  transition:all .2s;
+}
+.seg button.active{background:var(--card);color:var(--foreground);box-shadow:var(--shadow-sm)}
+.event-row{
+  display:flex;gap:13px;background:var(--card);border:1px solid var(--border);
+  border-radius:var(--radius);padding:13px;margin-bottom:11px;box-shadow:var(--shadow-sm);
+}
+.ev-cal{
+  width:52px;height:56px;border-radius:13px;flex-shrink:0;text-align:center;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;line-height:1.05;
+}
+.ev-cal.g{background:var(--accent);color:var(--vibrant-green-600)}
+body.dark .ev-cal.g{color:var(--primary)}
+.ev-cal.c{background:var(--accent-cyan);color:#0E7A87}
+body.dark .ev-cal.c{color:var(--secondary-brand)}
+.ev-cal.y{background:var(--accent-yellow);color:#9A6B00}
+body.dark .ev-cal.y{color:var(--tertiary-brand)}
+.ev-cal .d{font-size:18px;font-weight:900}
+.ev-cal .m{font-size:9px;font-weight:800;letter-spacing:.1em;text-transform:uppercase}
+.event-row .info{flex:1;min-width:0}
+.event-row .info h4{font-size:13.5px;font-weight:800;margin-bottom:3px}
+.event-row .info .em{font-size:11px;color:var(--muted-foreground);display:flex;align-items:center;gap:5px;margin-top:3px}
+.event-row .info .em svg{width:12px;height:12px}
+.reg-state{align-self:center;flex-shrink:0}
+.pill-state{font-size:10px;font-weight:800;padding:5px 10px;border-radius:99px}
+.pill-state.ok{background:var(--accent);color:var(--vibrant-green-600)}
+body.dark .pill-state.ok{color:var(--primary)}
+.pill-state.wait{background:var(--accent-yellow);color:#9A6B00}
+body.dark .pill-state.wait{color:var(--tertiary-brand)}
+
+/* Calendar screen */
+.cal-card{
+  margin:0 18px;background:var(--card);border:1px solid var(--border);border-radius:var(--radius);
+  padding:16px;box-shadow:var(--shadow-sm);
+}
+.cal-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px}
+.cal-head b{font-size:15px;font-weight:800}
+.cal-head .nav{display:flex;gap:6px}
+.cal-head .nav button{width:30px;height:30px;border-radius:9px;background:var(--muted);display:flex;align-items:center;justify-content:center}
+.cal-head .nav svg{width:14px;height:14px}
+.cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:3px;text-align:center}
+.cal-grid .dow{font-size:9.5px;font-weight:800;letter-spacing:.06em;color:var(--subtle-foreground);padding:5px 0;text-transform:uppercase}
+.cal-grid .day{
+  aspect-ratio:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;
+  font-size:12px;font-weight:600;border-radius:10px;color:var(--card-foreground);position:relative;
+}
+.cal-grid .day.dim{color:var(--subtle-foreground);font-weight:400}
+.cal-grid .day .ev{width:4.5px;height:4.5px;border-radius:99px}
+.ev.g{background:var(--vibrant-green)}.ev.c{background:var(--vibrant-cyan)}.ev.y{background:var(--vibrant-yellow)}
+.cal-grid .day.today{background:var(--primary);color:var(--primary-foreground);font-weight:900;box-shadow:0 6px 14px -4px rgba(20,155,95,.5)}
+.cal-grid .day:hover:not(.today){background:var(--muted)}
+.agenda{padding:18px 18px 0}
+.agenda-item{display:flex;gap:12px;padding:11px 0;border-bottom:1px solid var(--border)}
+.agenda-item:last-child{border:0}
+.agenda-item .t{font-size:11px;font-weight:800;color:var(--muted-foreground);width:54px;flex-shrink:0;padding-top:2px}
+.agenda-item .bar{width:3.5px;border-radius:99px;flex-shrink:0}
+.agenda-item .bar.g{background:var(--vibrant-green)}.agenda-item .bar.c{background:var(--vibrant-cyan)}.agenda-item .bar.y{background:var(--vibrant-yellow)}
+.agenda-item b{font-size:13px;display:block}
+.agenda-item span{font-size:11px;color:var(--muted-foreground)}
+
+/* Profile screen */
+.profile-hero{padding:8px 18px 18px;display:flex;flex-direction:column;align-items:center;text-align:center;flex-shrink:0}
+.profile-hero .avatar{width:84px;height:84px;font-size:26px;margin-bottom:12px}
+.profile-hero h3{font-size:19px;font-weight:900}
+.profile-hero p{font-size:12.5px;color:var(--muted-foreground);margin-top:2px}
+.stat-row{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;padding:0 18px;margin-bottom:18px}
+.stat{
+  background:var(--card);border:1px solid var(--border);border-radius:var(--radius);
+  padding:13px 8px;text-align:center;box-shadow:var(--shadow-sm);
+}
+.stat b{font-size:18px;font-weight:900;display:block}
+.stat span{font-size:10px;font-weight:700;color:var(--muted-foreground);text-transform:uppercase;letter-spacing:.05em}
+.stat b.g{color:var(--vibrant-green)}.stat b.c{color:var(--secondary-brand)}.stat b.y{color:#B07B00}
+body.dark .stat b.y{color:var(--tertiary-brand)}
+.list-card{margin:0 18px;background:var(--card);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;box-shadow:var(--shadow-sm)}
+.lrow{display:flex;align-items:center;gap:12px;padding:14px 15px;border-bottom:1px solid var(--border);font-size:13.5px;font-weight:600;width:100%;text-align:left}
+.lrow:last-child{border:0}
+.lrow:hover{background:var(--muted)}
+.lrow svg{width:18px;height:18px;color:var(--muted-foreground)}
+.lrow .chev{margin-left:auto;color:var(--subtle-foreground)}
+
+/* ============ TABLET LAYOUT ============ */
+.sidebar{
+  width:236px;flex-shrink:0;background:var(--sidebar);border-right:1px solid var(--sidebar-border);
+  display:flex;flex-direction:column;padding:20px 12px 16px;
+}
+.brand{display:flex;align-items:center;gap:11px;padding:4px 10px 18px}
+.brand-mark{
+  width:38px;height:38px;border-radius:12px;flex-shrink:0;position:relative;overflow:hidden;
+  background:conic-gradient(from 210deg,#149B5F,#2DBECD 40%,#FFC832 75%,#149B5F);
+  display:flex;align-items:center;justify-content:center;
+}
+.brand-mark::after{content:"";position:absolute;inset:3px;border-radius:9px;background:var(--sidebar)}
+.brand-mark span{position:relative;z-index:1;font-weight:900;font-size:15px;background:linear-gradient(120deg,#149B5F,#2DBECD);-webkit-background-clip:text;background-clip:text;color:transparent}
+.brand b{font-size:14.5px;font-weight:900;letter-spacing:-.01em;display:block;line-height:1.1}
+.brand span.sub{font-size:9.5px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--muted-foreground)}
+.sidebar .drawer-nav{padding:4px 0}
+.sidebar-foot{border-top:1px solid var(--sidebar-border);padding-top:10px}
+.storage-card{
+  margin:10px 4px 12px;border-radius:14px;padding:13px;
+  background:linear-gradient(135deg,var(--accent),var(--accent-cyan));
+  border:1px solid var(--border);
+}
+.storage-card b{font-size:12px;display:block;margin-bottom:3px}
+.storage-card p{font-size:10.5px;color:var(--muted-foreground);line-height:1.45;margin-bottom:9px}
+.storage-card .btn-sm{font-size:10.5px;padding:6px 11px}
+
+.main{flex:1;display:flex;flex-direction:column;min-width:0}
+.t-header{
+  height:64px;flex-shrink:0;display:flex;align-items:center;gap:14px;padding:0 22px;
+  border-bottom:1px solid var(--border);
+}
+.t-header h2{font-size:17px;font-weight:900;letter-spacing:-.01em}
+.t-header .search{margin:0;flex:1;max-width:340px;height:40px;margin-left:auto}
+.t-body{flex:1;overflow-y:auto;padding:20px 22px 26px}
+
+.hero-strip{
+  border-radius:var(--radius);padding:20px 22px;color:#fff;position:relative;overflow:hidden;
+  background:linear-gradient(112deg,#0B5A37 0%,#149B5F 46%,#1FA9B5 100%);
+  display:flex;align-items:center;gap:18px;margin-bottom:18px;box-shadow:var(--shadow-lg);
+}
+.hero-strip::after{content:"";position:absolute;right:-60px;top:-70px;width:230px;height:230px;border-radius:99px;border:30px solid rgba(255,200,50,.32)}
+.hero-strip::before{content:"";position:absolute;right:120px;bottom:-80px;width:160px;height:160px;border-radius:99px;background:rgba(45,190,205,.3);filter:blur(2px)}
+.hero-strip .ht{flex:1;position:relative;z-index:1}
+.hero-strip h3{font-size:19px;font-weight:900;margin-bottom:4px;letter-spacing:-.01em}
+.hero-strip p{font-size:12.5px;opacity:.88;max-width:480px;line-height:1.5}
+.hero-strip .cta{
+  position:relative;z-index:1;background:#fff;color:#0B5A37;font-weight:800;font-size:12.5px;
+  padding:10px 18px;border-radius:99px;display:flex;align-items:center;gap:7px;flex-shrink:0;
+}
+.hero-strip .cta svg{width:14px;height:14px}
+
+.kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:18px}
+.kpi{
+  background:var(--card);border:1px solid var(--border);border-radius:var(--radius);
+  padding:15px 16px;box-shadow:var(--shadow-sm);position:relative;overflow:hidden;
+}
+.kpi .ic{width:34px;height:34px;border-radius:11px;display:flex;align-items:center;justify-content:center;margin-bottom:11px}
+.kpi .ic svg{width:17px;height:17px}
+.kpi b{font-size:21px;font-weight:900;letter-spacing:-.02em;display:block}
+.kpi span{font-size:11px;font-weight:600;color:var(--muted-foreground)}
+.kpi .trend{
+  position:absolute;top:14px;right:14px;font-size:10px;font-weight:800;
+  padding:3px 8px;border-radius:99px;background:var(--accent);color:var(--vibrant-green-600);
+}
+body.dark .kpi .trend{color:var(--primary)}
+.kpi .trend.warn{background:var(--accent-yellow);color:#9A6B00}
+body.dark .kpi .trend.warn{color:var(--tertiary-brand)}
+
+.t-grid{display:grid;grid-template-columns:1.55fr 1fr;gap:16px;align-items:start}
+.panel{
+  background:var(--card);border:1px solid var(--border);border-radius:var(--radius);
+  box-shadow:var(--shadow-sm);overflow:hidden;
+}
+.panel-head{display:flex;align-items:center;justify-content:space-between;padding:15px 17px 0}
+.panel-head h3{font-size:14.5px;font-weight:800}
+.panel-head a{font-size:11.5px;font-weight:700;color:var(--primary);text-decoration:none}
+.panel .inner{padding:13px 17px 16px}
+.t-grid .post{margin-bottom:12px;box-shadow:none}
+.t-grid .post:last-child{margin-bottom:0}
+.side-stack{display:flex;flex-direction:column;gap:16px}
+.mini-cal .cal-grid .day{font-size:10.5px}
+.engage{display:flex;align-items:flex-end;gap:7px;height:88px;padding:6px 2px 0}
+.engage .col{flex:1;display:flex;flex-direction:column;align-items:center;gap:5px}
+.engage .barv{width:100%;border-radius:7px 7px 3px 3px;background:linear-gradient(180deg,var(--vibrant-cyan),var(--vibrant-green));opacity:.85;transition:height .4s ease}
+.engage .col:nth-child(2n) .barv{background:linear-gradient(180deg,var(--vibrant-green),var(--vibrant-green-600))}
+.engage .col.peak .barv{background:linear-gradient(180deg,var(--vibrant-yellow),#E8A600);opacity:1}
+.engage .lab{font-size:9px;font-weight:700;color:var(--subtle-foreground);text-transform:uppercase}
+
+/* responsive stage */
+@media (max-width:980px){
+  .tablet-frame{height:560px}
+  .devices{gap:32px}
+}
+</style>
+</head>
+<body>
+
+<!-- SVG SPRITE -->
+<svg width="0" height="0" style="position:absolute">
+  <symbol id="i-home" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></symbol>
+  <symbol id="i-cal" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></symbol>
+  <symbol id="i-ticket" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 9a3 3 0 0 1 0 6v2a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-2a3 3 0 0 1 0-6V7a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2Z"/><path d="M13 5v2"/><path d="M13 17v2"/><path d="M13 11v2"/></symbol>
+  <symbol id="i-user" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></symbol>
+  <symbol id="i-users" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></symbol>
+  <symbol id="i-bell" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></symbol>
+  <symbol id="i-search" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></symbol>
+  <symbol id="i-menu" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="4" y1="6" x2="20" y2="6"/><line x1="4" y1="12" x2="14" y2="12"/><line x1="4" y1="18" x2="20" y2="18"/></symbol>
+  <symbol id="i-plus" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></symbol>
+  <symbol id="i-heart" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/></symbol>
+  <symbol id="i-msg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7.9 20A9 9 0 1 0 4 16.1L2 22Z"/></symbol>
+  <symbol id="i-share" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.6" y1="13.5" x2="15.4" y2="17.5"/><line x1="15.4" y1="6.5" x2="8.6" y2="10.5"/></symbol>
+  <symbol id="i-bookmark" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m19 21-7-4-7 4V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v16z"/></symbol>
+  <symbol id="i-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2"/><path d="M12 20v2"/><path d="m4.93 4.93 1.41 1.41"/><path d="m17.66 17.66 1.41 1.41"/><path d="M2 12h2"/><path d="M20 12h2"/><path d="m6.34 17.66-1.41 1.41"/><path d="m19.07 4.93-1.41 1.41"/></symbol>
+  <symbol id="i-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/></symbol>
+  <symbol id="i-chev-r" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></symbol>
+  <symbol id="i-chev-l" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></symbol>
+  <symbol id="i-pin" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></symbol>
+  <symbol id="i-clock" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></symbol>
+  <symbol id="i-mega" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m3 11 18-5v12L3 14v-3z"/><path d="M11.6 16.8a3 3 0 1 1-5.8-1.6"/></symbol>
+  <symbol id="i-award" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="6"/><path d="M15.5 13 17 22l-5-3-5 3 1.5-9"/></symbol>
+  <symbol id="i-qr" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><path d="M14 14h3v3h-3z"/><path d="M21 21h-3"/><path d="M21 14v3"/></symbol>
+  <symbol id="i-doc" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></symbol>
+  <symbol id="i-chart" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="20" x2="12" y2="10"/><line x1="18" y1="20" x2="18" y2="4"/><line x1="6" y1="20" x2="6" y2="16"/></symbol>
+  <symbol id="i-settings" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M12 1v4M12 19v4M4.2 4.2l2.9 2.9M16.9 16.9l2.9 2.9M1 12h4M19 12h4M4.2 19.8l2.9-2.9M16.9 7.1l2.9-2.9"/></symbol>
+  <symbol id="i-logout" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></symbol>
+  <symbol id="i-play" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5.14v14l11-7-11-7z"/></symbol>
+  <symbol id="i-video" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m22 8-6 4 6 4V8Z"/><rect x="2" y="6" width="14" height="12" rx="2"/></symbol>
+  <symbol id="i-grad" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 10 12 5 2 10l10 5 10-5z"/><path d="M6 12v5c0 1.7 2.7 3 6 3s6-1.3 6-3v-5"/></symbol>
+  <symbol id="i-wifi" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 13a10 10 0 0 1 14 0"/><path d="M8.5 16.5a5 5 0 0 1 7 0"/><line x1="12" y1="20" x2="12.01" y2="20"/></symbol>
+  <symbol id="i-batt" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="16" height="10" rx="2"/><line x1="22" y1="11" x2="22" y2="13"/><rect x="4" y="9" width="9" height="6" rx="1" fill="currentColor" stroke="none"/></symbol>
+</svg>
+
+<!-- ============ STAGE HEADER ============ -->
+<div class="stage-header">
+  <div class="stage-title">
+    <span class="eyebrow"><span class="dot"></span>Merck · Liquid Design System</span>
+    <h1>Employee Connect <span class="tri">Platform</span></h1>
+    <p>Mobile &amp; iPad concept — vibrant green / cyan / yellow brand tokens, Noto Sans, 0.625rem radius. Tap the tabs, hamburger menu and theme switch to explore.</p>
+  </div>
+  <div class="theme-toggle" role="group" aria-label="Theme">
+    <button id="btnLight" class="active" onclick="setTheme('light')"><svg><use href="#i-sun"/></svg>Light</button>
+    <button id="btnDark" onclick="setTheme('dark')"><svg><use href="#i-moon"/></svg>Dark</button>
+  </div>
+</div>
+
+<div class="devices">
+
+  <!-- ===================== PHONE ===================== -->
+  <div>
+    <div class="device-label">Mobile · React Native <span class="pill">390 × 844</span></div>
+    <div class="phone-frame">
+      <div class="notch"></div>
+      <div class="screen">
+
+        <!-- Drawer -->
+        <div class="drawer-overlay" id="drawerOverlay" onclick="toggleDrawer(false)"></div>
+        <aside class="drawer" id="drawer">
+          <div class="drawer-profile">
+            <div class="avatar">PK</div>
+            <div><b>Prakash K.</b><span>Associate Architect · Digital</span></div>
+          </div>
+          <nav class="drawer-nav">
+            <div class="dlabel">Workspace</div>
+            <button class="ditem active"><svg><use href="#i-home"/></svg>My Feed</button>
+            <button class="ditem"><svg><use href="#i-mega"/></svg>Announcements <span class="count">4</span></button>
+            <button class="ditem"><svg><use href="#i-doc"/></svg>Blogs &amp; Articles</button>
+            <button class="ditem"><svg><use href="#i-ticket"/></svg>Events &amp; Booking <span class="count">2</span></button>
+            <button class="ditem"><svg><use href="#i-cal"/></svg>Calendar</button>
+            <div class="dlabel">Community</div>
+            <button class="ditem"><svg><use href="#i-award"/></svg>Recognition</button>
+            <button class="ditem"><svg><use href="#i-users"/></svg>Employee Directory</button>
+            <button class="ditem"><svg><use href="#i-qr"/></svg>Event Check-in</button>
+          </nav>
+          <div class="drawer-foot">
+            <button class="ditem"><svg><use href="#i-settings"/></svg>Settings</button>
+            <button class="ditem"><svg><use href="#i-logout"/></svg>Sign out</button>
+          </div>
+        </aside>
+
+        <div class="statusbar">
+          <span>9:41</span>
+          <span class="right"><svg width="15" height="15"><use href="#i-wifi"/></svg><svg width="20" height="15" viewBox="0 0 24 24"><use href="#i-batt"/></svg></span>
+        </div>
+
+        <!-- ========== HOME SCREEN ========== -->
+        <div class="app-screen active" id="scr-home">
+          <header class="app-header">
+            <button class="icon-btn" onclick="toggleDrawer(true)" aria-label="Menu"><svg><use href="#i-menu"/></svg></button>
+            <div class="greeting">
+              <div class="hi">Good morning ☀️</div>
+              <div class="name">Prakash Kumar</div>
+            </div>
+            <button class="icon-btn" aria-label="Notifications"><svg><use href="#i-bell"/></svg><span class="badge-dot"></span></button>
+            <div class="avatar">PK</div>
+          </header>
+
+          <div class="scroll-body">
+            <div class="search"><svg><use href="#i-search"/></svg><input placeholder="Search news, people, events…"></div>
+
+            <div class="announce">
+              <span class="tag"><svg><use href="#i-mega"/></svg>Priority · Leadership</span>
+              <h3>Q3 Townhall — Innovation Day 2026</h3>
+              <p>Join the EMEA leadership stream live from Darmstadt. Acknowledge to confirm you've read this update.</p>
+              <button class="cta">Read &amp; acknowledge <svg><use href="#i-chev-r"/></svg></button>
+            </div>
+
+            <div class="section">
+              <div class="quick-grid">
+                <button class="quick"><span class="qi g"><svg><use href="#i-ticket"/></svg></span><span>Book seat</span></button>
+                <button class="quick"><span class="qi c"><svg><use href="#i-qr"/></svg></span><span>Check-in</span></button>
+                <button class="quick"><span class="qi y"><svg><use href="#i-award"/></svg></span><span>Recognize</span></button>
+                <button class="quick"><span class="qi n"><svg><use href="#i-doc"/></svg></span><span>Write blog</span></button>
+              </div>
+            </div>
+
+            <div class="section" style="padding:0;margin-bottom:22px">
+              <div class="section-head" style="padding:0 18px">
+                <h2>Upcoming events</h2>
+                <a href="#" onclick="switchTab('events');return false">See all <svg><use href="#i-chev-r"/></svg></a>
+              </div>
+              <div class="h-scroll">
+                <div class="event-card">
+                  <div class="event-cover ec1"><div class="pattern"></div><div class="event-date"><div class="d">16</div><div class="m">Jun</div></div></div>
+                  <div class="event-body">
+                    <h4>AI in Pharma — Tech Conference</h4>
+                    <div class="event-meta"><svg><use href="#i-pin"/></svg>Innovation Center, Hall B</div>
+                    <div class="event-foot">
+                      <div style="display:flex;align-items:center;gap:8px">
+                        <div class="avatars"><span class="a" style="background:#149B5F">A</span><span class="a" style="background:#2DBECD">S</span><span class="a" style="background:#0F69AF">+</span></div>
+                        <span class="seats">12 seats left</span>
+                      </div>
+                      <button class="btn-sm">Register</button>
+                    </div>
+                  </div>
+                </div>
+                <div class="event-card">
+                  <div class="event-cover ec2"><div class="pattern"></div><div class="event-date"><div class="d">19</div><div class="m">Jun</div></div></div>
+                  <div class="event-body">
+                    <h4>Cloud Architecture Training</h4>
+                    <div class="event-meta"><svg><use href="#i-video"/></svg>Virtual · MS Teams</div>
+                    <div class="event-foot">
+                      <span class="seats low">Waitlist open</span>
+                      <button class="btn-sm ghost">Join waitlist</button>
+                    </div>
+                  </div>
+                </div>
+                <div class="event-card">
+                  <div class="event-cover ec3"><div class="pattern"></div><div class="event-date"><div class="d">24</div><div class="m">Jun</div></div></div>
+                  <div class="event-body">
+                    <h4>Summer Cricket Tournament 🏏</h4>
+                    <div class="event-meta"><svg><use href="#i-pin"/></svg>Campus Sports Ground</div>
+                    <div class="event-foot">
+                      <span class="seats">48 registered</span>
+                      <button class="btn-sm">Register</button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="section">
+              <div class="section-head"><h2>Your feed</h2><a href="#">Filter <svg><use href="#i-chev-r"/></svg></a></div>
+
+              <article class="post">
+                <div class="post-head">
+                  <div class="p-avatar" style="background:linear-gradient(135deg,#0F69AF,#2DBECD)">AR</div>
+                  <div class="who"><b>Ananya Rao</b><span>Data Science · 2h ago</span></div>
+                  <span class="chip blog">Blog</span>
+                </div>
+                <p><b>Scaling ML pipelines for clinical trials</b> — what we learned moving from batch scoring to real-time inference across 3 regions…</p>
+                <div class="post-media m1"><div class="glyph"><svg><use href="#i-play"/></svg>5 min read · with video</div></div>
+                <div class="post-actions">
+                  <button class="pact liked"><svg><use href="#i-heart"/></svg>248</button>
+                  <button class="pact"><svg><use href="#i-msg"/></svg>36</button>
+                  <button class="pact"><svg><use href="#i-share"/></svg></button>
+                  <button class="pact save"><svg><use href="#i-bookmark"/></svg></button>
+                </div>
+              </article>
+
+              <article class="post">
+                <div class="post-head">
+                  <div class="p-avatar" style="background:linear-gradient(135deg,#149B5F,#0B5A37)">HR</div>
+                  <div class="who"><b>People &amp; Culture</b><span>Official · 5h ago</span></div>
+                  <span class="chip kudos">Recognition</span>
+                </div>
+                <p>Celebrating excellence in cross-functional delivery this quarter 🎉</p>
+                <div class="kudos-strip">
+                  <div class="medal"><svg><use href="#i-award"/></svg></div>
+                  <div><b>Frontend Guild — Demand Portal launch</b><span>Spot Award · nominated by 6 colleagues</span></div>
+                </div>
+                <div class="post-actions">
+                  <button class="pact"><svg><use href="#i-heart"/></svg>512</button>
+                  <button class="pact"><svg><use href="#i-msg"/></svg>74</button>
+                  <button class="pact"><svg><use href="#i-share"/></svg></button>
+                  <button class="pact save"><svg><use href="#i-bookmark"/></svg></button>
+                </div>
+              </article>
+
+              <article class="post">
+                <div class="post-head">
+                  <div class="p-avatar" style="background:linear-gradient(135deg,#B07B00,#FFC832)">CM</div>
+                  <div class="who"><b>Corporate Comms</b><span>Official · Yesterday</span></div>
+                  <span class="chip news">News</span>
+                </div>
+                <p><b>New Bengaluru hub opens its doors.</b> 1,200 workstations, wellness floor and a maker lab — take the virtual tour and book your desk orientation.</p>
+                <div class="post-media" style="background:linear-gradient(115deg,#F4A460,#FFB84D);"><div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;color:rgba(255,255,255,.92);flex-direction:column;gap:12px"><svg width="40" height="40" fill="currentColor" viewBox="0 0 24 24"><path d="M21 19V5c0-1.1-.9-2-2-2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2zM8.5 13.5l2.5 3.01L14.5 12l4.5 6H5l3.5-4.5z"/></svg><span style="font-size:11px;font-weight:700">Hub interior gallery</span></div></div>
+                <div class="post-actions">
+                  <button class="pact"><svg><use href="#i-heart"/></svg>1.1k</button>
+                  <button class="pact"><svg><use href="#i-msg"/></svg>203</button>
+                  <button class="pact"><svg><use href="#i-share"/></svg></button>
+                  <button class="pact save"><svg><use href="#i-bookmark"/></svg></button>
+                </div>
+              </article>
+
+              <article class="post">
+                <div class="post-head">
+                  <div class="p-avatar" style="background:linear-gradient(135deg,#E74C3C,#C0392B)">JM</div>
+                  <div class="who"><b>James Mitchell</b><span>Engineering · 18h ago</span></div>
+                  <span class="chip blog">Blog</span>
+                </div>
+                <p><b>Microservices migration — lessons from 2 years in production</b> 📚 A deep dive into why we chose Kubernetes, how we scaled from 12 to 847 containers, and the gotchas nobody tells you about.</p>
+                <div class="post-media" style="background:linear-gradient(115deg,#1E3C72,#2A5298);"><div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;color:rgba(255,255,255,.92);flex-direction:column;gap:8px"><svg width="36" height="36" fill="currentColor" viewBox="0 0 24 24"><rect x="2" y="2" width="8" height="8" rx="1"/><rect x="13" y="2" width="8" height="8" rx="1"/><rect x="2" y="13" width="8" height="8" rx="1"/><rect x="13" y="13" width="8" height="8" rx="1"/></svg><span style="font-size:10px;font-weight:700">8 min video</span></div></div>
+                <div class="post-actions">
+                  <button class="pact"><svg><use href="#i-heart"/></svg>847</button>
+                  <button class="pact"><svg><use href="#i-msg"/></svg>152</button>
+                  <button class="pact"><svg><use href="#i-share"/></svg></button>
+                  <button class="pact save"><svg><use href="#i-bookmark"/></svg></button>
+                </div>
+              </article>
+
+              <article class="post">
+                <div class="post-head">
+                  <div class="p-avatar" style="background:linear-gradient(135deg,#27AE60,#229954)">SK</div>
+                  <div class="who"><b>Sarah Khan</b><span>Product Management · 1d ago</span></div>
+                  <span class="chip news">News</span>
+                </div>
+                <p>🚀 <b>Demand Portal v3.2 is live!</b> New features: batch submission, API webhooks, custom workflows. Check the <b>release notes</b> and join the Q&amp;A session Thursday 4 PM CET.</p>
+                <div class="post-media" style="background:linear-gradient(115deg,#149B5F,#1FB1A4);"><div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;color:rgba(255,255,255,.92)"><svg width="44" height="44" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg></div></div>
+                <div class="post-actions">
+                  <button class="pact liked"><svg><use href="#i-heart"/></svg>2.3k</button>
+                  <button class="pact"><svg><use href="#i-msg"/></svg>461</button>
+                  <button class="pact"><svg><use href="#i-share"/></svg></button>
+                  <button class="pact save"><svg><use href="#i-bookmark"/></svg></button>
+                </div>
+              </article>
+
+              <article class="post">
+                <div class="post-head">
+                  <div class="p-avatar" style="background:linear-gradient(135deg,#8E44AD,#6C3483)">MP</div>
+                  <div class="who"><b>Dr. Maya Patel</b><span>Research · 1d ago</span></div>
+                  <span class="chip blog">Blog</span>
+                </div>
+                <p><b>GenAI in drug discovery — real-world applications in oncology</b> 🧬 Exploring how Merck's AI lab is accelerating candidate identification by 40%, with case studies from Q1 trials.</p>
+                <div class="post-media" style="background:linear-gradient(115deg,#9B59B6,#AF7AC5);"><div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;color:rgba(255,255,255,.92);flex-direction:column;gap:8px"><svg width="36" height="36" fill="currentColor" viewBox="0 0 24 24"><circle cx="12" cy="12" r="2"/><path d="M12 4C7.03 4 2.92 7.05 1.54 11.35c.5 1.05.12 2.36.12 2.36s.07 1.31.5 2.36C2.92 16.95 7.05 20 12 20s9.08-3.05 10.46-7.35c-.5-1.05-.12-2.36-.12-2.36s-.07-1.31-.5-2.36C21.08 7.05 16.97 4 12 4zm0 9c-1.66 0-3-1.34-3-3s1.34-3 3-3 3 1.34 3 3-1.34 3-3 3z"/></svg><span style="font-size:10px;font-weight:700">12 min read</span></div></div>
+                <div class="post-actions">
+                  <button class="pact"><svg><use href="#i-heart"/></svg>1.5k</button>
+                  <button class="pact"><svg><use href="#i-msg"/></svg>287</button>
+                  <button class="pact"><svg><use href="#i-share"/></svg></button>
+                  <button class="pact save"><svg><use href="#i-bookmark"/></svg></button>
+                </div>
+              </article>
+            </div>
+          </div>
+        </div>
+
+        <!-- ========== EVENTS SCREEN ========== -->
+        <div class="app-screen" id="scr-events">
+          <header class="app-header">
+            <button class="icon-btn" onclick="toggleDrawer(true)"><svg><use href="#i-menu"/></svg></button>
+            <div class="greeting"><div class="name" style="font-size:19px">Events</div></div>
+            <button class="icon-btn"><svg><use href="#i-search"/></svg></button>
+          </header>
+          <div class="seg">
+            <button class="active">Discover</button><button>My bookings</button><button>Past</button>
+          </div>
+          <div class="scroll-body" style="padding-top:0">
+            <div class="section">
+              <div class="event-row">
+                <div class="ev-cal g"><span class="d">16</span><span class="m">Jun</span></div>
+                <div class="info">
+                  <h4>AI in Pharma — Tech Conference</h4>
+                  <div class="em"><svg><use href="#i-clock"/></svg>09:30 – 17:00 · Hall B</div>
+                  <div class="em"><svg><use href="#i-users"/></svg>238 attending · 12 seats left</div>
+                </div>
+                <div class="reg-state"><span class="pill-state ok">Booked</span></div>
+              </div>
+              <div class="event-row">
+                <div class="ev-cal c"><span class="d">19</span><span class="m">Jun</span></div>
+                <div class="info">
+                  <h4>Cloud Architecture Training</h4>
+                  <div class="em"><svg><use href="#i-clock"/></svg>14:00 – 16:30 · Virtual</div>
+                  <div class="em"><svg><use href="#i-users"/></svg>Capacity full · waitlist #4</div>
+                </div>
+                <div class="reg-state"><span class="pill-state wait">Waitlist</span></div>
+              </div>
+              <div class="event-row">
+                <div class="ev-cal y"><span class="d">24</span><span class="m">Jun</span></div>
+                <div class="info">
+                  <h4>Summer Cricket Tournament</h4>
+                  <div class="em"><svg><use href="#i-clock"/></svg>08:00 · Campus Ground</div>
+                  <div class="em"><svg><use href="#i-users"/></svg>48 registered · 8 teams</div>
+                </div>
+                <div class="reg-state"><button class="btn-sm">Register</button></div>
+              </div>
+              <div class="event-row">
+                <div class="ev-cal g"><span class="d">02</span><span class="m">Jul</span></div>
+                <div class="info">
+                  <h4>Toastmasters — Open House</h4>
+                  <div class="em"><svg><use href="#i-clock"/></svg>17:30 · Auditorium 2</div>
+                  <div class="em"><svg><use href="#i-users"/></svg>61 attending</div>
+                </div>
+                <div class="reg-state"><button class="btn-sm">Register</button></div>
+              </div>
+              <div class="event-row">
+                <div class="ev-cal c"><span class="d">09</span><span class="m">Jul</span></div>
+                <div class="info">
+                  <h4>Wellness Week — Yoga &amp; Mindfulness</h4>
+                  <div class="em"><svg><use href="#i-clock"/></svg>07:30 daily · Wellness Floor</div>
+                  <div class="em"><svg><use href="#i-users"/></svg>Drop-in · no booking needed</div>
+                </div>
+                <div class="reg-state"><button class="btn-sm ghost">Remind me</button></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ========== CALENDAR SCREEN ========== -->
+        <div class="app-screen" id="scr-cal">
+          <header class="app-header">
+            <button class="icon-btn" onclick="toggleDrawer(true)"><svg><use href="#i-menu"/></svg></button>
+            <div class="greeting"><div class="name" style="font-size:19px">Calendar</div></div>
+            <button class="icon-btn"><svg><use href="#i-plus"/></svg></button>
+          </header>
+          <div class="scroll-body" style="padding-top:4px">
+            <div class="cal-card">
+              <div class="cal-head">
+                <b>June 2026</b>
+                <div class="nav"><button><svg><use href="#i-chev-l"/></svg></button><button><svg><use href="#i-chev-r"/></svg></button></div>
+              </div>
+              <div class="cal-grid" id="calGrid"></div>
+            </div>
+            <div class="agenda">
+              <div class="section-head"><h2>Today · Wed, 10 June</h2></div>
+              <div class="agenda-item"><span class="t">10:00</span><span class="bar g"></span><div><b>Demand call — Portfolio sync</b><span>Teams · 45 min · 8 attendees</span></div></div>
+              <div class="agenda-item"><span class="t">13:00</span><span class="bar c"></span><div><b>Design review — Connect mobile</b><span>Room 4.12 · Figma walkthrough</span></div></div>
+              <div class="agenda-item"><span class="t">17:30</span><span class="bar y"></span><div><b>Toastmasters prep — Table Topics</b><span>Auditorium 2 · optional</span></div></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ========== PROFILE SCREEN ========== -->
+        <div class="app-screen" id="scr-profile">
+          <header class="app-header">
+            <button class="icon-btn" onclick="toggleDrawer(true)"><svg><use href="#i-menu"/></svg></button>
+            <div class="greeting"><div class="name" style="font-size:19px">Profile</div></div>
+            <button class="icon-btn"><svg><use href="#i-settings"/></svg></button>
+          </header>
+          <div class="scroll-body" style="padding-top:0">
+            <div class="profile-hero">
+              <div class="avatar">PK</div>
+              <h3>Prakash Kumar</h3>
+              <p>Associate Architect · Digital Solutions · Bengaluru</p>
+            </div>
+            <div class="stat-row">
+              <div class="stat"><b class="g">18</b><span>Events</span></div>
+              <div class="stat"><b class="c">7</b><span>Blogs</span></div>
+              <div class="stat"><b class="y">12</b><span>Kudos</span></div>
+            </div>
+            <div class="list-card">
+              <button class="lrow"><svg><use href="#i-bookmark"/></svg>Saved posts <svg class="chev"><use href="#i-chev-r"/></svg></button>
+              <button class="lrow"><svg><use href="#i-ticket"/></svg>My bookings &amp; QR passes <svg class="chev"><use href="#i-chev-r"/></svg></button>
+              <button class="lrow"><svg><use href="#i-award"/></svg>Recognition wall <svg class="chev"><use href="#i-chev-r"/></svg></button>
+              <button class="lrow"><svg><use href="#i-bell"/></svg>Notification preferences <svg class="chev"><use href="#i-chev-r"/></svg></button>
+              <button class="lrow"><svg><use href="#i-logout"/></svg>Sign out <svg class="chev"><use href="#i-chev-r"/></svg></button>
+            </div>
+          </div>
+        </div>
+
+        <!-- ========== BOTTOM TAB BAR ========== -->
+        <nav class="tabbar">
+          <div class="bar">
+            <button class="tab active" data-tab="home" onclick="switchTab('home')"><svg><use href="#i-home"/></svg>Home</button>
+            <button class="tab" data-tab="events" onclick="switchTab('events')"><svg><use href="#i-ticket"/></svg>Events<span class="n-badge">2</span></button>
+            <button class="fab" aria-label="Create"><svg><use href="#i-plus"/></svg></button>
+            <button class="tab" data-tab="cal" onclick="switchTab('cal')"><svg><use href="#i-cal"/></svg>Calendar</button>
+            <button class="tab" data-tab="profile" onclick="switchTab('profile')"><svg><use href="#i-user"/></svg>Profile</button>
+          </div>
+        </nav>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- ===================== TABLET ===================== -->
+  <div>
+    <div class="device-label">iPad · Web Dashboard <span class="pill">Landscape</span></div>
+    <div class="tablet-frame">
+      <div class="screen">
+
+        <aside class="sidebar">
+          <div class="brand">
+            <div class="brand-mark"><span>EC</span></div>
+            <div><b>Employee Connect</b><span class="sub">Merck · EMEA</span></div>
+          </div>
+          <nav class="drawer-nav">
+            <div class="dlabel">Workspace</div>
+            <button class="ditem active"><svg><use href="#i-home"/></svg>Dashboard</button>
+            <button class="ditem"><svg><use href="#i-mega"/></svg>Announcements <span class="count">4</span></button>
+            <button class="ditem"><svg><use href="#i-doc"/></svg>Blogs &amp; Articles</button>
+            <button class="ditem"><svg><use href="#i-ticket"/></svg>Events <span class="count">2</span></button>
+            <button class="ditem"><svg><use href="#i-cal"/></svg>Calendar</button>
+            <div class="dlabel">Community</div>
+            <button class="ditem"><svg><use href="#i-award"/></svg>Recognition</button>
+            <button class="ditem"><svg><use href="#i-users"/></svg>Directory</button>
+            <button class="ditem"><svg><use href="#i-chart"/></svg>Analytics</button>
+          </nav>
+          <div class="sidebar-foot">
+            <div class="storage-card">
+              <b>Innovation Day 2026</b>
+              <p>Seat booking opens Friday 09:00 CET. 420 seats · 3 tracks.</p>
+              <button class="btn-sm">Set reminder</button>
+            </div>
+            <button class="ditem"><svg><use href="#i-settings"/></svg>Settings</button>
+          </div>
+        </aside>
+
+        <div class="main">
+          <header class="t-header">
+            <h2>Dashboard</h2>
+            <div class="search"><svg><use href="#i-search"/></svg><input placeholder="Search everything…"><span class="kbd">⌘K</span></div>
+            <button class="icon-btn"><svg><use href="#i-bell"/></svg><span class="badge-dot"></span></button>
+            <div class="avatar">PK</div>
+          </header>
+
+          <div class="t-body">
+            <div class="hero-strip">
+              <div class="ht">
+                <h3>Good morning, Prakash 👋</h3>
+                <p>3 announcements need your acknowledgment, your AI in Pharma seat is confirmed for 16 June, and the Frontend Guild just earned a Spot Award.</p>
+              </div>
+              <button class="cta">Review now <svg><use href="#i-chev-r"/></svg></button>
+            </div>
+
+            <div class="kpis">
+              <div class="kpi"><span class="trend">+12%</span><div class="ic" style="background:var(--accent);color:var(--vibrant-green)"><svg><use href="#i-users"/></svg></div><b>2,847</b><span>Active employees today</span></div>
+              <div class="kpi"><span class="trend">+8%</span><div class="ic" style="background:var(--accent-cyan);color:var(--secondary-brand)"><svg><use href="#i-ticket"/></svg></div><b>14</b><span>Events this month</span></div>
+              <div class="kpi"><span class="trend warn">3 new</span><div class="ic" style="background:var(--accent-yellow);color:#B07B00"><svg><use href="#i-mega"/></svg></div><b>92%</b><span>Announcement reach</span></div>
+              <div class="kpi"><span class="trend">+21%</span><div class="ic" style="background:var(--accent);color:var(--vibrant-green)"><svg><use href="#i-heart"/></svg></div><b>6.4k</b><span>Reactions this week</span></div>
+            </div>
+
+            <div class="t-grid">
+              <div>
+                <div class="panel">
+                  <div class="panel-head"><h3>Company feed</h3><a href="#">Open feed</a></div>
+                  <div class="inner">
+                    <article class="post" style="border:0;border-bottom:1px solid var(--border);border-radius:0;padding:4px 0 14px">
+                      <div class="post-head">
+                        <div class="p-avatar" style="background:linear-gradient(135deg,#0F69AF,#2DBECD)">AR</div>
+                        <div class="who"><b>Ananya Rao</b><span>Data Science · 2h ago</span></div>
+                        <span class="chip blog">Blog</span>
+                      </div>
+                      <p><b>Scaling ML pipelines for clinical trials</b> — moving from batch scoring to real-time inference across three regions, and the guardrails that made it safe.</p>
+                      <div class="post-actions" style="border:0;padding-top:8px">
+                        <button class="pact liked"><svg><use href="#i-heart"/></svg>248</button>
+                        <button class="pact"><svg><use href="#i-msg"/></svg>36</button>
+                        <button class="pact"><svg><use href="#i-share"/></svg></button>
+                      </div>
+                    </article>
+                    <article class="post" style="border:0;border-radius:0;padding:14px 0 2px;margin:0">
+                      <div class="post-head">
+                        <div class="p-avatar" style="background:linear-gradient(135deg,#149B5F,#0B5A37)">HR</div>
+                        <div class="who"><b>People &amp; Culture</b><span>Official · 5h ago</span></div>
+                        <span class="chip kudos">Recognition</span>
+                      </div>
+                      <div class="kudos-strip" style="margin-top:4px">
+                        <div class="medal"><svg><use href="#i-award"/></svg></div>
+                        <div><b>Frontend Guild — Demand Portal launch</b><span>Spot Award · nominated by 6 colleagues</span></div>
+                      </div>
+                      <div class="post-actions" style="border:0;padding-top:10px">
+                        <button class="pact"><svg><use href="#i-heart"/></svg>512</button>
+                        <button class="pact"><svg><use href="#i-msg"/></svg>74</button>
+                        <button class="pact"><svg><use href="#i-share"/></svg></button>
+                      </div>
+                    </article>
+                    <article class="post" style="border:0;border-top:1px solid var(--border);border-radius:0;padding:14px 0;margin:0">
+                      <div class="post-head">
+                        <div class="p-avatar" style="background:linear-gradient(135deg,#E74C3C,#C0392B)">JM</div>
+                        <div class="who"><b>James Mitchell</b><span>Engineering · 18h ago</span></div>
+                        <span class="chip blog">Blog</span>
+                      </div>
+                      <p><b>Microservices migration — lessons from production</b> Why we chose Kubernetes, how we scaled from 12 to 847 containers, and the gotchas nobody tells you about.</p>
+                      <div class="post-media m1" style="background:linear-gradient(115deg,#1E3C72,#2A5298);height:140px"><div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;color:rgba(255,255,255,.92);flex-direction:column;gap:8px"><svg width="40" height="40" fill="currentColor" viewBox="0 0 24 24"><rect x="2" y="2" width="8" height="8" rx="1"/><rect x="13" y="2" width="8" height="8" rx="1"/><rect x="2" y="13" width="8" height="8" rx="1"/><rect x="13" y="13" width="8" height="8" rx="1"/></svg><span style="font-size:11px;font-weight:700">8 min video · Kubernetes deep dive</span></div></div>
+                      <div class="post-actions" style="border:0;padding-top:10px">
+                        <button class="pact liked"><svg><use href="#i-heart"/></svg>847</button>
+                        <button class="pact"><svg><use href="#i-msg"/></svg>152</button>
+                        <button class="pact"><svg><use href="#i-share"/></svg></button>
+                      </div>
+                    </article>
+                  </div>
+                </div>
+              </div>
+
+              <div class="side-stack">
+                <div class="panel mini-cal">
+                  <div class="panel-head"><h3>June 2026</h3><a href="#">Calendar</a></div>
+                  <div class="inner"><div class="cal-grid" id="calGridT"></div></div>
+                </div>
+                <div class="panel">
+                  <div class="panel-head"><h3>Engagement · last 7 days</h3><a href="#">Report</a></div>
+                  <div class="inner">
+                    <div class="engage">
+                      <div class="col"><div class="barv" style="height:46%"></div><span class="lab">Thu</span></div>
+                      <div class="col"><div class="barv" style="height:62%"></div><span class="lab">Fri</span></div>
+                      <div class="col"><div class="barv" style="height:30%"></div><span class="lab">Sat</span></div>
+                      <div class="col"><div class="barv" style="height:24%"></div><span class="lab">Sun</span></div>
+                      <div class="col"><div class="barv" style="height:70%"></div><span class="lab">Mon</span></div>
+                      <div class="col peak"><div class="barv" style="height:96%"></div><span class="lab">Tue</span></div>
+                      <div class="col"><div class="barv" style="height:80%"></div><span class="lab">Wed</span></div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+/* Theme */
+function setTheme(t){
+  document.body.classList.toggle('dark', t==='dark');
+  document.querySelectorAll('.screen,.drawer').forEach(el=>el.classList.toggle('dark', t==='dark'));
+  document.getElementById('btnLight').classList.toggle('active', t==='light');
+  document.getElementById('btnDark').classList.toggle('active', t==='dark');
+}
+
+/* Drawer */
+function toggleDrawer(open){
+  document.getElementById('drawer').classList.toggle('open', open);
+  document.getElementById('drawerOverlay').classList.toggle('open', open);
+}
+
+/* Tabs */
+function switchTab(name){
+  document.querySelectorAll('.app-screen').forEach(s=>s.classList.remove('active'));
+  document.getElementById('scr-'+name).classList.add('active');
+  document.querySelectorAll('.tab').forEach(t=>t.classList.toggle('active', t.dataset.tab===name));
+  toggleDrawer(false);
+}
+
+/* Calendar — June 2026 (Mon=1st), today = Wed 10 */
+function buildCal(id){
+  const g=document.getElementById(id); if(!g) return;
+  const dows=['Mo','Tu','We','Th','Fr','Sa','Su'];
+  let html=dows.map(d=>`<div class="dow">${d}</div>`).join('');
+  // trailing May (June 1 2026 is a Monday → no leading blanks)
+  const evDays={4:'c',10:null,16:'g',19:'c',24:'y',26:'g'};
+  for(let d=1; d<=30; d++){
+    const today=d===10?' today':'';
+    const ev=evDays[d]&&!today?`<span class="ev ${evDays[d]}"></span>`:(d===16?'':'');
+    let dot=''; if(evDays[d]&&d!==10) dot=`<span class="ev ${evDays[d]}"></span>`;
+    html+=`<div class="day${today}">${d}${dot}</div>`;
+  }
+  // pad next month
+  for(let d=1; d<=5; d++) html+=`<div class="day dim">${d}</div>`;
+  g.innerHTML=html;
+}
+buildCal('calGrid'); buildCal('calGridT');
+</script>
+</body>
+</html>

@@ -1,0 +1,652 @@
+{
+  "localNotificationSamples": {
+    "description": "Sample data for creating local in-app notifications using notificationService.ts",
+    "examples": [
+      {
+        "name": "Event Notification - High Priority",
+        "payload": {
+          "title": "Upcoming Event: Annual Medical Conference",
+          "message": "The 2026 Pharma Innovation Summit starts in 2 hours. Keynote speaker: Dr. Sarah Johnson on 'Future of Precision Medicine'",
+          "type": "event",
+          "priority": "high",
+          "icon": "calendar",
+          "action": {
+            "type": "navigate",
+            "screen": "EventDetail",
+            "params": {
+              "eventId": "event_2026_conf_001"
+            }
+          }
+        },
+        "usage": "notifyEvent('Upcoming Event: Annual Medical Conference', '...message...', 'event_2026_conf_001', 'high')"
+      },
+      {
+        "name": "Event Notification - Normal Priority",
+        "payload": {
+          "title": "Workshop Reminder",
+          "message": "Tomorrow's workshop on Clinical Data Analysis begins at 10:00 AM. Room: Conference Hall B",
+          "type": "event",
+          "priority": "normal",
+          "icon": "calendar",
+          "action": {
+            "type": "navigate",
+            "screen": "EventDetail",
+            "params": {
+              "eventId": "event_workshop_042"
+            }
+          }
+        },
+        "usage": "notifyEvent('Workshop Reminder', '...message...', 'event_workshop_042', 'normal')"
+      },
+      {
+        "name": "Message Notification",
+        "payload": {
+          "title": "New Message from Dr. Michael Chen",
+          "message": "Hi! I reviewed your research proposal. Let's schedule a meeting to discuss the methodology section. Are you free tomorrow?",
+          "type": "message",
+          "priority": "normal",
+          "icon": "mail",
+          "action": {
+            "type": "navigate",
+            "screen": "Messages",
+            "params": {
+              "conversationId": "conv_12345",
+              "userId": "user_dr_chen"
+            }
+          }
+        },
+        "usage": "notifyMessage('New Message from Dr. Michael Chen', '...message...', { type: 'navigate', screen: 'Messages', params: {...} })"
+      },
+      {
+        "name": "Alert Notification - Critical",
+        "payload": {
+          "title": "Critical System Update Required",
+          "message": "A security update is available. Please update your app within 24 hours to continue using all features.",
+          "type": "alert",
+          "priority": "high",
+          "icon": "bell",
+          "action": {
+            "type": "navigate",
+            "screen": "Settings",
+            "params": {
+              "tab": "updates"
+            }
+          }
+        },
+        "usage": "notifyAlert('Critical System Update Required', '...message...', { type: 'navigate', screen: 'Settings', params: {...} })"
+      },
+      {
+        "name": "Alert Notification - External Link",
+        "payload": {
+          "title": "Important Policy Update",
+          "message": "New data privacy policy is now in effect. Please review the changes.",
+          "type": "alert",
+          "priority": "high",
+          "icon": "bell",
+          "action": {
+            "type": "external",
+            "url": "https://example.com/privacy-policy"
+          }
+        },
+        "usage": "notifyAlert('Important Policy Update', '...message...', { type: 'external', url: 'https://example.com/privacy-policy' })"
+      },
+      {
+        "name": "Reminder Notification - Profile",
+        "payload": {
+          "title": "Complete Your Profile",
+          "message": "Add your specialization and research interests to connect with relevant colleagues and events.",
+          "type": "reminder",
+          "priority": "normal",
+          "icon": "clock",
+          "action": {
+            "type": "navigate",
+            "screen": "Profile",
+            "params": {
+              "section": "edit"
+            }
+          }
+        },
+        "usage": "notifyReminder('Complete Your Profile', '...message...', 'Profile', { section: 'edit' })"
+      },
+      {
+        "name": "Reminder Notification - Daily Check-in",
+        "payload": {
+          "title": "Daily Health Check-in",
+          "message": "Don't forget to log your daily health metrics. Consistency is key!",
+          "type": "reminder",
+          "priority": "normal",
+          "icon": "clock"
+        },
+        "usage": "notifyReminder('Daily Health Check-in', '...message...')"
+      },
+      {
+        "name": "General Notification - Welcome",
+        "payload": {
+          "title": "Welcome to TodoApp!",
+          "message": "Thank you for joining our community. Explore events, connect with peers, and manage your schedule efficiently.",
+          "type": "general",
+          "priority": "low",
+          "icon": "checkbox-checked"
+        },
+        "usage": "createNotification({ title: '...', message: '...', type: 'general', priority: 'low', icon: 'checkbox-checked' })"
+      },
+      {
+        "name": "General Notification - Achievement",
+        "payload": {
+          "title": "Achievement Unlocked!",
+          "message": "You've attended 10 events this month. Keep up the great networking!",
+          "type": "general",
+          "priority": "low",
+          "icon": "sparkle",
+          "action": {
+            "type": "navigate",
+            "screen": "Profile",
+            "params": {
+              "tab": "achievements"
+            }
+          }
+        },
+        "usage": "createNotification({ title: '...', message: '...', type: 'general', priority: 'low', icon: 'sparkle', action: {...} })"
+      },
+      {
+        "name": "Event Notification - Low Priority",
+        "payload": {
+          "title": "Event Recording Available",
+          "message": "The recording of 'Introduction to Clinical Trials' is now available in your library.",
+          "type": "event",
+          "priority": "low",
+          "icon": "calendar",
+          "action": {
+            "type": "navigate",
+            "screen": "EventDetail",
+            "params": {
+              "eventId": "event_recording_089"
+            }
+          }
+        },
+        "usage": "notifyEvent('Event Recording Available', '...message...', 'event_recording_089', 'low')"
+      }
+    ]
+  },
+  "fcmPayloadSamples": {
+    "description": "Sample FCM (Firebase Cloud Messaging) payloads that would be sent from the backend",
+    "examples": [
+      {
+        "name": "FCM Event Notification - Data Only",
+        "payload": {
+          "token": "DEVICE_FCM_TOKEN_HERE",
+          "data": {
+            "notificationType": "event",
+            "title": "Conference Starts Soon",
+            "message": "Medical Innovation Conference begins in 30 minutes",
+            "priority": "high",
+            "icon": "calendar",
+            "actionType": "navigate",
+            "actionScreen": "EventDetail",
+            "eventId": "event_456",
+            "timestamp": "1709568000000"
+          }
+        },
+        "description": "Data-only message - handled by app in all states (foreground, background, quit)"
+      },
+      {
+        "name": "FCM Event Notification - With Display",
+        "payload": {
+          "token": "DEVICE_FCM_TOKEN_HERE",
+          "notification": {
+            "title": "Conference Starts Soon",
+            "body": "Medical Innovation Conference begins in 30 minutes"
+          },
+          "data": {
+            "notificationType": "event",
+            "priority": "high",
+            "icon": "calendar",
+            "actionType": "navigate",
+            "actionScreen": "EventDetail",
+            "eventId": "event_456"
+          },
+          "android": {
+            "priority": "high",
+            "notification": {
+              "channelId": "event_notifications",
+              "color": "#4A90E2",
+              "icon": "ic_notification",
+              "sound": "default",
+              "tag": "event_456"
+            }
+          },
+          "apns": {
+            "payload": {
+              "aps": {
+                "alert": {
+                  "title": "Conference Starts Soon",
+                  "body": "Medical Innovation Conference begins in 30 minutes"
+                },
+                "sound": "default",
+                "badge": 1,
+                "category": "EVENT_CATEGORY",
+                "mutableContent": true
+              }
+            }
+          }
+        },
+        "description": "Notification with display - shown automatically by system when app is in background/quit"
+      },
+      {
+        "name": "FCM Message Notification",
+        "payload": {
+          "token": "DEVICE_FCM_TOKEN_HERE",
+          "notification": {
+            "title": "New Message",
+            "body": "Dr. Sarah: Can we discuss the research findings?"
+          },
+          "data": {
+            "notificationType": "message",
+            "priority": "normal",
+            "icon": "mail",
+            "actionType": "navigate",
+            "actionScreen": "Messages",
+            "conversationId": "conv_789",
+            "senderId": "user_dr_sarah"
+          },
+          "android": {
+            "priority": "high",
+            "notification": {
+              "channelId": "message_notifications",
+              "color": "#10B981",
+              "icon": "ic_notification",
+              "sound": "default"
+            }
+          },
+          "apns": {
+            "payload": {
+              "aps": {
+                "alert": {
+                  "title": "New Message",
+                  "body": "Dr. Sarah: Can we discuss the research findings?"
+                },
+                "sound": "default",
+                "badge": 1,
+                "category": "MESSAGE_CATEGORY"
+              }
+            }
+          }
+        }
+      },
+      {
+        "name": "FCM Alert Notification",
+        "payload": {
+          "token": "DEVICE_FCM_TOKEN_HERE",
+          "notification": {
+            "title": "Security Alert",
+            "body": "Unusual login detected from a new device"
+          },
+          "data": {
+            "notificationType": "alert",
+            "priority": "high",
+            "icon": "bell",
+            "actionType": "navigate",
+            "actionScreen": "Settings",
+            "tab": "security"
+          },
+          "android": {
+            "priority": "high",
+            "notification": {
+              "channelId": "alert_notifications",
+              "color": "#EF4444",
+              "icon": "ic_notification",
+              "sound": "default",
+              "vibrationPattern": "[0, 500, 200, 500]"
+            }
+          },
+          "apns": {
+            "payload": {
+              "aps": {
+                "alert": {
+                  "title": "Security Alert",
+                  "body": "Unusual login detected from a new device"
+                },
+                "sound": "default",
+                "badge": 1,
+                "category": "ALERT_CATEGORY",
+                "interruptionLevel": "timeSensitive"
+              }
+            }
+          }
+        }
+      },
+      {
+        "name": "FCM Reminder Notification",
+        "payload": {
+          "token": "DEVICE_FCM_TOKEN_HERE",
+          "notification": {
+            "title": "Daily Reminder",
+            "body": "Complete your daily health check-in"
+          },
+          "data": {
+            "notificationType": "reminder",
+            "priority": "normal",
+            "icon": "clock",
+            "actionType": "navigate",
+            "actionScreen": "Home"
+          },
+          "android": {
+            "priority": "normal",
+            "notification": {
+              "channelId": "reminder_notifications",
+              "color": "#F59E0B",
+              "icon": "ic_notification",
+              "sound": "default"
+            }
+          },
+          "apns": {
+            "payload": {
+              "aps": {
+                "alert": {
+                  "title": "Daily Reminder",
+                  "body": "Complete your daily health check-in"
+                },
+                "sound": "default",
+                "badge": 1,
+                "category": "REMINDER_CATEGORY"
+              }
+            }
+          }
+        }
+      },
+      {
+        "name": "FCM Multicast - Multiple Devices",
+        "payload": {
+          "tokens": ["DEVICE_TOKEN_1", "DEVICE_TOKEN_2", "DEVICE_TOKEN_3"],
+          "notification": {
+            "title": "System Maintenance",
+            "body": "Scheduled maintenance tonight from 2 AM - 4 AM EST"
+          },
+          "data": {
+            "notificationType": "general",
+            "priority": "low",
+            "icon": "bell"
+          }
+        },
+        "description": "Send to multiple devices at once (up to 500 tokens)"
+      },
+      {
+        "name": "FCM Topic Message",
+        "payload": {
+          "topic": "events_medical_conferences",
+          "notification": {
+            "title": "New Conference Posted",
+            "body": "2026 International Cardiology Summit - Register Now!"
+          },
+          "data": {
+            "notificationType": "event",
+            "priority": "normal",
+            "icon": "calendar",
+            "actionType": "navigate",
+            "actionScreen": "EventDetail",
+            "eventId": "event_cardio_2026"
+          }
+        },
+        "description": "Send to all devices subscribed to a topic"
+      },
+      {
+        "name": "FCM Rich Notification with Image",
+        "payload": {
+          "token": "DEVICE_FCM_TOKEN_HERE",
+          "notification": {
+            "title": "Event Highlights",
+            "body": "Check out the best moments from yesterday's conference"
+          },
+          "data": {
+            "notificationType": "event",
+            "priority": "low",
+            "icon": "calendar",
+            "actionType": "navigate",
+            "actionScreen": "EventDetail",
+            "eventId": "event_999",
+            "imageUrl": "https://example.com/images/event_highlight.jpg"
+          },
+          "android": {
+            "notification": {
+              "channelId": "event_notifications",
+              "imageUrl": "https://example.com/images/event_highlight.jpg"
+            }
+          },
+          "apns": {
+            "payload": {
+              "aps": {
+                "alert": {
+                  "title": "Event Highlights",
+                  "body": "Check out the best moments from yesterday's conference"
+                },
+                "mutableContent": 1
+              }
+            },
+            "fcmOptions": {
+              "imageUrl": "https://example.com/images/event_highlight.jpg"
+            }
+          }
+        }
+      },
+      {
+        "name": "FCM Silent Data Message",
+        "payload": {
+          "token": "DEVICE_FCM_TOKEN_HERE",
+          "data": {
+            "type": "sync_request",
+            "action": "refresh_events",
+            "priority": "low"
+          },
+          "android": {
+            "priority": "normal"
+          },
+          "apns": {
+            "payload": {
+              "aps": {
+                "contentAvailable": true
+              }
+            },
+            "headers": {
+              "apns-priority": "5",
+              "apns-push-type": "background"
+            }
+          }
+        },
+        "description": "Silent background sync - no notification displayed"
+      }
+    ]
+  },
+  "firestoreNotificationRecords": {
+    "description": "Sample documents that would be stored in Firestore 'notifications' collection",
+    "examples": [
+      {
+        "id": "notif_1709568000_abc123",
+        "userId": "user_12345",
+        "title": "Conference Starts Soon",
+        "message": "Medical Innovation Conference begins in 30 minutes",
+        "type": "event",
+        "priority": "high",
+        "status": "delivered",
+        "scheduledFor": null,
+        "sentAt": {
+          "_seconds": 1709568000,
+          "_nanoseconds": 0
+        },
+        "deliveredAt": {
+          "_seconds": 1709568002,
+          "_nanoseconds": 0
+        },
+        "data": {
+          "eventId": "event_456",
+          "actionType": "navigate",
+          "actionScreen": "EventDetail"
+        }
+      },
+      {
+        "id": "notif_1709568100_def456",
+        "userId": "user_12345",
+        "title": "Daily Reminder",
+        "message": "Complete your daily health check-in",
+        "type": "reminder",
+        "priority": "normal",
+        "status": "pending",
+        "scheduledFor": {
+          "_seconds": 1709640000,
+          "_nanoseconds": 0
+        },
+        "sentAt": null,
+        "deliveredAt": null,
+        "data": {
+          "reminderType": "daily_checkin"
+        }
+      },
+      {
+        "id": "notif_1709568200_ghi789",
+        "userId": "user_67890",
+        "title": "New Message",
+        "message": "Dr. Sarah: Can we discuss the research findings?",
+        "type": "message",
+        "priority": "normal",
+        "status": "failed",
+        "scheduledFor": null,
+        "sentAt": {
+          "_seconds": 1709568200,
+          "_nanoseconds": 0
+        },
+        "deliveredAt": null,
+        "error": "Invalid FCM token",
+        "data": {
+          "conversationId": "conv_789",
+          "senderId": "user_dr_sarah"
+        }
+      }
+    ]
+  },
+  "testingScenarios": {
+    "description": "Test scenarios for comprehensive notification testing",
+    "scenarios": [
+      {
+        "scenario": "Multiple Notifications at Once",
+        "code": "handleMultipleNotifications()",
+        "notifications": [
+          {
+            "title": "Event Starting Soon",
+            "message": "Workshop begins in 15 minutes",
+            "type": "event",
+            "priority": "high"
+          },
+          {
+            "title": "New Connection",
+            "message": "Dr. Johnson wants to connect with you",
+            "type": "message",
+            "priority": "normal"
+          },
+          {
+            "title": "Daily Check-in",
+            "message": "Don't forget your daily health check-in",
+            "type": "reminder",
+            "priority": "normal"
+          }
+        ]
+      },
+      {
+        "scenario": "All Priority Levels",
+        "notifications": [
+          {
+            "title": "Low Priority",
+            "message": "New feature available",
+            "priority": "low"
+          },
+          {
+            "title": "Normal Priority",
+            "message": "Workshop tomorrow",
+            "priority": "normal"
+          },
+          {
+            "title": "High Priority",
+            "message": "Conference starts in 10 minutes",
+            "priority": "high"
+          }
+        ]
+      },
+      {
+        "scenario": "All Notification Types",
+        "notifications": [
+          {
+            "type": "event",
+            "title": "Event Type Test"
+          },
+          {
+            "type": "message",
+            "title": "Message Type Test"
+          },
+          {
+            "type": "alert",
+            "title": "Alert Type Test"
+          },
+          {
+            "type": "reminder",
+            "title": "Reminder Type Test"
+          },
+          {
+            "type": "general",
+            "title": "General Type Test"
+          }
+        ]
+      }
+    ]
+  },
+  "cloudFunctionCallExamples": {
+    "description": "Sample requests for calling Firebase Cloud Functions",
+    "examples": [
+      {
+        "function": "registerDeviceToken",
+        "request": {
+          "userId": "user_12345",
+          "token": "fcm_device_token_abc123xyz",
+          "platform": "ios",
+          "appVersion": "1.0.0"
+        }
+      },
+      {
+        "function": "sendNotification",
+        "request": {
+          "userId": "user_12345",
+          "title": "New Event Posted",
+          "message": "Medical Conference scheduled for next week",
+          "type": "event",
+          "priority": "normal",
+          "data": {
+            "eventId": "event_123",
+            "actionType": "navigate",
+            "actionScreen": "EventDetail"
+          }
+        }
+      },
+      {
+        "function": "sendBulkNotifications",
+        "request": {
+          "userIds": ["user_12345", "user_67890", "user_11111"],
+          "title": "System Maintenance",
+          "message": "Scheduled maintenance tonight 2-4 AM",
+          "type": "alert",
+          "priority": "high"
+        }
+      },
+      {
+        "function": "scheduleNotification",
+        "request": {
+          "userId": "user_12345",
+          "title": "Event Reminder",
+          "message": "Your event starts in 1 hour",
+          "type": "reminder",
+          "priority": "high",
+          "scheduledFor": "2026-03-05T14:00:00Z",
+          "data": {
+            "eventId": "event_456"
+          }
+        }
+      }
+    ]
+  }
+}

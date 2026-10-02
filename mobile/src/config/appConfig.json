@@ -1,0 +1,83 @@
+{
+  "app": {
+    "name": "Pharma Connect",
+    "version": "1.0.0",
+    "environment": "development",
+    "buildNumber": "1",
+    "storeUrls": {
+      "ios": "https://apps.apple.com/app/id000000000",
+      "android": "https://play.google.com/store/apps/details?id=com.pharmaconnect"
+    }
+  },
+  "api": {
+    "note": "API baseUrl and timeout are now configured via .env file (API_BASE_URL and API_TIMEOUT)",
+    "retryAttempts": 3,
+    "featureFlagsEndpoint": "/feature-flags",
+    "configEndpoint": "/app-config"
+  },
+  "localization": {
+    "defaultLanguage": "en",
+    "supportedLanguages": ["en", "fr", "ar"],
+    "fallbackLanguage": "en",
+    "rtlLanguages": ["ar"],
+    "autoDetectLanguage": true,
+    "persistLanguageChoice": true
+  },
+  "theme": {
+    "defaultMode": "light",
+    "followSystemTheme": true,
+    "allowUserToggle": true
+  },
+  "storage": {
+    "keys": {
+      "language": "@app_language",
+      "theme": "@app_theme",
+      "onboarding": "@app_onboarding_completed",
+      "featureFlags": "@app_feature_flags_cache",
+      "config": "@app_config_cache"
+    },
+    "cacheDuration": {
+      "featureFlags": 3600000,
+      "appConfig": 86400000
+    }
+  },
+  "network": {
+    "enableOfflineMode": true,
+    "retryOnFailure": true,
+    "showNetworkStatus": true,
+    "cacheStrategy": "cache-first"
+  },
+  "analytics": {
+    "enabled": true,
+    "providers": {
+      "firebase": true,
+      "mixpanel": false,
+      "amplitude": false
+    },
+    "trackScreenViews": true,
+    "trackUserActions": true
+  },
+  "notifications": {
+    "enabled": true,
+    "providers": {
+      "firebase": true,
+      "onesignal": false
+    },
+    "showBadge": true,
+    "soundEnabled": true
+  },
+  "security": {
+    "enableBiometric": false,
+    "requirePinCode": false,
+    "sessionTimeout": 1800000,
+    "autoLogout": false
+  },
+  "performance": {
+    "enableCodePush": false,
+    "enableCrashReporting": true,
+    "enablePerformanceMonitoring": false
+  },
+  "devOverrides": {
+    "simulateForceUpdate": false
+  }
+}

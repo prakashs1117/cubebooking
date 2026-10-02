@@ -1,0 +1,258 @@
+{
+  "version": "1.0",
+  "lastUpdated": "2026-02-28",
+  "languages": {
+    "en": {
+      "categories": [
+        {
+          "id": "getting-started",
+          "name": "Getting Started",
+          "icon": "rocket",
+          "order": 1
+        },
+        {
+          "id": "account",
+          "name": "Account & Profile",
+          "icon": "user",
+          "order": 2
+        },
+        {
+          "id": "features",
+          "name": "Features",
+          "icon": "star",
+          "order": 3
+        },
+        {
+          "id": "troubleshooting",
+          "name": "Troubleshooting",
+          "icon": "tool",
+          "order": 4
+        },
+        {
+          "id": "security",
+          "name": "Security & Privacy",
+          "icon": "shield-check",
+          "order": 5
+        }
+      ],
+      "items": [
+        {
+          "id": "faq-1",
+          "question": "How do I create an account?",
+          "answer": "Creating an account is simple! Tap the 'Sign Up' button on the home screen, enter your email address and create a strong password. You'll receive a verification email to confirm your account. Once verified, you can start using all the features of our app.",
+          "category": "getting-started",
+          "tags": ["signup", "account", "registration"],
+          "order": 1,
+          "icon": "user-plus"
+        },
+        {
+          "id": "faq-2",
+          "question": "How do I reset my password?",
+          "answer": "To reset your password, go to the login screen and tap 'Forgot Password?' Enter your registered email address, and we'll send you a password reset link. Click the link in the email and follow the instructions to create a new password.",
+          "category": "account",
+          "tags": ["password", "reset", "security"],
+          "order": 1,
+          "icon": "key"
+        },
+        {
+          "id": "faq-3",
+          "question": "Can I use the app offline?",
+          "answer": "Yes! Our app supports offline functionality. You can view your saved data and make changes while offline. Once you're back online, all your changes will automatically sync with our servers.",
+          "category": "features",
+          "tags": ["offline", "sync", "connectivity"],
+          "order": 1,
+          "icon": "cloud-off"
+        },
+        {
+          "id": "faq-4",
+          "question": "How do I change my profile information?",
+          "answer": "To update your profile, go to Settings > Profile. Here you can change your name, email, profile picture, and other personal information. Make sure to tap 'Save Changes' when you're done.",
+          "category": "account",
+          "tags": ["profile", "settings", "personal info"],
+          "order": 2,
+          "icon": "edit"
+        },
+        {
+          "id": "faq-5",
+          "question": "What should I do if the app crashes?",
+          "answer": "If the app crashes, try these steps: 1) Force close and restart the app, 2) Clear the app cache in your device settings, 3) Check for app updates in the App Store/Play Store, 4) If the issue persists, contact our support team with details about when the crash occurred.",
+          "category": "troubleshooting",
+          "tags": ["crash", "bug", "error", "support"],
+          "order": 1,
+          "icon": "alert-triangle"
+        },
+        {
+          "id": "faq-6",
+          "question": "How is my data protected?",
+          "answer": "We take data security seriously. All data is encrypted both in transit and at rest using industry-standard encryption. We never share your personal information with third parties without your explicit consent. You can read more in our Privacy Policy.",
+          "category": "security",
+          "tags": ["security", "privacy", "encryption", "data"],
+          "order": 1,
+          "icon": "lock"
+        },
+        {
+          "id": "faq-7",
+          "question": "Can I delete my account?",
+          "answer": "Yes, you can delete your account at any time. Go to Settings > Account > Delete Account. Please note that this action is irreversible and will permanently delete all your data. You'll be asked to confirm before the deletion is processed.",
+          "category": "account",
+          "tags": ["delete", "account", "removal"],
+          "order": 3,
+          "icon": "trash"
+        },
+        {
+          "id": "faq-8",
+          "question": "How do I enable dark mode?",
+          "answer": "To enable dark mode, go to Settings > Appearance and select 'Dark Mode'. You can also choose 'Auto' to automatically switch between light and dark modes based on your device's system settings.",
+          "category": "features",
+          "tags": ["dark mode", "theme", "appearance"],
+          "order": 2,
+          "icon": "moon"
+        },
+        {
+          "id": "faq-9",
+          "question": "Is there a limit to how much data I can store?",
+          "answer": "Free accounts have a storage limit of 5GB. If you need more storage, you can upgrade to our Premium plan which offers unlimited storage. You can check your current storage usage in Settings > Storage.",
+          "category": "features",
+          "tags": ["storage", "limit", "premium", "upgrade"],
+          "order": 3,
+          "icon": "database"
+        },
+        {
+          "id": "faq-10",
+          "question": "How do I contact support?",
+          "answer": "You can contact our support team in several ways: 1) In-app chat available 24/7 in Settings > Help & Support, 2) Email us at support@todoapp.com, 3) Visit our Help Center at help.todoapp.com. We typically respond within 24 hours.",
+          "category": "getting-started",
+          "tags": ["support", "help", "contact"],
+          "order": 2,
+          "icon": "message-circle"
+        },
+        {
+          "id": "faq-11",
+          "question": "Can I use the app on multiple devices?",
+          "answer": "Absolutely! Your account syncs across all your devices. Simply log in with the same credentials on any device, and all your data will be available. Changes made on one device will automatically sync to all other devices.",
+          "category": "features",
+          "tags": ["sync", "multi-device", "cloud"],
+          "order": 4,
+          "icon": "refresh"
+        },
+        {
+          "id": "faq-12",
+          "question": "What languages does the app support?",
+          "answer": "Currently, the app supports English, French, and Arabic with full right-to-left (RTL) support for Arabic. You can change the language in Settings > Language. The app will automatically detect your device's language and set it as default.",
+          "category": "features",
+          "tags": ["language", "localization", "translation"],
+          "order": 5,
+          "icon": "globe"
+        }
+      ]
+    },
+    "fr": {
+      "categories": [
+        {
+          "id": "getting-started",
+          "name": "Commencer",
+          "icon": "rocket",
+          "order": 1
+        },
+        {
+          "id": "account",
+          "name": "Compte et Profil",
+          "icon": "user",
+          "order": 2
+        },
+        {
+          "id": "features",
+          "name": "Fonctionnalités",
+          "icon": "star",
+          "order": 3
+        },
+        {
+          "id": "troubleshooting",
+          "name": "Dépannage",
+          "icon": "tool",
+          "order": 4
+        },
+        {
+          "id": "security",
+          "name": "Sécurité et Confidentialité",
+          "icon": "shield-check",
+          "order": 5
+        }
+      ],
+      "items": [
+        {
+          "id": "faq-1",
+          "question": "Comment créer un compte?",
+          "answer": "Créer un compte est simple! Appuyez sur le bouton 'S'inscrire' sur l'écran d'accueil, entrez votre adresse e-mail et créez un mot de passe fort. Vous recevrez un e-mail de vérification pour confirmer votre compte.",
+          "category": "getting-started",
+          "tags": ["inscription", "compte", "enregistrement"],
+          "order": 1,
+          "icon": "user-plus"
+        },
+        {
+          "id": "faq-2",
+          "question": "Comment réinitialiser mon mot de passe?",
+          "answer": "Pour réinitialiser votre mot de passe, allez sur l'écran de connexion et appuyez sur 'Mot de passe oublié?' Entrez votre adresse e-mail enregistrée et nous vous enverrons un lien de réinitialisation.",
+          "category": "account",
+          "tags": ["mot de passe", "réinitialisation", "sécurité"],
+          "order": 1,
+          "icon": "key"
+        }
+      ]
+    },
+    "ar": {
+      "categories": [
+        {
+          "id": "getting-started",
+          "name": "البدء",
+          "icon": "rocket",
+          "order": 1
+        },
+        {
+          "id": "account",
+          "name": "الحساب والملف الشخصي",
+          "icon": "user",
+          "order": 2
+        },
+        {
+          "id": "features",
+          "name": "المميزات",
+          "icon": "star",
+          "order": 3
+        },
+        {
+          "id": "troubleshooting",
+          "name": "استكشاف الأخطاء",
+          "icon": "tool",
+          "order": 4
+        },
+        {
+          "id": "security",
+          "name": "الأمان والخصوصية",
+          "icon": "shield-check",
+          "order": 5
+        }
+      ],
+      "items": [
+        {
+          "id": "faq-1",
+          "question": "كيف أقوم بإنشاء حساب؟",
+          "answer": "إنشاء حساب بسيط! اضغط على زر 'التسجيل' في الشاشة الرئيسية، أدخل عنوان بريدك الإلكتروني وأنشئ كلمة مرور قوية. ستتلقى بريداً إلكترونياً للتحقق لتأكيد حسابك.",
+          "category": "getting-started",
+          "tags": ["تسجيل", "حساب", "اشتراك"],
+          "order": 1,
+          "icon": "user-plus"
+        },
+        {
+          "id": "faq-2",
+          "question": "كيف أقوم بإعادة تعيين كلمة المرور الخاصة بي؟",
+          "answer": "لإعادة تعيين كلمة المرور، انتقل إلى شاشة تسجيل الدخول واضغط على 'نسيت كلمة المرور؟' أدخل عنوان بريدك الإلكتروني المسجل وسنرسل لك رابط إعادة التعيين.",
+          "category": "account",
+          "tags": ["كلمة المرور", "إعادة التعيين", "الأمان"],
+          "order": 1,
+          "icon": "key"
+        }
+      ]
+    }
+  }
+}

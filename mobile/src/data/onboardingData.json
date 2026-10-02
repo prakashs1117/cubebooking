@@ -1,0 +1,44 @@
+{
+  "onboardingScreens": [
+    {
+      "id": "1",
+      "title": "Welcome to Pharma Connect",
+      "description": "Your gateway to cutting-edge pharmaceutical events, networking, and innovation",
+      "imageUrl": "",
+      "iconName": "merck-logo",
+      "backgroundColor": "#4A90E2"
+    },
+    {
+      "id": "2",
+      "title": "Stay Informed",
+      "description": "Get real-time updates on events, sessions, and speakers. Never miss an important moment",
+      "imageUrl": "",
+      "iconName": "bell",
+      "backgroundColor": "#50C878"
+    },
+    {
+      "id": "3",
+      "title": "Network & Connect",
+      "description": "Meet industry leaders, researchers, and professionals from around the globe",
+      "imageUrl": "",
+      "iconName": "favorite",
+      "backgroundColor": "#E67E22"
+    },
+    {
+      "id": "4",
+      "title": "Track Your Progress",
+      "description": "Earn CME credits, access session materials, and download your certificates",
+      "imageUrl": "",
+      "iconName": "calendar",
+      "backgroundColor": "#9B59B6"
+    },
+    {
+      "id": "5",
+      "title": "Get Started",
+      "description": "Everything you need for an exceptional event experience is right at your fingertips",
+      "imageUrl": "",
+      "iconName": "checkbox-checked",
+      "backgroundColor": "#E74C3C"
+    }
+  ]
+}

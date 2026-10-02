@@ -1,0 +1,392 @@
+{
+  "version": "1.0.0",
+  "lastUpdated": "2026-03-04T00:00:00Z",
+  "templates": [
+    {
+      "id": "event-registration-success",
+      "type": "event",
+      "priority": "normal",
+      "title": "Registration Confirmed",
+      "message": "You're registered for Startup Innovation Week 2026! Check your email for details.",
+      "timestamp": "2026-03-04T10:30:00Z",
+      "read": false,
+      "isNew": true,
+      "icon": "calendar",
+      "imageUrl": "https://images.unsplash.com/photo-1540575467063-178a50c2df87?w=200&h=200&fit=crop",
+      "action": {
+        "type": "navigate",
+        "screen": "EventDetail",
+        "params": {
+          "slug": "startup-innovation-week-2026"
+        }
+      },
+      "metadata": {
+        "eventId": "cmm3iizhq001612m2k9ixe49w",
+        "eventTitle": "Startup Innovation Week 2026",
+        "registrationId": "reg_12345"
+      }
+    },
+    {
+      "id": "event-reminder",
+      "type": "reminder",
+      "priority": "high",
+      "title": "Event Starting Soon",
+      "message": "Your event 'Pitch Competition Finals' starts in 1 hour. See you there!",
+      "timestamp": "2026-03-04T09:15:00Z",
+      "read": false,
+      "isNew": true,
+      "icon": "clock",
+      "action": {
+        "type": "navigate",
+        "screen": "EventDetail",
+        "params": {
+          "slug": "startup-innovation-week-2026"
+        }
+      },
+      "metadata": {
+        "eventId": "cmm3iizhq001612m2k9ixe49w",
+        "sessionId": "cmm3iizx6001e12m2s0ozq10q",
+        "reminderType": "1_hour_before"
+      }
+    },
+    {
+      "id": "event-cancelled",
+      "type": "alert",
+      "priority": "high",
+      "title": "Event Cancelled",
+      "message": "Unfortunately, 'Product Workshop' has been cancelled. You'll receive a full refund within 5-7 business days.",
+      "timestamp": "2026-03-04T08:00:00Z",
+      "read": false,
+      "isNew": true,
+      "icon": "bell",
+      "action": {
+        "type": "navigate",
+        "screen": "Events",
+        "params": {}
+      },
+      "metadata": {
+        "eventId": "event_cancelled_123",
+        "reason": "venue_unavailable"
+      }
+    },
+    {
+      "id": "event-update",
+      "type": "event",
+      "priority": "normal",
+      "title": "Event Update",
+      "message": "The venue for 'Tech Summit 2026' has been changed to Convention Center Hall A.",
+      "timestamp": "2026-03-03T16:45:00Z",
+      "read": false,
+      "isNew": false,
+      "icon": "calendar",
+      "action": {
+        "type": "navigate",
+        "screen": "EventDetail",
+        "params": {
+          "slug": "tech-summit-2026"
+        }
+      },
+      "metadata": {
+        "eventId": "event_update_456",
+        "updateType": "venue_change",
+        "oldVenue": "City Hall",
+        "newVenue": "Convention Center Hall A"
+      }
+    },
+    {
+      "id": "message-new",
+      "type": "message",
+      "priority": "normal",
+      "title": "New Message",
+      "message": "Sarah Johnson sent you a message about the networking event.",
+      "timestamp": "2026-03-03T14:20:00Z",
+      "read": false,
+      "isNew": false,
+      "icon": "mail",
+      "imageUrl": "https://i.pravatar.cc/200?img=47",
+      "action": {
+        "type": "navigate",
+        "screen": "Messages",
+        "params": {
+          "conversationId": "conv_789"
+        }
+      },
+      "metadata": {
+        "senderId": "user_sarah_123",
+        "senderName": "Sarah Johnson",
+        "messagePreview": "Hey, are you attending the networking event tomorrow?"
+      }
+    },
+    {
+      "id": "message-mention",
+      "type": "message",
+      "priority": "high",
+      "title": "You were mentioned",
+      "message": "John Doe mentioned you in the event discussion.",
+      "timestamp": "2026-03-03T13:10:00Z",
+      "read": false,
+      "isNew": false,
+      "icon": "mail",
+      "action": {
+        "type": "navigate",
+        "screen": "Discussion",
+        "params": {
+          "postId": "post_mention_123"
+        }
+      },
+      "metadata": {
+        "mentionedBy": "user_john_456",
+        "postId": "post_mention_123",
+        "context": "event_discussion"
+      }
+    },
+    {
+      "id": "alert-waitlist-opened",
+      "type": "alert",
+      "priority": "high",
+      "title": "Waitlist Spot Available",
+      "message": "A spot just opened up for 'AI Workshop'. Register now before it's gone!",
+      "timestamp": "2026-03-03T11:30:00Z",
+      "read": true,
+      "isNew": false,
+      "icon": "bell",
+      "action": {
+        "type": "navigate",
+        "screen": "EventDetail",
+        "params": {
+          "slug": "ai-workshop-2026"
+        }
+      },
+      "metadata": {
+        "eventId": "event_waitlist_789",
+        "waitlistPosition": 1,
+        "expiresAt": "2026-03-03T15:30:00Z"
+      }
+    },
+    {
+      "id": "reminder-schedule-change",
+      "type": "reminder",
+      "priority": "normal",
+      "title": "Schedule Change",
+      "message": "Session 'How to Raise Your Seed Round' has been moved to 11:00 AM tomorrow.",
+      "timestamp": "2026-03-02T18:00:00Z",
+      "read": true,
+      "isNew": false,
+      "icon": "clock",
+      "action": {
+        "type": "navigate",
+        "screen": "EventDetail",
+        "params": {
+          "slug": "startup-innovation-week-2026"
+        }
+      },
+      "metadata": {
+        "sessionId": "cmm3ij0ij001g12m2zu4l2e7d",
+        "oldTime": "2026-03-03T10:00:00Z",
+        "newTime": "2026-03-03T11:00:00Z"
+      }
+    },
+    {
+      "id": "alert-certificate-ready",
+      "type": "alert",
+      "priority": "low",
+      "title": "Certificate Available",
+      "message": "Your completion certificate for 'Product-Market Fit Workshop' is ready to download.",
+      "timestamp": "2026-03-02T10:00:00Z",
+      "read": true,
+      "isNew": false,
+      "icon": "bell",
+      "action": {
+        "type": "navigate",
+        "screen": "Certificates",
+        "params": {
+          "certificateId": "cert_abc123"
+        }
+      },
+      "metadata": {
+        "certificateId": "cert_abc123",
+        "eventId": "event_workshop_101",
+        "certificateUrl": "https://example.com/certificates/cert_abc123.pdf"
+      }
+    },
+    {
+      "id": "event-feedback-request",
+      "type": "event",
+      "priority": "low",
+      "title": "Event Feedback",
+      "message": "How was your experience at 'Startup Innovation Week'? Help us improve by sharing your feedback.",
+      "timestamp": "2026-03-01T20:00:00Z",
+      "read": true,
+      "isNew": false,
+      "icon": "calendar",
+      "action": {
+        "type": "navigate",
+        "screen": "Feedback",
+        "params": {
+          "eventId": "cmm3iizhq001612m2k9ixe49w"
+        }
+      },
+      "metadata": {
+        "eventId": "cmm3iizhq001612m2k9ixe49w",
+        "feedbackType": "post_event_survey",
+        "surveyUrl": "https://example.com/feedback/event_123"
+      }
+    },
+    {
+      "id": "message-connection-request",
+      "type": "message",
+      "priority": "normal",
+      "title": "New Connection Request",
+      "message": "Emily Chen wants to connect with you after meeting at Tech Summit.",
+      "timestamp": "2026-03-01T15:30:00Z",
+      "read": true,
+      "isNew": false,
+      "icon": "mail",
+      "action": {
+        "type": "navigate",
+        "screen": "Profile",
+        "params": {
+          "userId": "user_emily_789"
+        }
+      },
+      "metadata": {
+        "requesterId": "user_emily_789",
+        "requesterName": "Emily Chen",
+        "connectionContext": "tech_summit_2026"
+      }
+    },
+    {
+      "id": "reminder-payment-due",
+      "type": "reminder",
+      "priority": "high",
+      "title": "Payment Reminder",
+      "message": "Your payment for 'Annual Conference 2026' is due in 3 days. Complete payment to confirm your registration.",
+      "timestamp": "2026-03-01T09:00:00Z",
+      "read": true,
+      "isNew": false,
+      "icon": "clock",
+      "action": {
+        "type": "navigate",
+        "screen": "Payment",
+        "params": {
+          "invoiceId": "inv_xyz789"
+        }
+      },
+      "metadata": {
+        "invoiceId": "inv_xyz789",
+        "amount": 299.99,
+        "currency": "USD",
+        "dueDate": "2026-03-04T23:59:59Z"
+      }
+    },
+    {
+      "id": "alert-early-bird-ending",
+      "type": "alert",
+      "priority": "high",
+      "title": "Early Bird Ending Soon",
+      "message": "Last chance! Early bird pricing for 'DevCon 2026' ends in 24 hours. Save $100 now!",
+      "timestamp": "2026-02-28T12:00:00Z",
+      "read": true,
+      "isNew": false,
+      "icon": "bell",
+      "action": {
+        "type": "navigate",
+        "screen": "EventDetail",
+        "params": {
+          "slug": "devcon-2026"
+        }
+      },
+      "metadata": {
+        "eventId": "event_devcon_2026",
+        "pricingTier": "early_bird",
+        "discount": 100,
+        "expiresAt": "2026-02-29T23:59:59Z"
+      }
+    },
+    {
+      "id": "event-speaker-added",
+      "type": "event",
+      "priority": "normal",
+      "title": "New Speaker Added",
+      "message": "Exciting news! Elon Musk has been added as a keynote speaker for Tech Summit 2026.",
+      "timestamp": "2026-02-27T14:00:00Z",
+      "read": true,
+      "isNew": false,
+      "icon": "calendar",
+      "imageUrl": "https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?w=200&h=200&fit=crop",
+      "action": {
+        "type": "navigate",
+        "screen": "EventDetail",
+        "params": {
+          "slug": "tech-summit-2026"
+        }
+      },
+      "metadata": {
+        "eventId": "event_tech_summit",
+        "speakerId": "speaker_elon_123",
+        "speakerName": "Elon Musk",
+        "sessionTitle": "The Future of AI and Space"
+      }
+    },
+    {
+      "id": "reminder-checkin-available",
+      "type": "reminder",
+      "priority": "normal",
+      "title": "Check-in Now Available",
+      "message": "Check-in is now open for 'Product Launch Event'. Skip the queue and check in from the app!",
+      "timestamp": "2026-02-27T08:00:00Z",
+      "read": true,
+      "isNew": false,
+      "icon": "clock",
+      "action": {
+        "type": "navigate",
+        "screen": "CheckIn",
+        "params": {
+          "eventId": "event_product_launch"
+        }
+      },
+      "metadata": {
+        "eventId": "event_product_launch",
+        "checkInType": "mobile",
+        "qrCode": "QR_CODE_DATA_HERE"
+      }
+    },
+    {
+      "id": "alert-network-event",
+      "type": "alert",
+      "priority": "low",
+      "title": "Networking Opportunity",
+      "message": "5 people with similar interests are attending 'Startup Innovation Week'. Connect now!",
+      "timestamp": "2026-02-26T16:00:00Z",
+      "read": true,
+      "isNew": false,
+      "icon": "bell",
+      "action": {
+        "type": "navigate",
+        "screen": "Networking",
+        "params": {
+          "eventId": "cmm3iizhq001612m2k9ixe49w"
+        }
+      },
+      "metadata": {
+        "eventId": "cmm3iizhq001612m2k9ixe49w",
+        "matchCount": 5,
+        "interests": ["startups", "funding", "product"]
+      }
+    }
+  ],
+  "metadata": {
+    "totalTemplates": 16,
+    "types": {
+      "event": 6,
+      "message": 3,
+      "alert": 5,
+      "reminder": 4
+    },
+    "priorities": {
+      "high": 6,
+      "normal": 7,
+      "low": 3
+    }
+  }
+}

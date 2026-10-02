@@ -1,8 +1,9 @@
-import { useEffect } from 'react';
+import { useEffect, useDebugValue } from 'react';
 import { useLocation } from 'react-router-dom';
 import { initAnalytics, trackPageView, trackScreenView } from '../services/analyticsService';
 
 export const useAnalyticsInit = () => {
+  useDebugValue('analytics', () => 'useAnalyticsInit: initialized')
   useEffect(() => {
     initAnalytics();
   }, []);
@@ -10,6 +11,7 @@ export const useAnalyticsInit = () => {
 
 export const usePageTracking = () => {
   const location = useLocation();
+  useDebugValue(location.pathname, (p) => `usePageTracking: ${p}`)
 
   useEffect(() => {
     const pathName = location.pathname;

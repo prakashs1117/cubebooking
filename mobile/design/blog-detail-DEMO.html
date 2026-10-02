@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Blog Detail — Demo</title>
+<style>
+body{font-family:system-ui;padding:20px;background:#f5f5f5}
+.container{max-width:1200px;margin:0 auto}
+h1{margin-bottom:20px}
+.demo-section{
+  background:white;padding:20px;border-radius:8px;margin-bottom:20px;
+  box-shadow:0 2px 8px rgba(0,0,0,0.1)
+}
+.device-wrapper{
+  display:inline-block;border-radius:40px;padding:12px;
+  background:linear-gradient(160deg,#2a2a2e,#0e0e10);
+  box-shadow:0 30px 70px rgba(0,0,0,.3);
+}
+.phone-screen{
+  width:390px;height:824px;border-radius:34px;
+  overflow:hidden;background:white;
+}
+.ipad-screen{
+  width:880px;height:660px;border-radius:20px;
+  overflow:hidden;background:white;
+}
+iframe{width:100%;height:100%;border:none}
+.controls{margin-bottom:20px}
+.controls button{
+  padding:8px 16px;margin-right:8px;border-radius:6px;
+  border:none;background:#149B5F;color:white;cursor:pointer;
+  font-weight:600;
+}
+.controls button:hover{background:#01884C}
+.demo-section ul{margin-left:20px;line-height:1.8}
+.demo-section ol{margin-left:20px;line-height:1.8}
+.demo-section li{margin-bottom:8px}
+code{background:#f0f0f0;padding:2px 6px;border-radius:3px;font-family:monospace}
+</style>
+</head>
+<body>
+<div class="container">
+  <h1>📱 Blog Detail Modal — Demo</h1>
+
+  <div class="demo-section">
+    <h2>Mobile (390×844)</h2>
+    <div class="controls">
+      <button onclick="openMobileModal()">Open Blog Detail</button>
+      <span style="color:#666;font-size:14px">← Click to see modal overlay</span>
+    </div>
+    <div class="device-wrapper">
+      <div class="phone-screen" id="phoneScreen"></div>
+    </div>
+  </div>
+
+  <div class="demo-section">
+    <h2>iPad/Tablet (880×660)</h2>
+    <div class="controls">
+      <button onclick="openTabletModal()">Open Blog Detail</button>
+    </div>
+    <div class="device-wrapper">
+      <div class="ipad-screen" id="ipadScreen"></div>
+    </div>
+  </div>
+
+  <div class="demo-section">
+    <h2>Features Checklist</h2>
+    <ul>
+      <li>✅ Modal overlay with slide-up animation</li>
+      <li>✅ Sticky engagement bar (mobile) with fade effect</li>
+      <li>✅ Like/bookmark with visual feedback</li>
+      <li>✅ Comment submission and display</li>
+      <li>✅ Author card with Follow button</li>
+      <li>✅ Split layout on tablet (60/40)</li>
+      <li>✅ Vertical engagement bar (tablet)</li>
+      <li>✅ Related posts section (tablet)</li>
+      <li>✅ Dark mode support</li>
+      <li>✅ Keyboard accessibility (Escape to close)</li>
+    </ul>
+  </div>
+
+  <div class="demo-section">
+    <h2>Integration Guide</h2>
+    <p>To integrate into the main Employee Connect app:</p>
+    <ol>
+      <li>Import CSS from <code>blog-detail.html</code> into your app stylesheet</li>
+      <li>Import JavaScript functions: <code>openBlogModal()</code>, <code>closeBlogModal()</code></li>
+      <li>Add click handler to blog posts in feed: <code>onclick="openBlogModal()"</code></li>
+      <li>Wire up comment API calls (replace <code>submitComment()</code> dummy logic)</li>
+      <li>Replace mock data with real article data from backend</li>
+      <li>Test on mobile and tablet viewports</li>
+    </ol>
+  </div>
+</div>
+
+<script>
+function openMobileModal(){
+  const container = document.getElementById('phoneScreen');
+  container.innerHTML = '<iframe src="blog-detail.html" style="width:100%;height:100%;border:none"></iframe>';
+}
+
+function openTabletModal(){
+  const container = document.getElementById('ipadScreen');
+  container.innerHTML = '<iframe src="blog-detail.html" style="width:100%;height:100%;border:none"></iframe>';
+}
+</script>
+</body>
+</html>

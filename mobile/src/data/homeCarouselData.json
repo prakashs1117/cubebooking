@@ -1,0 +1,119 @@
+{
+  "en": {
+    "items": [
+      {
+        "id": "1",
+        "title": "Welcome to the App",
+        "description": "Discover amazing features and functionality",
+        "imageUrl": "",
+        "backgroundColor": "#4A90E2"
+      },
+      {
+        "id": "2",
+        "title": "Stay Connected",
+        "description": "Keep track of your important events",
+        "imageUrl": "",
+        "backgroundColor": "#50C878"
+      },
+      {
+        "id": "3",
+        "title": "Customize Your Experience",
+        "description": "Personalize settings to match your style",
+        "imageUrl": "",
+        "backgroundColor": "#E67E22"
+      },
+      {
+        "id": "4",
+        "title": "Track Progress",
+        "description": "Monitor your achievements and milestones",
+        "imageUrl": "",
+        "backgroundColor": "#9B59B6"
+      },
+      {
+        "id": "5",
+        "title": "Get Started",
+        "description": "Begin your journey with us today",
+        "imageUrl": "",
+        "backgroundColor": "#E74C3C"
+      }
+    ]
+  },
+  "fr": {
+    "items": [
+      {
+        "id": "1",
+        "title": "Bienvenue dans l'Application",
+        "description": "Découvrez des fonctionnalités et des fonctionnalités incroyables",
+        "imageUrl": "",
+        "backgroundColor": "#4A90E2"
+      },
+      {
+        "id": "2",
+        "title": "Restez Connecté",
+        "description": "Gardez une trace de vos événements importants",
+        "imageUrl": "",
+        "backgroundColor": "#50C878"
+      },
+      {
+        "id": "3",
+        "title": "Personnalisez Votre Expérience",
+        "description": "Personnalisez les paramètres pour correspondre à votre style",
+        "imageUrl": "",
+        "backgroundColor": "#E67E22"
+      },
+      {
+        "id": "4",
+        "title": "Suivez Vos Progrès",
+        "description": "Surveillez vos réalisations et vos jalons",
+        "imageUrl": "",
+        "backgroundColor": "#9B59B6"
+      },
+      {
+        "id": "5",
+        "title": "Commencer",
+        "description": "Commencez votre voyage avec nous aujourd'hui",
+        "imageUrl": "",
+        "backgroundColor": "#E74C3C"
+      }
+    ]
+  },
+  "ar": {
+    "items": [
+      {
+        "id": "1",
+        "title": "مرحبًا بك في التطبيق",
+        "description": "اكتشف ميزات ووظائف مذهلة",
+        "imageUrl": "",
+        "backgroundColor": "#4A90E2"
+      },
+      {
+        "id": "2",
+        "title": "ابق على اتصال",
+        "description": "تتبع أحداثك المهمة",
+        "imageUrl": "",
+        "backgroundColor": "#50C878"
+      },
+      {
+        "id": "3",
+        "title": "خصص تجربتك",
+        "description": "قم بتخصيص الإعدادات لتتناسب مع أسلوبك",
+        "imageUrl": "",
+        "backgroundColor": "#E67E22"
+      },
+      {
+        "id": "4",
+        "title": "تتبع التقدم",
+        "description": "راقب إنجازاتك ومعالمك",
+        "imageUrl": "",
+        "backgroundColor": "#9B59B6"
+      },
+      {
+        "id": "5",
+        "title": "ابدأ",
+        "description": "ابدأ رحلتك معنا اليوم",
+        "imageUrl": "",
+        "backgroundColor": "#E74C3C"
+      }
+    ]
+  }
+}

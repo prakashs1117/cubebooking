@@ -57,6 +57,28 @@
   --space-8: 32px;
   --space-12: 48px;
 
+  /* Fluid tokens — scale linearly between min (375px) and max (1440px) via clamp()
+     Usage: style={{ fontSize: 'var(--fluid-text-xl)' }} or padding: 'var(--fluid-gutter)' */
+
+  /* Typography */
+  --fluid-text-sm:   clamp(0.75rem,  0.65rem + 0.4vw,  0.875rem);
+  --fluid-text-base: clamp(0.875rem, 0.75rem + 0.5vw,  1rem);
+  --fluid-text-lg:   clamp(1rem,     0.85rem + 0.6vw,  1.25rem);
+  --fluid-text-xl:   clamp(1.25rem,  1rem    + 1vw,    1.5rem);
+  --fluid-text-2xl:  clamp(1.5rem,   1.2rem  + 1.2vw,  2rem);
+  --fluid-text-3xl:  clamp(1.875rem, 1.4rem  + 1.8vw,  2.5rem);
+
+  /* Spacing */
+  --fluid-space-xs:  clamp(0.5rem,   0.4rem  + 0.4vw,  0.75rem);
+  --fluid-space-sm:  clamp(0.75rem,  0.6rem  + 0.6vw,  1rem);
+  --fluid-space-md:  clamp(1rem,     0.75rem + 1vw,    1.5rem);
+  --fluid-space-lg:  clamp(1.25rem,  0.9rem  + 1.4vw,  2rem);
+  --fluid-space-xl:  clamp(1.5rem,   1rem    + 2vw,    2.5rem);
+  --fluid-space-2xl: clamp(2rem,     1.25rem + 3vw,    3.5rem);
+
+  /* Page gutter — horizontal padding for main content areas */
+  --fluid-gutter: clamp(1rem, 0.5rem + 2vw, 2.5rem);
+
   /* Radius scale */
   --radius-sm: 6px;
   --radius-md: 8px;
@@ -309,3 +331,4 @@ body {
 input, select, textarea, button {
   font-family: "Poppins", system-ui, -apple-system, sans-serif;
 }
+

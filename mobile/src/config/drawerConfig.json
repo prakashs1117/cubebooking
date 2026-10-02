@@ -1,0 +1,58 @@
+{
+  "drawerItems": [
+    {
+      "id": "home",
+      "label": "Home",
+      "icon": "home",
+      "tab": "Home"
+    },
+    {
+      "id": "feed",
+      "label": "Feed",
+      "icon": "calendar",
+      "tab": "Feed"
+    },
+    {
+      "id": "people",
+      "label": "People",
+      "icon": "users",
+      "tab": "People"
+    },
+    {
+      "type": "divider"
+    },
+    {
+      "id": "profile",
+      "label": "Profile",
+      "icon": "profile",
+      "tab": "Profile"
+    },
+    {
+      "id": "settings",
+      "label": "Settings",
+      "icon": "settings",
+      "tab": "Profile"
+    },
+    {
+      "type": "divider"
+    },
+    {
+      "id": "faq",
+      "label": "FAQ",
+      "icon": "info-circle",
+      "screen": "FAQ"
+    },
+    {
+      "id": "feedback",
+      "label": "Feedback",
+      "icon": "star",
+      "screen": "Feedback"
+    },
+    {
+      "id": "privacy",
+      "label": "Privacy Policy",
+      "icon": "shield-check",
+      "action": "privacy"
+    }
+  ]
+}

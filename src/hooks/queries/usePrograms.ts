@@ -1,10 +1,11 @@
+import { useDebugValue } from 'react'
 import { useQuery } from '@tanstack/react-query'
 import { collection, getDocs } from 'firebase/firestore'
 import { db } from '../../shared/firebase'
 import type { Program, ProgramId } from '../../shared/types'
 
 export function usePrograms() {
-  return useQuery({
+  const result = useQuery({
     queryKey: ['programs'],
     queryFn: async () => {
       const snap = await getDocs(collection(db, 'programs'))
@@ -14,6 +15,11 @@ export function usePrograms() {
       })
       return map
     },
-    staleTime: 5 * 60_000,
+    // Programs are static content — never refetch until manually invalidated.
+    // 'static' blocks even manual invalidateQueries(); use Infinity if you need that.
+    staleTime: Infinity,
+    gcTime: Infinity,
   })
+  useDebugValue(result.data, (d) => `usePrograms: ${Object.keys(d ?? {}).length} programs`)
+  return result
 }

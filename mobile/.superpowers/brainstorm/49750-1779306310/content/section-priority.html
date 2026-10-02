@@ -1,0 +1,120 @@
+<h2>Which sections should appear on Home?</h2>
+<p class="subtitle">
+  Search bar is fixed at top. Select all the sections you want below it — you
+  can pick multiple.
+</p>
+
+<div class="options" data-multiselect style="margin-top: 24px">
+  <div
+    class="option"
+    data-choice="recent-articles"
+    onclick="toggleSelect(this)"
+  >
+    <div class="letter">1</div>
+    <div class="content">
+      <h3>🕒 Recently Viewed Articles</h3>
+      <p>
+        Horizontal chip strip — SDS articles the user last viewed. Already live
+        on home today.
+      </p>
+      <div style="margin-top: 6px; font-size: 11px; opacity: 0.6">
+        Source: AsyncStorage (local) · Component: RecentArticlesStrip · Zero
+        extra work
+      </div>
+    </div>
+  </div>
+
+  <div
+    class="option"
+    data-choice="recent-searches"
+    onclick="toggleSelect(this)"
+  >
+    <div class="letter">2</div>
+    <div class="content">
+      <h3>🔎 Recent Searches</h3>
+      <p>
+        Pill chips of past search terms — tap to instantly re-run. Currently
+        only on Favorites tab.
+      </p>
+      <div style="margin-top: 6px; font-size: 11px; opacity: 0.6">
+        Source: AsyncStorage (local) · Component: RecentSearchesStrip · Drag
+        &amp; drop from Favorites
+      </div>
+    </div>
+  </div>
+
+  <div class="option" data-choice="quick-actions" onclick="toggleSelect(this)">
+    <div class="letter">3</div>
+    <div class="content">
+      <h3>⚡ Quick Actions</h3>
+      <p>
+        Icon-tile row: Safety Label · Scan Barcode · My Favorites. One tap to a
+        core feature.
+      </p>
+      <div style="margin-top: 6px; font-size: 11px; opacity: 0.6">
+        Translation keys already exist · Needs a new small QuickActionsRow
+        component
+      </div>
+    </div>
+  </div>
+
+  <div class="option" data-choice="events" onclick="toggleSelect(this)">
+    <div class="letter">4</div>
+    <div class="content">
+      <h3>📅 Upcoming Events</h3>
+      <p>
+        Horizontal scrollable event cards showing LIVE / UPCOMING events. Hides
+        itself when no events exist.
+      </p>
+      <div style="margin-top: 6px; font-size: 11px; opacity: 0.6">
+        Source: Events API · Component: UpcomingEventsCarousel · Already fully
+        built
+      </div>
+    </div>
+  </div>
+
+  <div class="option" data-choice="curated-cards" onclick="toggleSelect(this)">
+    <div class="letter">5</div>
+    <div class="content">
+      <h3>🃏 Curated Horizontal Cards</h3>
+      <p>
+        Editorial image cards with category tags (Oncology, Neuroscience…).
+        "Recommended for You" feel.
+      </p>
+      <div style="margin-top: 6px; font-size: 11px; opacity: 0.6">
+        Source: curatedHomeData.json (local) · Component: HorizontalCardsSection
+        · Already fully built
+      </div>
+    </div>
+  </div>
+
+  <div class="option" data-choice="insights" onclick="toggleSelect(this)">
+    <div class="letter">6</div>
+    <div class="content">
+      <h3>📰 Daily Insights</h3>
+      <p>
+        Vertical list of articles with thumbnail, category dot, title, and
+        read-time. "Daily briefing" feel.
+      </p>
+      <div style="margin-top: 6px; font-size: 11px; opacity: 0.6">
+        Source: curatedHomeData.json (local) · Component:
+        VerticalInsightsSection · Already fully built
+      </div>
+    </div>
+  </div>
+</div>
+
+<div
+  style="
+    margin-top: 20px;
+    padding: 14px 18px;
+    background: rgba(255, 255, 255, 0.04);
+    border-radius: 8px;
+    border-left: 3px solid rgba(150, 150, 255, 0.5);
+  "
+>
+  <div style="font-size: 13px; opacity: 0.8; line-height: 1.6">
+    💡 <strong>Tip:</strong> Select as many as you want. We'll decide ordering
+    and visual weight in the next step.
+  </div>
+</div>

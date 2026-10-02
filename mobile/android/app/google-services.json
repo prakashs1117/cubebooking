@@ -1,0 +1,30 @@
+{
+  "project_info": {
+    "project_number": "542237732405",
+    "firebase_url": "https://mms-test-rnapp-default-rtdb.asia-southeast1.firebasedatabase.app",
+    "project_id": "mms-test-rnapp",
+    "storage_bucket": "mms-test-rnapp.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:542237732405:android:c4cc7906acb870f849cb7c",
+        "android_client_info": {
+          "package_name": "com.merck.ocb"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBNoNI8_YdbFiKYXeFDcxx4zLnLYFKchL4"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

@@ -1,0 +1,280 @@
+/**
+ * Feature Flags Configuration
+ *
+ * This file defines all feature flags used in the application.
+ * Feature flags allow us to control feature rollouts, perform A/B testing,
+ * and safely deploy code while keeping features disabled.
+ */
+
+export interface FeatureFlag {
+  key: string;
+  name: string;
+  description: string;
+  defaultValue: boolean;
+  environment?: 'development' | 'staging' | 'production' | 'all';
+  enabled: boolean;
+}
+
+export type FeatureFlagKey = keyof typeof FEATURE_FLAGS;
+
+/**
+ * Feature Flags Registry
+ *
+ * Add new feature flags here following the naming convention:
+ * - ENABLE_* for feature toggles
+ * - SHOW_* for UI elements
+ * - Use descriptive UPPER_SNAKE_CASE names
+ */
+export const FEATURE_FLAGS = {
+  // UI Features
+  ENABLE_NEW_TODO_UI: {
+    key: 'ENABLE_NEW_TODO_UI',
+    name: 'New Todo UI',
+    description: 'Enhanced todo interface with animations and improved UX',
+    defaultValue: false,
+    environment: 'all',
+    enabled: __DEV__ ? true : false, // Enable in development by default
+  },
+
+  ENABLE_DARK_MODE: {
+    key: 'ENABLE_DARK_MODE',
+    name: 'Dark Mode',
+    description: 'Toggle between dark and light themes',
+    defaultValue: true,
+    environment: 'all',
+    enabled: true, // Already implemented, always enabled
+  },
+
+  // Data & Sync Features
+  ENABLE_OFFLINE_SYNC: {
+    key: 'ENABLE_OFFLINE_SYNC',
+    name: 'Offline Sync',
+    description: 'Background synchronization when connection is restored',
+    defaultValue: false,
+    environment: 'all',
+    enabled: __DEV__ ? true : false, // Testing in development
+  },
+
+  ENABLE_REAL_TIME_UPDATES: {
+    key: 'ENABLE_REAL_TIME_UPDATES',
+    name: 'Real-time Updates',
+    description: 'Live updates using WebSockets or Server-Sent Events',
+    defaultValue: false,
+    environment: 'development',
+    enabled: false, // Not implemented yet
+  },
+
+  // Analytics & Monitoring
+  ENABLE_ANALYTICS: {
+    key: 'ENABLE_ANALYTICS',
+    name: 'Analytics Tracking',
+    description: 'User behavior analytics and crash reporting',
+    defaultValue: false,
+    environment: 'all',
+    enabled: !__DEV__, // Enabled in production, disabled in development
+  },
+
+  ENABLE_PERFORMANCE_MONITORING: {
+    key: 'ENABLE_PERFORMANCE_MONITORING',
+    name: 'Performance Monitoring',
+    description: 'Monitor app performance and render times',
+    defaultValue: false,
+    environment: 'all',
+    enabled: __DEV__, // Enable in development for debugging
+  },
+
+  // Premium Features
+  ENABLE_PREMIUM_FEATURES: {
+    key: 'ENABLE_PREMIUM_FEATURES',
+    name: 'Premium Features',
+    description: 'Advanced todo management, categories, and collaboration',
+    defaultValue: false,
+    environment: 'all',
+    enabled: false, // Disabled until implemented
+  },
+
+  ENABLE_EXPORT_FEATURES: {
+    key: 'ENABLE_EXPORT_FEATURES',
+    name: 'Export Features',
+    description: 'Export todos to PDF, CSV, or other formats',
+    defaultValue: false,
+    environment: 'all',
+    enabled: false, // Future feature
+  },
+
+  // Network & API Features
+  ENABLE_API_V2: {
+    key: 'ENABLE_API_V2',
+    name: 'API Version 2',
+    description: 'Use new API endpoints with improved performance',
+    defaultValue: false,
+    environment: 'development',
+    enabled: false, // Testing new API
+  },
+
+  ENABLE_PUSH_NOTIFICATIONS: {
+    key: 'ENABLE_PUSH_NOTIFICATIONS',
+    name: 'Push Notifications',
+    description: 'Send push notifications for reminders and updates',
+    defaultValue: false,
+    environment: 'all',
+    enabled: false, // Not implemented yet
+  },
+
+  // Debug & Development
+  SHOW_DEBUG_INFO: {
+    key: 'SHOW_DEBUG_INFO',
+    name: 'Debug Information',
+    description: 'Show debug information in the UI',
+    defaultValue: false,
+    environment: 'development',
+    enabled: __DEV__, // Only in development
+  },
+
+  ENABLE_FLIPPER_INTEGRATION: {
+    key: 'ENABLE_FLIPPER_INTEGRATION',
+    name: 'Flipper Integration',
+    description: 'Enable Flipper debugging tools',
+    defaultValue: false,
+    environment: 'development',
+    enabled: __DEV__, // Only in development
+  },
+
+  // Navigation
+  ENABLE_DRAWER_NAVIGATION: {
+    key: 'ENABLE_DRAWER_NAVIGATION',
+    name: 'Drawer Navigation',
+    description: 'Enable drawer navigation menu (hamburger menu)',
+    defaultValue: false,
+    environment: 'all',
+    enabled: false, // Set to false to disable drawer and use tabs only
+  },
+
+  ENABLE_TAB_NAVIGATION: {
+    key: 'ENABLE_TAB_NAVIGATION',
+    name: 'Tab Navigation',
+    description: 'Enable bottom tab navigation bar',
+    defaultValue: true,
+    environment: 'all',
+    enabled: true, // Set to false to disable bottom tabs
+  },
+
+  ENABLE_FEATURE_FLAGS_SCREEN: {
+    key: 'ENABLE_FEATURE_FLAGS_SCREEN',
+    name: 'Feature Flags Screen',
+    description: 'Show feature flags screen in drawer navigation',
+    defaultValue: true,
+    environment: 'development',
+    enabled: __DEV__, // Only in development
+  },
+
+  ENABLE_ABOUT_SCREEN: {
+    key: 'ENABLE_ABOUT_SCREEN',
+    name: 'About Screen',
+    description: 'Show about screen in drawer navigation',
+    defaultValue: true,
+    environment: 'all',
+    enabled: true, // Always enabled
+  },
+
+  ENABLE_HOME_CAROUSEL: {
+    key: 'ENABLE_HOME_CAROUSEL',
+    name: 'Home Carousel',
+    description: 'Show image carousel on home screen',
+    defaultValue: true,
+    environment: 'all',
+    enabled: true, // Carousel feature
+  },
+} as const;
+
+/**
+ * Environment-specific feature flag overrides
+ */
+const ENVIRONMENT_OVERRIDES = {
+  development: {
+    ENABLE_ANALYTICS: false,
+    SHOW_DEBUG_INFO: true,
+    ENABLE_PERFORMANCE_MONITORING: true,
+  },
+  staging: {
+    ENABLE_ANALYTICS: true,
+    SHOW_DEBUG_INFO: false,
+    ENABLE_PERFORMANCE_MONITORING: true,
+  },
+  production: {
+    ENABLE_ANALYTICS: true,
+    SHOW_DEBUG_INFO: false,
+    ENABLE_PERFORMANCE_MONITORING: false,
+  },
+};
+
+/**
+ * Get the current environment
+ */
+const getCurrentEnvironment = (): 'development' | 'staging' | 'production' => {
+  if (__DEV__) return 'development';
+  // Add logic here to detect staging vs production
+  // This could be based on bundle identifier, API endpoints, etc.
+  return 'production';
+};
+
+/**
+ * Get feature flag value with environment overrides
+ */
+export const getFeatureFlagValue = (flagKey: FeatureFlagKey): boolean => {
+  const flag = FEATURE_FLAGS[flagKey];
+  if (!flag) {
+    console.warn(`Feature flag ${flagKey} not found, returning false`);
+    return false;
+  }
+
+  const currentEnv = getCurrentEnvironment();
+  const overrides = ENVIRONMENT_OVERRIDES[currentEnv];
+
+  // Check if there's an environment-specific override
+  if (overrides && flagKey in overrides) {
+    return overrides[flagKey as keyof typeof overrides];
+  }
+
+  // Check if flag is restricted to specific environment
+  if (flag.environment && flag.environment !== 'all' && flag.environment !== currentEnv) {
+    return false;
+  }
+
+  return flag.enabled;
+};
+
+/**
+ * Get all active feature flags
+ */
+export const getAllActiveFeatureFlags = (): Record<string, boolean> => {
+  const activeFlags: Record<string, boolean> = {};
+
+  Object.keys(FEATURE_FLAGS).forEach((key) => {
+    const flagKey = key as FeatureFlagKey;
+    activeFlags[flagKey] = getFeatureFlagValue(flagKey);
+  });
+
+  return activeFlags;
+};
+
+/**
+ * Feature flag metadata for debugging
+ */
+export const getFeatureFlagMetadata = (flagKey: FeatureFlagKey) => {
+  return FEATURE_FLAGS[flagKey];
+};
+
+/**
+ * Development helper to log all feature flags
+ */
+export const logAllFeatureFlags = () => {
+  if (__DEV__) {
+    console.group('🚩 Feature Flags Status');
+    Object.entries(getAllActiveFeatureFlags()).forEach(([key, value]) => {
+      const flag = FEATURE_FLAGS[key as FeatureFlagKey];
+      console.log(`${key}: ${value ? '✅' : '❌'} (${flag?.description})`);
+    });
+    console.groupEnd();
+  }
+};

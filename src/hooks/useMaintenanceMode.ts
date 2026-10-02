@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useDebugValue } from 'react'
 import { doc, onSnapshot } from 'firebase/firestore'
 import { db } from '../shared/firebase'
 
@@ -38,5 +38,6 @@ export function useMaintenanceMode() {
     return unsub
   }, [])
 
+  useDebugValue(config, (c) => `useMaintenanceMode: ${c.enabled ? (c.bannerOnly ? 'banner' : 'full') : 'off'}`)
   return { ...config, loading }
 }

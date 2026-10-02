@@ -1,0 +1,143 @@
+{
+  "en": {
+    "skip": "Skip",
+    "next": "Next",
+    "getStarted": "Get Started",
+    "screens": [
+      {
+        "id": "1",
+        "title": "Welcome to Merck Connect",
+        "description": "Your all-in-one workplace app. Order food, manage your profile, and stay connected at the Merck campus.",
+        "imageUrl": "",
+        "iconName": "merck-logo",
+        "backgroundColor": "#0D4F3C"
+      },
+      {
+        "id": "2",
+        "title": "Order Your Meals",
+        "description": "Browse the cafeteria menu and pre-order breakfast, lunch, or dinner up to 3 weekdays in advance. Skip the queue — just scan your QR pass.",
+        "imageUrl": "",
+        "iconName": "lab",
+        "backgroundColor": "#008A63"
+      },
+      {
+        "id": "3",
+        "title": "Pick Up with Your QR Pass",
+        "description": "Once your order is placed, generate a QR pickup pass. Show it at the cafeteria counter and your meal will be ready.",
+        "imageUrl": "",
+        "iconName": "shield-person",
+        "backgroundColor": "#0D4F3C"
+      },
+      {
+        "id": "4",
+        "title": "Vendor Menu Management",
+        "description": "Cafeteria vendors can manage daily menus, toggle meal availability, and scan employee QR passes — all from the Vendor tab.",
+        "imageUrl": "",
+        "iconName": "checkbox-checked",
+        "backgroundColor": "#008A63"
+      },
+      {
+        "id": "5",
+        "title": "Help & Feedback",
+        "description": "Have a question? Browse the FAQ or send us feedback. We're always improving Merck Connect based on your suggestions.",
+        "imageUrl": "",
+        "iconName": "favorite",
+        "backgroundColor": "#0D4F3C"
+      }
+    ]
+  },
+  "fr": {
+    "skip": "Ignorer",
+    "next": "Suivant",
+    "getStarted": "Commencer",
+    "screens": [
+      {
+        "id": "1",
+        "title": "Bienvenue sur Merck Connect",
+        "description": "Votre application de lieu de travail tout-en-un. Commandez des repas, gérez votre profil et restez connecté sur le campus Merck.",
+        "imageUrl": "",
+        "iconName": "merck-logo",
+        "backgroundColor": "#0D4F3C"
+      },
+      {
+        "id": "2",
+        "title": "Commandez vos repas",
+        "description": "Parcourez le menu de la cafétéria et pré-commandez le petit-déjeuner, le déjeuner ou le dîner jusqu'à 3 jours ouvrables à l'avance.",
+        "imageUrl": "",
+        "iconName": "lab",
+        "backgroundColor": "#008A63"
+      },
+      {
+        "id": "3",
+        "title": "Récupérez avec votre QR Pass",
+        "description": "Une fois votre commande passée, générez un QR pass de retrait. Présentez-le au comptoir de la cafétéria.",
+        "imageUrl": "",
+        "iconName": "shield-person",
+        "backgroundColor": "#0D4F3C"
+      },
+      {
+        "id": "4",
+        "title": "Gestion du menu vendeur",
+        "description": "Les vendeurs de la cafétéria peuvent gérer les menus quotidiens et scanner les QR pass des employés depuis l'onglet Vendeur.",
+        "imageUrl": "",
+        "iconName": "checkbox-checked",
+        "backgroundColor": "#008A63"
+      },
+      {
+        "id": "5",
+        "title": "Aide et retours",
+        "description": "Des questions ? Consultez la FAQ ou envoyez-nous vos commentaires. Nous améliorons Merck Connect en fonction de vos suggestions.",
+        "imageUrl": "",
+        "iconName": "favorite",
+        "backgroundColor": "#0D4F3C"
+      }
+    ]
+  },
+  "ar": {
+    "skip": "تخطي",
+    "next": "التالي",
+    "getStarted": "ابدأ الآن",
+    "screens": [
+      {
+        "id": "1",
+        "title": "مرحبًا بك في Merck Connect",
+        "description": "تطبيقك الشامل لمكان العمل. اطلب الطعام وأدر ملفك الشخصي وابقَ على تواصل في حرم Merck.",
+        "imageUrl": "",
+        "iconName": "merck-logo",
+        "backgroundColor": "#0D4F3C"
+      },
+      {
+        "id": "2",
+        "title": "اطلب وجباتك",
+        "description": "تصفح قائمة الكافيتيريا واطلب مسبقًا الفطور أو الغداء أو العشاء قبل 3 أيام عمل.",
+        "imageUrl": "",
+        "iconName": "lab",
+        "backgroundColor": "#008A63"
+      },
+      {
+        "id": "3",
+        "title": "استلم بتصريح QR الخاص بك",
+        "description": "بعد تقديم طلبك، أنشئ تصريح استلام QR. اعرضه على كاونتر الكافيتيريا لاستلام وجبتك.",
+        "imageUrl": "",
+        "iconName": "shield-person",
+        "backgroundColor": "#0D4F3C"
+      },
+      {
+        "id": "4",
+        "title": "إدارة قائمة البائعين",
+        "description": "يمكن لبائعي الكافيتيريا إدارة القوائم اليومية ومسح رموز QR الخاصة بالموظفين من تبويب البائع.",
+        "imageUrl": "",
+        "iconName": "checkbox-checked",
+        "backgroundColor": "#008A63"
+      },
+      {
+        "id": "5",
+        "title": "المساعدة والملاحظات",
+        "description": "هل لديك سؤال؟ تصفح الأسئلة الشائعة أو أرسل لنا ملاحظاتك. نحن نحسّن Merck Connect بناءً على اقتراحاتك.",
+        "imageUrl": "",
+        "iconName": "favorite",
+        "backgroundColor": "#0D4F3C"
+      }
+    ]
+  }
+}

@@ -1,0 +1,177 @@
+{
+  "version": "2.0",
+  "lastUpdated": "2026-09-14",
+  "languages": {
+    "en": {
+      "categories": [
+        {
+          "id": "getting-started",
+          "name": "Getting Started",
+          "icon": "rocket",
+          "order": 1
+        },
+        {
+          "id": "food-orders",
+          "name": "Food & Cafeteria",
+          "icon": "food",
+          "order": 2
+        },
+        {
+          "id": "events",
+          "name": "Events",
+          "icon": "calendar",
+          "order": 3
+        },
+        {
+          "id": "profile",
+          "name": "Profile & Account",
+          "icon": "user",
+          "order": 4
+        },
+        {
+          "id": "troubleshooting",
+          "name": "Troubleshooting",
+          "icon": "tool",
+          "order": 5
+        }
+      ],
+      "items": [
+        {
+          "id": "faq-1",
+          "question": "What is MerckConnect?",
+          "answer": "MerckConnect is Merck's internal employee app that brings together everything you need in one place — cafeteria food ordering, company events, colleague directory, company news, and your profile. It's designed to keep you connected and informed wherever you are on campus.",
+          "category": "getting-started",
+          "tags": ["merckconnect", "overview", "features"],
+          "order": 1,
+          "icon": "info"
+        },
+        {
+          "id": "faq-2",
+          "question": "How do I sign in to MerckConnect?",
+          "answer": "Use your Merck corporate credentials (your @merck.com email and network password) to sign in. If you have SSO (Single Sign-On) enabled on your device, the app may log you in automatically. Contact IT Help Desk if you're having trouble accessing your account.",
+          "category": "getting-started",
+          "tags": ["signin", "sso", "login", "credentials"],
+          "order": 2,
+          "icon": "lock"
+        },
+        {
+          "id": "faq-3",
+          "question": "Which offices are supported for food ordering?",
+          "answer": "MerckConnect food ordering is currently available at Merck Group Campus Canteen (MGCC), Frankfurt Office Cafeteria (FOC), and Berlin Science Hub (BSH). More locations are being added. You can switch your default office from the Food tab by tapping the office name at the top.",
+          "category": "food-orders",
+          "tags": ["office", "location", "cafeteria", "campus"],
+          "order": 1,
+          "icon": "location"
+        },
+        {
+          "id": "faq-4",
+          "question": "What is the meal ordering cutoff time?",
+          "answer": "All meal orders for the next day must be placed by 6:00 PM on the preceding day. For example, to order Tuesday's meals, you must order by 6:00 PM on Monday. Orders placed after the cutoff will be locked and cannot be modified. The app will warn you when the cutoff is approaching.",
+          "category": "food-orders",
+          "tags": ["cutoff", "deadline", "ordering", "time"],
+          "order": 2,
+          "icon": "clock"
+        },
+        {
+          "id": "faq-5",
+          "question": "How are meals charged to my account?",
+          "answer": "Meal costs are deducted from your salary wallet — a monthly cafeteria credit provided by Merck as part of your benefits. A company subsidy is automatically applied to each order. Any amount exceeding the subsidy is deducted from your salary. You can view your wallet balance in Settings.",
+          "category": "food-orders",
+          "tags": ["payment", "salary", "wallet", "subsidy", "billing"],
+          "order": 3,
+          "icon": "credit-card"
+        },
+        {
+          "id": "faq-6",
+          "question": "Can I cancel a food order after placing it?",
+          "answer": "Yes, you can cancel an upcoming meal order free of charge before 6:00 PM on the day before the meal. To cancel, go to the Food tab → My Orders, then tap the trash icon on the order you wish to cancel. For today's orders (if you're not coming in), use the 'Not coming in today?' option on the order card.",
+          "category": "food-orders",
+          "tags": ["cancel", "refund", "order", "no-show"],
+          "order": 4,
+          "icon": "trash"
+        },
+        {
+          "id": "faq-7",
+          "question": "What is the Pickup Pass (QR code)?",
+          "answer": "The Pickup Pass is a QR code tied to your confirmed meal order. Show it at the cafeteria counter to collect your meal. Access it by tapping the QR icon on any upcoming or today's order card in the My Orders tab. The pass includes your name, meal type, office, and date.",
+          "category": "food-orders",
+          "tags": ["qr code", "pickup", "pass", "cafeteria"],
+          "order": 5,
+          "icon": "qr-code"
+        },
+        {
+          "id": "faq-8",
+          "question": "How do I repeat a previous meal order?",
+          "answer": "In the My Orders tab, past meals show a 'Repeat' button. Tapping it will add the same meal to your cart for the next available booking slot (if the menu item is still available). You can then review and confirm as usual.",
+          "category": "food-orders",
+          "tags": ["repeat", "reorder", "previous", "meal"],
+          "order": 6,
+          "icon": "repeat"
+        },
+        {
+          "id": "faq-9",
+          "question": "How do I register for company events?",
+          "answer": "Go to the Events tab to browse all upcoming company events. Tap on any event card to see full details including date, time, location, and capacity. Tap the 'Register' button to secure your spot. You'll receive a confirmation notification and the event will appear in your profile.",
+          "category": "events",
+          "tags": ["register", "events", "attendance", "booking"],
+          "order": 1,
+          "icon": "calendar"
+        },
+        {
+          "id": "faq-10",
+          "question": "Can I see who else is attending an event?",
+          "answer": "Yes, on the event detail page you can see the attendee count and, for smaller events, a preview of registered colleagues. Use the People tab to search for specific colleagues and see their profiles and upcoming event participations.",
+          "category": "events",
+          "tags": ["attendees", "colleagues", "event", "people"],
+          "order": 2,
+          "icon": "users"
+        },
+        {
+          "id": "faq-11",
+          "question": "How do I update my profile information?",
+          "answer": "Tap the Profile tab or go to the drawer menu and select 'My Profile'. Your profile is synced from the Merck HR system. To update your photo, department, or contact details, please use the internal HR portal or contact HR directly. Changes made there will sync to MerckConnect within 24 hours.",
+          "category": "profile",
+          "tags": ["profile", "update", "photo", "hr"],
+          "order": 1,
+          "icon": "user"
+        },
+        {
+          "id": "faq-12",
+          "question": "How do I enable or disable notifications?",
+          "answer": "Go to Settings (accessible from Profile or the drawer menu) and tap 'Notifications'. You can control notifications for meal order reminders, event announcements, colleague updates, and more. Make sure push notifications are also enabled for MerckConnect in your device's system settings.",
+          "category": "profile",
+          "tags": ["notifications", "push", "alerts", "settings"],
+          "order": 2,
+          "icon": "bell"
+        },
+        {
+          "id": "faq-13",
+          "question": "The app is loading slowly or not loading data. What should I do?",
+          "answer": "First, check your internet or VPN connection — MerckConnect requires access to the Merck internal network. If you're on VPN, ensure it's connected. Try pulling down on any screen to refresh. If the issue persists, force-close the app and reopen it. Contact IT Help Desk if problems continue.",
+          "category": "troubleshooting",
+          "tags": ["loading", "slow", "vpn", "network", "refresh"],
+          "order": 1,
+          "icon": "alert-circle"
+        },
+        {
+          "id": "faq-14",
+          "question": "I can't see the food menu for my office. Why?",
+          "answer": "Menus are loaded from the backend and may take a moment to appear. Ensure your selected office is correct (tap the office name in the Food tab header). If the menu still doesn't load, it's possible that meals haven't been published yet for that day — they're typically available by 8:00 AM. Try refreshing by pulling down on the screen.",
+          "category": "troubleshooting",
+          "tags": ["menu", "food", "office", "missing", "not loading"],
+          "order": 2,
+          "icon": "alert-triangle"
+        },
+        {
+          "id": "faq-15",
+          "question": "How do I report a problem or give feedback about MerckConnect?",
+          "answer": "We love hearing from you! Use the Feedback option in the drawer menu (tap the hamburger ☰ icon) to send us your suggestions, bug reports, or general feedback. You can also contact the MerckConnect team directly via Contact Us in the same menu.",
+          "category": "troubleshooting",
+          "tags": ["feedback", "bug", "report", "contact", "support"],
+          "order": 3,
+          "icon": "message-circle"
+        }
+      ]
+    }
+  }
+}

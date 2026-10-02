@@ -1,0 +1,40 @@
+{
+  "suggestions": [
+    {
+      "id": "1",
+      "text": "Coffee date spots",
+      "category": "dining",
+      "popularity": 95
+    },
+    {
+      "id": "2",
+      "text": "Bar crawl with the gang",
+      "category": "nightlife",
+      "popularity": 88
+    },
+    {
+      "id": "3",
+      "text": "Best North Indian restaurants",
+      "category": "dining",
+      "popularity": 92
+    },
+    {
+      "id": "4",
+      "text": "Lunch buffets",
+      "category": "dining",
+      "popularity": 85
+    },
+    {
+      "id": "5",
+      "text": "Best Northside cafes",
+      "category": "cafe",
+      "popularity": 90
+    },
+    {
+      "id": "6",
+      "text": "Weekend brunch places",
+      "category": "dining",
+      "popularity": 93
+    }
+  ]
+}

@@ -1,0 +1,174 @@
+{
+  "version": "1.0",
+  "lastUpdated": "2026-02-28",
+  "languages": {
+    "en": {
+      "title": "Terms of Service",
+      "lastUpdatedLabel": "Last Updated",
+      "lastUpdatedDate": "February 28, 2026",
+      "sections": [
+        {
+          "id": "agreementToTerms",
+          "order": 1,
+          "title": "1. Agreement to Terms",
+          "content": "By accessing and using this application, you accept and agree to be bound by the terms and provisions of this agreement. If you do not agree to these terms, please do not use our application.",
+          "icon": "file-text"
+        },
+        {
+          "id": "userAccounts",
+          "order": 2,
+          "title": "2. User Accounts",
+          "content": "You are responsible for maintaining the confidentiality of your account credentials and for all activities that occur under your account. You must immediately notify us of any unauthorized use of your account or any other breach of security.",
+          "icon": "user"
+        },
+        {
+          "id": "acceptableUse",
+          "order": 3,
+          "title": "3. Acceptable Use",
+          "content": "You agree not to use the application for any unlawful purpose or in any way that might harm, disable, overburden, or impair the application. You may not attempt to gain unauthorized access to any part of the application or its related systems.",
+          "icon": "check-square"
+        },
+        {
+          "id": "intellectualProperty",
+          "order": 4,
+          "title": "4. Intellectual Property",
+          "content": "The application and its original content, features, and functionality are owned by us and are protected by international copyright, trademark, patent, trade secret, and other intellectual property laws. You may not reproduce, distribute, or create derivative works without our express written permission.",
+          "icon": "book"
+        },
+        {
+          "id": "limitationOfLiability",
+          "order": 5,
+          "title": "5. Limitation of Liability",
+          "content": "To the fullest extent permitted by law, we shall not be liable for any indirect, incidental, special, consequential, or punitive damages resulting from your use or inability to use the application, even if we have been advised of the possibility of such damages.",
+          "icon": "alert-circle"
+        },
+        {
+          "id": "termination",
+          "order": 6,
+          "title": "6. Termination",
+          "content": "We may terminate or suspend your account and access to the application immediately, without prior notice or liability, for any reason whatsoever, including without limitation if you breach these Terms of Service.",
+          "icon": "close"
+        },
+        {
+          "id": "changesToTerms",
+          "order": 7,
+          "title": "7. Changes to Terms",
+          "content": "We reserve the right to modify or replace these terms at any time. If a revision is material, we will provide at least 30 days notice prior to any new terms taking effect. What constitutes a material change will be determined at our sole discretion.",
+          "icon": "refresh"
+        }
+      ]
+    },
+    "fr": {
+      "title": "Conditions d'utilisation",
+      "lastUpdatedLabel": "Dernière mise à jour",
+      "lastUpdatedDate": "28 février 2026",
+      "sections": [
+        {
+          "id": "agreementToTerms",
+          "order": 1,
+          "title": "1. Acceptation des conditions",
+          "content": "En accédant et en utilisant cette application, vous acceptez et acceptez d'être lié par les termes et dispositions de cet accord. Si vous n'acceptez pas ces conditions, veuillez ne pas utiliser notre application.",
+          "icon": "file-text"
+        },
+        {
+          "id": "userAccounts",
+          "order": 2,
+          "title": "2. Comptes utilisateurs",
+          "content": "Vous êtes responsable du maintien de la confidentialité de vos identifiants de compte et de toutes les activités qui se produisent sous votre compte. Vous devez nous informer immédiatement de toute utilisation non autorisée de votre compte ou de toute autre violation de la sécurité.",
+          "icon": "user"
+        },
+        {
+          "id": "acceptableUse",
+          "order": 3,
+          "title": "3. Utilisation acceptable",
+          "content": "Vous acceptez de ne pas utiliser l'application à des fins illégales ou de toute manière qui pourrait nuire, désactiver, surcharger ou altérer l'application. Vous ne pouvez pas tenter d'accéder de manière non autorisée à toute partie de l'application ou de ses systèmes connexes.",
+          "icon": "check-square"
+        },
+        {
+          "id": "intellectualProperty",
+          "order": 4,
+          "title": "4. Propriété intellectuelle",
+          "content": "L'application et son contenu, ses fonctionnalités et ses fonctionnalités d'origine nous appartiennent et sont protégés par les lois internationales sur le droit d'auteur, les marques, les brevets, les secrets commerciaux et autres droits de propriété intellectuelle. Vous ne pouvez pas reproduire, distribuer ou créer des œuvres dérivées sans notre autorisation écrite expresse.",
+          "icon": "book"
+        },
+        {
+          "id": "limitationOfLiability",
+          "order": 5,
+          "title": "5. Limitation de responsabilité",
+          "content": "Dans toute la mesure permise par la loi, nous ne serons pas responsables des dommages indirects, accessoires, spéciaux, consécutifs ou punitifs résultant de votre utilisation ou de votre incapacité à utiliser l'application, même si nous avons été informés de la possibilité de tels dommages.",
+          "icon": "alert-circle"
+        },
+        {
+          "id": "termination",
+          "order": 6,
+          "title": "6. Résiliation",
+          "content": "Nous pouvons résilier ou suspendre votre compte et votre accès à l'application immédiatement, sans préavis ni responsabilité, pour quelque raison que ce soit, y compris, sans limitation, si vous violez ces Conditions d'utilisation.",
+          "icon": "close"
+        },
+        {
+          "id": "changesToTerms",
+          "order": 7,
+          "title": "7. Modifications des conditions",
+          "content": "Nous nous réservons le droit de modifier ou de remplacer ces conditions à tout moment. Si une révision est importante, nous fournirons un préavis d'au moins 30 jours avant l'entrée en vigueur de nouvelles conditions. Ce qui constitue un changement important sera déterminé à notre seule discrétion.",
+          "icon": "refresh"
+        }
+      ]
+    },
+    "ar": {
+      "title": "شروط الخدمة",
+      "lastUpdatedLabel": "آخر تحديث",
+      "lastUpdatedDate": "28 فبراير 2026",
+      "sections": [
+        {
+          "id": "agreementToTerms",
+          "order": 1,
+          "title": "1. الموافقة على الشروط",
+          "content": "من خلال الوصول إلى هذا التطبيق واستخدامه، فإنك تقبل وتوافق على الالتزام بشروط وأحكام هذه الاتفاقية. إذا كنت لا توافق على هذه الشروط، يرجى عدم استخدام تطبيقنا.",
+          "icon": "file-text"
+        },
+        {
+          "id": "userAccounts",
+          "order": 2,
+          "title": "2. حسابات المستخدمين",
+          "content": "أنت مسؤول عن الحفاظ على سرية بيانات اعتماد حسابك وعن جميع الأنشطة التي تحدث تحت حسابك. يجب عليك إخطارنا على الفور بأي استخدام غير مصرح به لحسابك أو أي خرق آخر للأمان.",
+          "icon": "user"
+        },
+        {
+          "id": "acceptableUse",
+          "order": 3,
+          "title": "3. الاستخدام المقبول",
+          "content": "أنت توافق على عدم استخدام التطبيق لأي غرض غير قانوني أو بأي طريقة قد تضر أو تعطل أو تثقل كاهل التطبيق أو تضعفه. لا يجوز لك محاولة الحصول على وصول غير مصرح به إلى أي جزء من التطبيق أو أنظمته ذات الصلة.",
+          "icon": "check-square"
+        },
+        {
+          "id": "intellectualProperty",
+          "order": 4,
+          "title": "4. الملكية الفكرية",
+          "content": "التطبيق ومحتواه الأصلي وميزاته ووظائفه مملوكة لنا ومحمية بموجب قوانين حقوق النشر والعلامات التجارية وبراءات الاختراع والأسرار التجارية وحقوق الملكية الفكرية الأخرى الدولية. لا يجوز لك إعادة إنتاج أو توزيع أو إنشاء أعمال مشتقة دون إذن كتابي صريح منا.",
+          "icon": "book"
+        },
+        {
+          "id": "limitationOfLiability",
+          "order": 5,
+          "title": "5. حدود المسؤولية",
+          "content": "إلى أقصى حد يسمح به القانون، لن نكون مسؤولين عن أي أضرار غير مباشرة أو عرضية أو خاصة أو تبعية أو عقابية ناتجة عن استخدامك أو عدم قدرتك على استخدام التطبيق، حتى لو تم إبلاغنا بإمكانية حدوث مثل هذه الأضرار.",
+          "icon": "alert-circle"
+        },
+        {
+          "id": "termination",
+          "order": 6,
+          "title": "6. الإنهاء",
+          "content": "يجوز لنا إنهاء أو تعليق حسابك والوصول إلى التطبيق على الفور، دون إشعار مسبق أو مسؤولية، لأي سبب كان، بما في ذلك على سبيل المثال لا الحصر إذا انتهكت شروط الخدمة هذه.",
+          "icon": "close"
+        },
+        {
+          "id": "changesToTerms",
+          "order": 7,
+          "title": "7. التغييرات على الشروط",
+          "content": "نحتفظ بالحق في تعديل أو استبدال هذه الشروط في أي وقت. إذا كانت المراجعة جوهرية، فسنقدم إشعاراً قبل 30 يوماً على الأقل قبل سريان أي شروط جديدة. ما يشكل تغييراً جوهرياً سيتم تحديده وفقاً لتقديرنا الخاص.",
+          "icon": "refresh"
+        }
+      ]
+    }
+  }
+}

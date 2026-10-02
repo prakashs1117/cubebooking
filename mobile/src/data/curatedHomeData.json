@@ -1,0 +1,112 @@
+{
+  "header": {
+    "title": "PHARMA CONNECT",
+    "heroHeight": "half",
+    "autoPlay": true,
+    "autoPlayInterval": 4500,
+    "showDots": false,
+    "stickyHeader": true
+  },
+  "heroSlides": [
+    {
+      "id": "hero_1",
+      "image": "https://picsum.photos/seed/pharma1/800/1200",
+      "badge": "Featured",
+      "badgeColor": "#679cff",
+      "headline": "Advancing\nMedicine",
+      "subtitle": "Explore breakthrough therapies and clinical innovations shaping the future of healthcare.",
+      "ctaLabel": "Explore Events",
+      "ctaAction": "navigate",
+      "ctaTarget": "Events"
+    },
+    {
+      "id": "hero_2",
+      "image": "https://picsum.photos/seed/pharma2/800/1200",
+      "badge": "Research Spotlight",
+      "badgeColor": "#ff7162",
+      "headline": "Precision\nOncology",
+      "subtitle": "New data from leading clinical trials transforming cancer treatment protocols.",
+      "ctaLabel": "Read More",
+      "ctaAction": "navigate",
+      "ctaTarget": "Events"
+    },
+    {
+      "id": "hero_3",
+      "image": "https://picsum.photos/seed/pharma3/800/1200",
+      "badge": "Industry News",
+      "badgeColor": "#a9c4ff",
+      "headline": "Digital\nHealth 2025",
+      "subtitle": "How AI and digital diagnostics are redefining patient-centred care pathways.",
+      "ctaLabel": "Discover",
+      "ctaAction": "navigate",
+      "ctaTarget": "Events"
+    }
+  ],
+  "sections": [
+    {
+      "id": "recommended",
+      "type": "horizontal-cards",
+      "title": "Recommended for You",
+      "seeAllLabel": "VIEW ALL",
+      "seeAllAction": "navigate",
+      "seeAllTarget": "Events",
+      "items": [
+        {
+          "id": "card_1",
+          "image": "https://picsum.photos/seed/card_p1/400/600",
+          "category": "ONCOLOGY",
+          "categoryColor": "#ff7162",
+          "title": "Next-Gen CAR-T Therapies",
+          "subtitle": "Emerging cell therapy platforms"
+        },
+        {
+          "id": "card_2",
+          "image": "https://picsum.photos/seed/card_p2/400/600",
+          "category": "NEUROSCIENCE",
+          "categoryColor": "#679cff",
+          "title": "Blood-Brain Barrier Breakthroughs",
+          "subtitle": "Novel CNS drug delivery"
+        },
+        {
+          "id": "card_3",
+          "image": "https://picsum.photos/seed/card_p3/400/600",
+          "category": "VACCINES",
+          "categoryColor": "#ff7162",
+          "title": "mRNA Platform Evolution",
+          "subtitle": "Beyond COVID-19 applications"
+        }
+      ]
+    },
+    {
+      "id": "insights",
+      "type": "vertical-list",
+      "title": "Daily Insights",
+      "items": [
+        {
+          "id": "insight_1",
+          "image": "https://picsum.photos/seed/ins_p1/200/200",
+          "category": "CLINICAL TRIALS",
+          "categoryColor": "#ff7162",
+          "title": "Phase III Data: What the New Biomarker Results Mean",
+          "meta": "5 min read  ·  Today"
+        },
+        {
+          "id": "insight_2",
+          "image": "https://picsum.photos/seed/ins_p2/200/200",
+          "category": "REGULATORY",
+          "categoryColor": "#679cff",
+          "title": "FDA Accelerated Approval Pathway: 2025 Updates",
+          "meta": "7 min read  ·  Yesterday"
+        },
+        {
+          "id": "insight_3",
+          "image": "https://picsum.photos/seed/ins_p3/200/200",
+          "category": "MARKET ACCESS",
+          "categoryColor": "#a9c4ff",
+          "title": "Payer Landscape Shifts in Specialty Biologics",
+          "meta": "4 min read  ·  2 days ago"
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,298 @@
+{
+  "info": {
+    "name": "TodoApp - FCM Notification Testing",
+    "description": "Collection for testing Firebase Cloud Messaging notifications. Replace {{FCM_SERVER_KEY}} and {{DEVICE_TOKEN}} with your actual values.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "FCM_SERVER_KEY",
+      "value": "YOUR_FIREBASE_SERVER_KEY_HERE",
+      "type": "string"
+    },
+    {
+      "key": "DEVICE_TOKEN",
+      "value": "YOUR_DEVICE_FCM_TOKEN_HERE",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "Event Notifications",
+      "item": [
+        {
+          "name": "High Priority Event",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "key={{FCM_SERVER_KEY}}",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"to\": \"{{DEVICE_TOKEN}}\",\n  \"notification\": {\n    \"title\": \"Conference Starts Soon\",\n    \"body\": \"Medical Innovation Conference begins in 30 minutes\"\n  },\n  \"data\": {\n    \"notificationType\": \"event\",\n    \"priority\": \"high\",\n    \"icon\": \"calendar\",\n    \"actionType\": \"navigate\",\n    \"actionScreen\": \"EventDetail\",\n    \"eventId\": \"event_456\"\n  },\n  \"android\": {\n    \"priority\": \"high\",\n    \"notification\": {\n      \"channelId\": \"event_notifications\",\n      \"color\": \"#4A90E2\",\n      \"icon\": \"ic_notification\",\n      \"sound\": \"default\"\n    }\n  },\n  \"apns\": {\n    \"payload\": {\n      \"aps\": {\n        \"alert\": {\n          \"title\": \"Conference Starts Soon\",\n          \"body\": \"Medical Innovation Conference begins in 30 minutes\"\n        },\n        \"sound\": \"default\",\n        \"badge\": 1,\n        \"category\": \"EVENT_CATEGORY\"\n      }\n    }\n  }\n}"
+            },
+            "url": {
+              "raw": "https://fcm.googleapis.com/fcm/send",
+              "protocol": "https",
+              "host": ["fcm", "googleapis", "com"],
+              "path": ["fcm", "send"]
+            }
+          }
+        },
+        {
+          "name": "Normal Priority Event",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "key={{FCM_SERVER_KEY}}",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"to\": \"{{DEVICE_TOKEN}}\",\n  \"notification\": {\n    \"title\": \"Workshop Reminder\",\n    \"body\": \"Tomorrow's workshop on Clinical Data Analysis begins at 10:00 AM\"\n  },\n  \"data\": {\n    \"notificationType\": \"event\",\n    \"priority\": \"normal\",\n    \"icon\": \"calendar\",\n    \"actionType\": \"navigate\",\n    \"actionScreen\": \"EventDetail\",\n    \"eventId\": \"event_workshop_042\"\n  }\n}"
+            },
+            "url": {
+              "raw": "https://fcm.googleapis.com/fcm/send",
+              "protocol": "https",
+              "host": ["fcm", "googleapis", "com"],
+              "path": ["fcm", "send"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Message Notifications",
+      "item": [
+        {
+          "name": "New Message",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "key={{FCM_SERVER_KEY}}",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"to\": \"{{DEVICE_TOKEN}}\",\n  \"notification\": {\n    \"title\": \"New Message\",\n    \"body\": \"Dr. Sarah: Can we discuss the research findings?\"\n  },\n  \"data\": {\n    \"notificationType\": \"message\",\n    \"priority\": \"normal\",\n    \"icon\": \"mail\",\n    \"actionType\": \"navigate\",\n    \"actionScreen\": \"Messages\",\n    \"conversationId\": \"conv_789\",\n    \"senderId\": \"user_dr_sarah\"\n  },\n  \"android\": {\n    \"priority\": \"high\",\n    \"notification\": {\n      \"channelId\": \"message_notifications\",\n      \"color\": \"#10B981\",\n      \"sound\": \"default\"\n    }\n  },\n  \"apns\": {\n    \"payload\": {\n      \"aps\": {\n        \"alert\": {\n          \"title\": \"New Message\",\n          \"body\": \"Dr. Sarah: Can we discuss the research findings?\"\n        },\n        \"sound\": \"default\",\n        \"badge\": 1\n      }\n    }\n  }\n}"
+            },
+            "url": {
+              "raw": "https://fcm.googleapis.com/fcm/send",
+              "protocol": "https",
+              "host": ["fcm", "googleapis", "com"],
+              "path": ["fcm", "send"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Alert Notifications",
+      "item": [
+        {
+          "name": "Security Alert",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "key={{FCM_SERVER_KEY}}",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"to\": \"{{DEVICE_TOKEN}}\",\n  \"notification\": {\n    \"title\": \"Security Alert\",\n    \"body\": \"Unusual login detected from a new device\"\n  },\n  \"data\": {\n    \"notificationType\": \"alert\",\n    \"priority\": \"high\",\n    \"icon\": \"bell\",\n    \"actionType\": \"navigate\",\n    \"actionScreen\": \"Settings\",\n    \"tab\": \"security\"\n  },\n  \"android\": {\n    \"priority\": \"high\",\n    \"notification\": {\n      \"channelId\": \"alert_notifications\",\n      \"color\": \"#EF4444\",\n      \"sound\": \"default\",\n      \"vibrationPattern\": \"[0, 500, 200, 500]\"\n    }\n  },\n  \"apns\": {\n    \"payload\": {\n      \"aps\": {\n        \"alert\": {\n          \"title\": \"Security Alert\",\n          \"body\": \"Unusual login detected from a new device\"\n        },\n        \"sound\": \"default\",\n        \"badge\": 1,\n        \"interruptionLevel\": \"timeSensitive\"\n      }\n    }\n  }\n}"
+            },
+            "url": {
+              "raw": "https://fcm.googleapis.com/fcm/send",
+              "protocol": "https",
+              "host": ["fcm", "googleapis", "com"],
+              "path": ["fcm", "send"]
+            }
+          }
+        },
+        {
+          "name": "System Update Alert",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "key={{FCM_SERVER_KEY}}",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"to\": \"{{DEVICE_TOKEN}}\",\n  \"notification\": {\n    \"title\": \"Critical System Update\",\n    \"body\": \"A security update is available. Please update within 24 hours.\"\n  },\n  \"data\": {\n    \"notificationType\": \"alert\",\n    \"priority\": \"high\",\n    \"icon\": \"bell\",\n    \"actionType\": \"navigate\",\n    \"actionScreen\": \"Settings\"\n  }\n}"
+            },
+            "url": {
+              "raw": "https://fcm.googleapis.com/fcm/send",
+              "protocol": "https",
+              "host": ["fcm", "googleapis", "com"],
+              "path": ["fcm", "send"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Reminder Notifications",
+      "item": [
+        {
+          "name": "Daily Reminder",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "key={{FCM_SERVER_KEY}}",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"to\": \"{{DEVICE_TOKEN}}\",\n  \"notification\": {\n    \"title\": \"Daily Reminder\",\n    \"body\": \"Complete your daily health check-in\"\n  },\n  \"data\": {\n    \"notificationType\": \"reminder\",\n    \"priority\": \"normal\",\n    \"icon\": \"clock\",\n    \"actionType\": \"navigate\",\n    \"actionScreen\": \"Home\"\n  },\n  \"android\": {\n    \"priority\": \"normal\",\n    \"notification\": {\n      \"channelId\": \"reminder_notifications\",\n      \"color\": \"#F59E0B\"\n    }\n  }\n}"
+            },
+            "url": {
+              "raw": "https://fcm.googleapis.com/fcm/send",
+              "protocol": "https",
+              "host": ["fcm", "googleapis", "com"],
+              "path": ["fcm", "send"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Advanced",
+      "item": [
+        {
+          "name": "Rich Notification with Image",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "key={{FCM_SERVER_KEY}}",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"to\": \"{{DEVICE_TOKEN}}\",\n  \"notification\": {\n    \"title\": \"Event Highlights\",\n    \"body\": \"Check out the best moments from yesterday's conference\"\n  },\n  \"data\": {\n    \"notificationType\": \"event\",\n    \"priority\": \"low\",\n    \"icon\": \"calendar\",\n    \"actionType\": \"navigate\",\n    \"actionScreen\": \"EventDetail\",\n    \"eventId\": \"event_999\",\n    \"imageUrl\": \"https://picsum.photos/800/400\"\n  },\n  \"android\": {\n    \"notification\": {\n      \"channelId\": \"event_notifications\",\n      \"imageUrl\": \"https://picsum.photos/800/400\"\n    }\n  },\n  \"apns\": {\n    \"payload\": {\n      \"aps\": {\n        \"alert\": {\n          \"title\": \"Event Highlights\",\n          \"body\": \"Check out the best moments from yesterday's conference\"\n        },\n        \"mutableContent\": 1\n      }\n    },\n    \"fcmOptions\": {\n      \"imageUrl\": \"https://picsum.photos/800/400\"\n    }\n  }\n}"
+            },
+            "url": {
+              "raw": "https://fcm.googleapis.com/fcm/send",
+              "protocol": "https",
+              "host": ["fcm", "googleapis", "com"],
+              "path": ["fcm", "send"]
+            }
+          }
+        },
+        {
+          "name": "Silent Data Message",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "key={{FCM_SERVER_KEY}}",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"to\": \"{{DEVICE_TOKEN}}\",\n  \"data\": {\n    \"type\": \"sync_request\",\n    \"action\": \"refresh_events\",\n    \"priority\": \"low\"\n  },\n  \"android\": {\n    \"priority\": \"normal\"\n  },\n  \"apns\": {\n    \"payload\": {\n      \"aps\": {\n        \"contentAvailable\": true\n      }\n    },\n    \"headers\": {\n      \"apns-priority\": \"5\",\n      \"apns-push-type\": \"background\"\n    }\n  }\n}"
+            },
+            "url": {
+              "raw": "https://fcm.googleapis.com/fcm/send",
+              "protocol": "https",
+              "host": ["fcm", "googleapis", "com"],
+              "path": ["fcm", "send"]
+            }
+          }
+        },
+        {
+          "name": "Topic Broadcast",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "key={{FCM_SERVER_KEY}}",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"to\": \"/topics/events_medical_conferences\",\n  \"notification\": {\n    \"title\": \"New Conference Posted\",\n    \"body\": \"2026 International Cardiology Summit - Register Now!\"\n  },\n  \"data\": {\n    \"notificationType\": \"event\",\n    \"priority\": \"normal\",\n    \"icon\": \"calendar\",\n    \"actionType\": \"navigate\",\n    \"actionScreen\": \"EventDetail\",\n    \"eventId\": \"event_cardio_2026\"\n  }\n}"
+            },
+            "url": {
+              "raw": "https://fcm.googleapis.com/fcm/send",
+              "protocol": "https",
+              "host": ["fcm", "googleapis", "com"],
+              "path": ["fcm", "send"]
+            }
+          }
+        }
+      ]
+    }
+  ]
+}

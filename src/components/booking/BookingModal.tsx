@@ -46,7 +46,7 @@ function StepHeader({
 }) {
   const intl = useIntl()
   return (
-    <div className="px-5 pt-2 pb-3 flex flex-col gap-3">
+    <div className="px-4 md:px-5 pt-1 md:pt-2 pb-2 md:pb-3 flex flex-col gap-2 md:gap-3">
       <div className="flex items-center gap-1 min-h-[40px]">
         {showBack ? (
           <button
@@ -143,7 +143,7 @@ export function BookingModal({ open, onClose, initialVisitType }: BookingModalPr
         />
       )}
 
-      <div className="px-5 pt-2 pb-8 flex flex-col gap-4">
+      <div className="px-4 md:px-5 pt-1 md:pt-2 pb-6 md:pb-8 flex flex-col gap-3 md:gap-4">
         {step === 'type' && (
           <BookTypeStep onSelect={(vt) => { void vt; goTo('programs') }} />
         )}

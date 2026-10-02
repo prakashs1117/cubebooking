@@ -27,21 +27,26 @@ function isActive(href: string, path: string) {
 // ─── Mobile top bar ───────────────────────────────────────────────────────────
 export function MobileTopBar() {
   return (
-    <header
-      className="md:hidden sticky top-0 z-30 flex items-center justify-between px-4 border-b"
-      style={{
-        height: 52,
-        background: 'var(--surface-glass)',
-        backdropFilter: 'blur(12px)',
-        borderColor: 'var(--border)',
-      }}
-    >
-      <MerckLogo width={44} height={21} />
-      <div className="flex items-center gap-1">
-        <ThemeToggle variant="icon" />
-        <NotificationPopover />
-      </div>
-    </header>
+    <>
+      {/* Fixed bar — never moves on scroll */}
+      <header
+        className="md:hidden fixed top-0 left-0 right-0 z-30 flex items-center justify-between px-4 border-b"
+        style={{
+          height: 52,
+          background: 'var(--surface-glass)',
+          backdropFilter: 'blur(12px)',
+          borderColor: 'var(--border)',
+        }}
+      >
+        <MerckLogo width={44} height={21} />
+        <div className="flex items-center gap-1">
+          <ThemeToggle variant="icon" />
+          <NotificationPopover />
+        </div>
+      </header>
+      {/* Spacer so page content starts below the fixed bar */}
+      <div className="md:hidden flex-none" style={{ height: 52 }} />
+    </>
   )
 }
 

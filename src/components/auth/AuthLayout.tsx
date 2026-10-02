@@ -9,7 +9,7 @@ interface AuthLayoutProps {
 export default function AuthLayout({ children, footer }: AuthLayoutProps) {
   return (
     <div
-      className="min-h-dvh relative overflow-hidden flex flex-col items-center justify-center px-4 sm:px-6 py-10"
+      className="h-dvh relative overflow-hidden flex flex-col items-center justify-center px-4 sm:px-6 py-6 sm:py-10"
       style={{ background: 'var(--brand-purple)', fontFamily: 'var(--font-sans)', color: 'var(--foreground)' }}
     >
       {/* Floating brand circles — clamped so they stay partially visible on any screen width */}
@@ -54,7 +54,7 @@ export function GoogleButton({ onClick, disabled, label }: { onClick: () => void
 
 export function OrDivider() {
   return (
-    <div className="flex items-center gap-3 my-4">
+    <div className="flex items-center gap-3 my-2 sm:my-4">
       <div className="h-px flex-1" style={{ background: 'rgba(255,255,255,0.2)' }} />
       <span className="text-xs font-bold uppercase tracking-widest" style={{ color: 'rgba(255,255,255,0.5)' }}>or</span>
       <div className="h-px flex-1" style={{ background: 'rgba(255,255,255,0.2)' }} />

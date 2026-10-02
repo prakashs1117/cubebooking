@@ -1,0 +1,43 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`CustomText Component CustomText combines custom styles with font styles 1`] = `null`;
+
+exports[`CustomText Component CustomText passes through additional props 1`] = `null`;
+
+exports[`CustomText Component CustomText renders correctly with default props 1`] = `null`;
+
+exports[`CustomText Component CustomText renders with custom color 1`] = `null`;
+
+exports[`CustomText Component CustomText renders with custom fontSize 1`] = `null`;
+
+exports[`CustomText Component CustomText renders with custom variant 1`] = `null`;
+
+exports[`CustomText Component Edge Cases handles boolean children 1`] = `null`;
+
+exports[`CustomText Component Edge Cases handles empty children 1`] = `null`;
+
+exports[`CustomText Component Edge Cases handles null children 1`] = `null`;
+
+exports[`CustomText Component Edge Cases handles number children 1`] = `null`;
+
+exports[`CustomText Component Text Variants renders BodyText correctly 1`] = `null`;
+
+exports[`CustomText Component Text Variants renders ButtonText correctly 1`] = `null`;
+
+exports[`CustomText Component Text Variants renders CaptionText correctly 1`] = `null`;
+
+exports[`CustomText Component Text Variants renders Heading1 correctly 1`] = `null`;
+
+exports[`CustomText Component Text Variants renders Heading2 correctly 1`] = `null`;
+
+exports[`CustomText Component Text Variants renders Heading3 correctly 1`] = `null`;
+
+exports[`CustomText Component Text Variants renders Heading4 correctly 1`] = `null`;
+
+exports[`CustomText Component Text Variants renders SubtitleText correctly 1`] = `null`;
+
+exports[`CustomText Component Variant Props Override allows color override on variants 1`] = `null`;
+
+exports[`CustomText Component Variant Props Override allows fontSize override on variants 1`] = `null`;
+
+exports[`CustomText Component Variant Props Override allows style override on variants 1`] = `null`;

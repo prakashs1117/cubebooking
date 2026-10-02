@@ -1,0 +1,510 @@
+{
+  "version": "1.0.0",
+  "lastUpdated": "2025-01-01T00:00:00Z",
+  "flags": [
+    {
+      "id": "home-carousel",
+      "key": "ENABLE_HOME_CAROUSEL",
+      "name": "Home Carousel",
+      "description": "Show image carousel on home screen",
+      "category": "ui",
+      "type": "boolean",
+      "enabled": true,
+      "defaultValue": true,
+      "targeting": {
+        "rolloutPercentage": 100,
+        "environments": ["development", "staging", "production"]
+      },
+      "metadata": {
+        "tags": ["ui", "home", "carousel"],
+        "owner": "product-team",
+        "priority": "high"
+      }
+    },
+    {
+      "id": "drawer-navigation",
+      "key": "ENABLE_DRAWER_NAVIGATION",
+      "name": "Drawer Navigation",
+      "description": "Enable drawer navigation menu (hamburger menu)",
+      "category": "ui",
+      "type": "boolean",
+      "enabled": false,
+      "defaultValue": false,
+      "targeting": {
+        "rolloutPercentage": 100,
+        "environments": ["development", "staging", "production"]
+      },
+      "metadata": {
+        "tags": ["ui", "navigation", "drawer"],
+        "owner": "product-team",
+        "priority": "high"
+      }
+    },
+    {
+      "id": "tab-navigation",
+      "key": "ENABLE_TAB_NAVIGATION",
+      "name": "Tab Navigation",
+      "description": "Enable bottom tab navigation bar",
+      "category": "ui",
+      "type": "boolean",
+      "enabled": true,
+      "defaultValue": true,
+      "targeting": {
+        "rolloutPercentage": 100,
+        "environments": ["development", "staging", "production"]
+      },
+      "metadata": {
+        "tags": ["ui", "navigation", "tabs"],
+        "owner": "product-team",
+        "priority": "high"
+      }
+    },
+    {
+      "id": "dark-mode",
+      "key": "ENABLE_DARK_MODE",
+      "name": "Dark Mode",
+      "description": "Toggle between dark & light themes",
+      "category": "ui",
+      "type": "boolean",
+      "enabled": true,
+      "defaultValue": true,
+      "targeting": {
+        "rolloutPercentage": 100,
+        "environments": ["development", "staging", "production"]
+      },
+      "metadata": {
+        "tags": ["ui", "theme", "accessibility"],
+        "owner": "design-team",
+        "priority": "medium"
+      }
+    },
+    {
+      "id": "about-screen",
+      "key": "ENABLE_ABOUT_SCREEN",
+      "name": "About Screen",
+      "description": "Show About screen in drawer navigation",
+      "category": "ui",
+      "type": "boolean",
+      "enabled": true,
+      "defaultValue": true,
+      "targeting": {
+        "rolloutPercentage": 100,
+        "environments": ["development", "staging", "production"]
+      },
+      "metadata": {
+        "tags": ["ui", "navigation", "about"],
+        "owner": "product-team",
+        "priority": "low"
+      }
+    },
+    {
+      "id": "header-search",
+      "key": "ENABLE_HEADER_SEARCH",
+      "name": "Header Search",
+      "description": "Show search icon in header with search functionality",
+      "category": "ui",
+      "type": "boolean",
+      "enabled": true,
+      "defaultValue": true,
+      "targeting": {
+        "rolloutPercentage": 100,
+        "environments": ["development", "staging", "production"]
+      },
+      "metadata": {
+        "tags": ["ui", "search", "header"],
+        "owner": "product-team",
+        "priority": "medium"
+      }
+    },
+    {
+      "id": "header-notifications",
+      "key": "ENABLE_HEADER_NOTIFICATIONS",
+      "name": "Header Notifications",
+      "description": "Show notification bell icon in header",
+      "category": "ui",
+      "type": "boolean",
+      "enabled": true,
+      "defaultValue": true,
+      "targeting": {
+        "rolloutPercentage": 100,
+        "environments": ["development", "staging", "production"]
+      },
+      "metadata": {
+        "tags": ["ui", "notifications", "header"],
+        "owner": "product-team",
+        "priority": "medium"
+      }
+    },
+    {
+      "id": "header-profile",
+      "key": "ENABLE_HEADER_PROFILE",
+      "name": "Header Profile",
+      "description": "Show profile icon in header",
+      "category": "ui",
+      "type": "boolean",
+      "enabled": true,
+      "defaultValue": true,
+      "targeting": {
+        "rolloutPercentage": 100,
+        "environments": ["development", "staging", "production"]
+      },
+      "metadata": {
+        "tags": ["ui", "profile", "header"],
+        "owner": "product-team",
+        "priority": "medium"
+      }
+    },
+    {
+      "id": "faq",
+      "key": "ENABLE_FAQ",
+      "name": "FAQ",
+      "description": "Show FAQ (Frequently Asked Questions) icon in header and screen in drawer",
+      "category": "ui",
+      "type": "boolean",
+      "enabled": true,
+      "defaultValue": true,
+      "targeting": {
+        "rolloutPercentage": 100,
+        "environments": ["development", "staging", "production"]
+      },
+      "metadata": {
+        "tags": ["ui", "help", "faq"],
+        "owner": "support-team",
+        "priority": "medium"
+      }
+    },
+    {
+      "id": "ai-search",
+      "key": "ENABLE_AI_SEARCH",
+      "name": "AI Search",
+      "description": "Show AI Search floating action button and search overlay with suggestions",
+      "category": "ui",
+      "type": "boolean",
+      "enabled": true,
+      "defaultValue": true,
+      "targeting": {
+        "rolloutPercentage": 100,
+        "environments": ["development", "staging", "production"]
+      },
+      "metadata": {
+        "tags": ["ui", "ai", "search"],
+        "owner": "ai-team",
+        "priority": "high"
+      }
+    },
+    {
+      "id": "onboarding",
+      "key": "ENABLE_ONBOARDING",
+      "name": "Onboarding",
+      "description": "Show first launch onboarding carousel",
+      "category": "feature",
+      "type": "boolean",
+      "enabled": true,
+      "defaultValue": true,
+      "targeting": {
+        "rolloutPercentage": 100,
+        "environments": ["development", "staging", "production"]
+      },
+      "config": {
+        "showOnFirstLaunchOnly": true,
+        "skipEnabled": true,
+        "autoPlayEnabled": false
+      },
+      "metadata": {
+        "tags": ["onboarding", "ux", "first-run"],
+        "owner": "product-team",
+        "priority": "high"
+      }
+    },
+    {
+      "id": "terms-privacy-popup",
+      "key": "ENABLE_TERMS_AND_PRIVACY_POPUP",
+      "name": "Terms & Privacy Popup",
+      "description": "Show privacy policy and terms of service agreement popup during signup/signin",
+      "category": "feature",
+      "type": "boolean",
+      "enabled": true,
+      "defaultValue": true,
+      "targeting": {
+        "rolloutPercentage": 100,
+        "environments": ["development", "staging", "production"]
+      },
+      "config": {
+        "requireAcceptance": true,
+        "showOnSignup": true,
+        "showOnSignin": false
+      },
+      "metadata": {
+        "tags": ["legal", "compliance", "privacy"],
+        "owner": "legal-team",
+        "priority": "critical"
+      }
+    },
+    {
+      "id": "offline-sync",
+      "key": "ENABLE_OFFLINE_SYNC",
+      "name": "Offline Sync",
+      "description": "Background synchronization when connection is restored",
+      "category": "feature",
+      "type": "boolean",
+      "enabled": false,
+      "defaultValue": false,
+      "targeting": {
+        "rolloutPercentage": 0,
+        "environments": ["development"]
+      },
+      "metadata": {
+        "tags": ["sync", "offline", "performance"],
+        "owner": "backend-team",
+        "priority": "medium"
+      }
+    },
+    {
+      "id": "push-notifications",
+      "key": "ENABLE_PUSH_NOTIFICATIONS",
+      "name": "Push Notifications",
+      "description": "Send push notifications for reminders and updates",
+      "category": "feature",
+      "type": "boolean",
+      "enabled": false,
+      "defaultValue": false,
+      "targeting": {
+        "rolloutPercentage": 0,
+        "environments": ["development", "staging"]
+      },
+      "metadata": {
+        "tags": ["notifications", "engagement", "push"],
+        "owner": "product-team",
+        "priority": "high"
+      }
+    },
+    {
+      "id": "biometric-auth",
+      "key": "ENABLE_BIOMETRIC_AUTH",
+      "name": "Biometric Authentication",
+      "description": "Enable fingerprint/face ID authentication",
+      "category": "feature",
+      "type": "boolean",
+      "enabled": false,
+      "defaultValue": false,
+      "targeting": {
+        "rolloutPercentage": 0,
+        "environments": ["development"]
+      },
+      "metadata": {
+        "tags": ["auth", "security", "biometric"],
+        "owner": "security-team",
+        "priority": "medium"
+      }
+    },
+    {
+      "id": "social-login-google",
+      "key": "ENABLE_SOCIAL_LOGIN_GOOGLE",
+      "name": "Google Social Login",
+      "description": "Enable Google social login",
+      "category": "social",
+      "type": "boolean",
+      "enabled": true,
+      "defaultValue": true,
+      "targeting": {
+        "rolloutPercentage": 100,
+        "environments": ["development", "staging", "production"]
+      },
+      "metadata": {
+        "tags": ["auth", "social", "google"],
+        "owner": "auth-team",
+        "priority": "high"
+      }
+    },
+    {
+      "id": "social-login-apple",
+      "key": "ENABLE_SOCIAL_LOGIN_APPLE",
+      "name": "Apple Social Login",
+      "description": "Enable Apple social login",
+      "category": "social",
+      "type": "boolean",
+      "enabled": true,
+      "defaultValue": true,
+      "targeting": {
+        "rolloutPercentage": 100,
+        "environments": ["development", "staging", "production"]
+      },
+      "metadata": {
+        "tags": ["auth", "social", "apple"],
+        "owner": "auth-team",
+        "priority": "high"
+      }
+    },
+    {
+      "id": "social-login-facebook",
+      "key": "ENABLE_SOCIAL_LOGIN_FACEBOOK",
+      "name": "Facebook Social Login",
+      "description": "Enable Facebook social login",
+      "category": "social",
+      "type": "boolean",
+      "enabled": false,
+      "defaultValue": false,
+      "targeting": {
+        "rolloutPercentage": 0,
+        "environments": ["development"]
+      },
+      "metadata": {
+        "tags": ["auth", "social", "facebook"],
+        "owner": "auth-team",
+        "priority": "low"
+      }
+    },
+    {
+      "id": "analytics",
+      "key": "ENABLE_ANALYTICS",
+      "name": "Analytics",
+      "description": "User behavior analytics and crash reporting",
+      "category": "analytics",
+      "type": "boolean",
+      "enabled": false,
+      "defaultValue": false,
+      "targeting": {
+        "rolloutPercentage": 0,
+        "environments": ["production"]
+      },
+      "metadata": {
+        "tags": ["analytics", "tracking", "monitoring"],
+        "owner": "analytics-team",
+        "priority": "medium"
+      }
+    },
+    {
+      "id": "performance-monitoring",
+      "key": "ENABLE_PERFORMANCE_MONITORING",
+      "name": "Performance Monitoring",
+      "description": "Monitor app performance and render times",
+      "category": "analytics",
+      "type": "boolean",
+      "enabled": false,
+      "defaultValue": false,
+      "targeting": {
+        "rolloutPercentage": 0,
+        "environments": ["development"]
+      },
+      "metadata": {
+        "tags": ["performance", "monitoring", "metrics"],
+        "owner": "performance-team",
+        "priority": "low"
+      }
+    },
+    {
+      "id": "new-todo-ui",
+      "key": "ENABLE_NEW_TODO_UI",
+      "name": "New Todo UI",
+      "description": "Enhanced todo interface with animations",
+      "category": "experimental",
+      "type": "boolean",
+      "enabled": false,
+      "defaultValue": false,
+      "targeting": {
+        "rolloutPercentage": 0,
+        "environments": ["development"]
+      },
+      "metadata": {
+        "tags": ["ui", "experimental", "todo"],
+        "owner": "design-team",
+        "priority": "low"
+      }
+    },
+    {
+      "id": "real-time-updates",
+      "key": "ENABLE_REAL_TIME_UPDATES",
+      "name": "Real-time Updates",
+      "description": "Live updates using WebSockets or Server-Sent Events",
+      "category": "experimental",
+      "type": "boolean",
+      "enabled": false,
+      "defaultValue": false,
+      "targeting": {
+        "rolloutPercentage": 0,
+        "environments": ["development"]
+      },
+      "metadata": {
+        "tags": ["realtime", "websockets", "experimental"],
+        "owner": "backend-team",
+        "priority": "low"
+      }
+    },
+    {
+      "id": "ai-features",
+      "key": "ENABLE_AI_FEATURES",
+      "name": "AI Features",
+      "description": "AI-powered recommendations and insights",
+      "category": "experimental",
+      "type": "boolean",
+      "enabled": false,
+      "defaultValue": false,
+      "targeting": {
+        "rolloutPercentage": 0,
+        "environments": ["development"]
+      },
+      "metadata": {
+        "tags": ["ai", "experimental", "ml"],
+        "owner": "ai-team",
+        "priority": "low"
+      }
+    },
+    {
+      "id": "debug-info",
+      "key": "SHOW_DEBUG_INFO",
+      "name": "Debug Info",
+      "description": "Show debug information in the UI",
+      "category": "debug",
+      "type": "boolean",
+      "enabled": true,
+      "defaultValue": true,
+      "targeting": {
+        "rolloutPercentage": 100,
+        "environments": ["development"]
+      },
+      "metadata": {
+        "tags": ["debug", "developer", "tools"],
+        "owner": "dev-team",
+        "priority": "low"
+      }
+    },
+    {
+      "id": "feature-flags-screen",
+      "key": "ENABLE_FEATURE_FLAGS_SCREEN",
+      "name": "Feature Flags Screen",
+      "description": "Show feature flags screen in drawer navigation",
+      "category": "debug",
+      "type": "boolean",
+      "enabled": true,
+      "defaultValue": true,
+      "targeting": {
+        "rolloutPercentage": 100,
+        "environments": ["development"]
+      },
+      "metadata": {
+        "tags": ["debug", "developer", "feature-flags"],
+        "owner": "dev-team",
+        "priority": "low"
+      }
+    },
+    {
+      "id": "icon-gallery",
+      "key": "ENABLE_ICON_GALLERY",
+      "name": "Icon Gallery",
+      "description": "Show icon gallery screen in drawer navigation (dev mode)",
+      "category": "debug",
+      "type": "boolean",
+      "enabled": true,
+      "defaultValue": true,
+      "targeting": {
+        "rolloutPercentage": 100,
+        "environments": ["development"]
+      },
+      "metadata": {
+        "tags": ["debug", "developer", "icons"],
+        "owner": "design-team",
+        "priority": "low"
+      }
+    }
+  ]
+}

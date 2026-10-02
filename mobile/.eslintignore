@@ -1,0 +1,19 @@
+# Build outputs
+node_modules/
+dist/
+build/
+
+# Coverage reports
+coverage/
+.nyc_output/
+
+# Platform specific
+android/
+ios/
+
+# Node.js scripts
+create_splash_images.js
+convert_image_to_splash.js
+
+# Generated files
+*.log

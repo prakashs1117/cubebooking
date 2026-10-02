@@ -1,0 +1,3 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`TermsAndPrivacyModal Component Rendering renders correctly when visible 1`] = `null`;

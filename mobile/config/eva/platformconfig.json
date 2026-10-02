@@ -1,0 +1,38 @@
+{
+  "baseUrl": "https://abc.com",
+  "bbcNewsUrl": "https://newsapi.org/v2/top-headlines?",
+  "API_KEY": "892f5f461b4c4b7c94a611e673ccc60e",
+  "news": {
+    "country": {
+      "india": "in",
+      "unitedstates": "us"
+    }
+  },
+  "deviceType": {
+    "ios": "IOS",
+    "android": "Android",
+    "androidhevc": "Android_HEVC",
+    "ioshevc": "IOS_HEVC"
+  },
+  "locale": "en_GB",
+  "provider": "GLOBAL",
+  "defaultLanguage": "en",
+  "audioLanguage": "en",
+  "features": {
+    "LIVE": true,
+    "DISCOVER": true,
+    "FIRST_LAUNCH": true,
+    "SOCIAL_LOGIN_GOOGLE": true,
+    "SOCIAL_LOGIN_APPLE": true,
+    "SOCIAL_LOGIN_FACEBOOK": false
+  },
+  "ui": {
+    "headerType": "type2"
+  },
+  "onboarding": {
+    "enabled": true,
+    "showOnFirstLaunchOnly": true,
+    "skipEnabled": true,
+    "autoPlayEnabled": false
+  }
+}
