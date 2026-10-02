@@ -1,0 +1,46 @@
+{
+  "project_info": {
+    "project_number": "377720551717",
+    "project_id": "mer-booking-tool",
+    "storage_bucket": "mer-booking-tool.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:377720551717:android:e9c20c605ff12d5cfe82cc",
+        "android_client_info": {
+          "package_name": "com.merck.ocb"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "377720551717-6per9j9h5botevbej18hlf10e4e47oql.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDw1_HGtnr5bUqZQXhjmnzZJSYMLWTxmVw"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "377720551717-6per9j9h5botevbej18hlf10e4e47oql.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "377720551717-sofeuf0olb73lpb8jgcs4rsle29uhgl2.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.merck.ocb"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
