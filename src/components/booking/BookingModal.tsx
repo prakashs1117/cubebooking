@@ -10,19 +10,30 @@ import { BookTimeStep } from './steps/BookTimeStep'
 import { BookDetailsStep } from './steps/BookDetailsStep'
 import { BookReviewStep } from './steps/BookReviewStep'
 import { BookConfirmedStep } from './steps/BookConfirmedStep'
+import { ToadDateStep } from './steps/ToadDateStep'
+import { ToadDetailsStep } from './steps/ToadDetailsStep'
+import { ToadReviewStep } from './steps/ToadReviewStep'
+import { ToadConfirmedStep } from './steps/ToadConfirmedStep'
 
 type Step = 'type' | 'programs' | 'time' | 'details' | 'review' | 'confirmed'
+          | 'toad-date' | 'toad-details' | 'toad-review' | 'toad-confirmed'
 
 const STEP_ORDER: Step[] = ['type', 'programs', 'time', 'details', 'review', 'confirmed']
 const PROGRESS_STEPS: Step[] = ['programs', 'time', 'details', 'review']
+const TOAD_STEP_ORDER: Step[] = ['type', 'toad-date', 'toad-details', 'toad-review', 'toad-confirmed']
+const TOAD_PROGRESS_STEPS: Step[] = ['toad-date', 'toad-details', 'toad-review']
 
 const STEP_TITLES: Record<Step, string> = {
-  type:      'book.title',
-  programs:  'bookPrograms.title',
-  time:      'bookTime.title',
-  details:   'bookDetails.title',
-  review:    'review.title',
-  confirmed: 'confirmed.heading',
+  type:           'book.title',
+  programs:       'bookPrograms.title',
+  time:           'bookTime.title',
+  details:        'bookDetails.title',
+  review:         'review.title',
+  confirmed:      'confirmed.heading',
+  'toad-date':      'book.title',
+  'toad-details':   'bookDetails.title',
+  'toad-review':    'toad.review.heading',
+  'toad-confirmed': 'toad.confirmed.heading',
 }
 
 interface BookingModalProps {
@@ -87,10 +98,10 @@ function StepHeader({
 
 export function BookingModal({ open, onClose, initialVisitType }: BookingModalProps) {
   const intl = useIntl()
-  const { setVisitType, reset } = useBookingStore()
+  const { setVisitType, reset, visitType } = useBookingStore()
   const navigate = useNavigate()
 
-  const firstStep: Step = initialVisitType ? 'programs' : 'type'
+  const firstStep: Step = initialVisitType === 'toad' ? 'toad-date' : initialVisitType ? 'programs' : 'type'
   const [step, setStep] = useState<Step>(firstStep)
   const [confirmedBookingId, setConfirmedBookingId] = useState<string | null>(null)
   const [confirmedBookingCode, setConfirmedBookingCode] = useState<string | null>(null)
@@ -100,7 +111,7 @@ export function BookingModal({ open, onClose, initialVisitType }: BookingModalPr
       reset()
       if (initialVisitType) {
         setVisitType(initialVisitType)
-        setStep('programs')
+        setStep(initialVisitType === 'toad' ? 'toad-date' : 'programs')
       } else {
         setStep('type')
       }
@@ -116,28 +127,35 @@ export function BookingModal({ open, onClose, initialVisitType }: BookingModalPr
 
   const goTo = (s: Step) => setStep(s)
 
+  const isToadStep = (s: Step) => s.startsWith('toad-')
+
   const goBack = () => {
-    const order = initialVisitType ? STEP_ORDER.filter((s) => s !== 'type') : STEP_ORDER
+    const isToad = visitType === 'toad'
+    const baseOrder = isToad ? TOAD_STEP_ORDER : STEP_ORDER
+    const order = initialVisitType ? baseOrder.filter((s) => s !== 'type') : baseOrder
     const idx = order.indexOf(step)
     if (idx > 0) setStep(order[idx - 1])
   }
 
-  const progressIdx = PROGRESS_STEPS.indexOf(step)
+  const progressIdx = isToadStep(step)
+    ? TOAD_PROGRESS_STEPS.indexOf(step)
+    : PROGRESS_STEPS.indexOf(step)
   const progressStep = progressIdx >= 0 ? progressIdx + 1 : 0
-  const showBack = step !== 'type' && step !== 'programs' && step !== 'confirmed'
-  const showProgress = step !== 'type' && step !== 'confirmed'
+  const showBack = step !== 'type' && step !== 'programs' && step !== 'confirmed' && step !== 'toad-confirmed' && step !== 'toad-date'
+  const showProgress = step !== 'type' && step !== 'confirmed' && step !== 'toad-confirmed'
+  const totalSteps = isToadStep(step) ? TOAD_PROGRESS_STEPS.length : PROGRESS_STEPS.length
   const title = intl.formatMessage({ id: STEP_TITLES[step] })
-  const scrollKey = STEP_ORDER.indexOf(step)
+  const scrollKey = isToadStep(step) ? TOAD_STEP_ORDER.indexOf(step) : STEP_ORDER.indexOf(step)
 
   if (!open) return null
 
   return (
     <Modal onClose={handleClose} scrollKey={scrollKey}>
-      {step !== 'confirmed' && (
+      {step !== 'confirmed' && step !== 'toad-confirmed' && (
         <StepHeader
           title={title}
           progressStep={showProgress ? progressStep : 0}
-          totalSteps={PROGRESS_STEPS.length}
+          totalSteps={totalSteps}
           showBack={showBack}
           onBack={goBack}
         />
@@ -145,7 +163,28 @@ export function BookingModal({ open, onClose, initialVisitType }: BookingModalPr
 
       <div className="px-4 md:px-5 pt-1 md:pt-2 pb-6 md:pb-8 flex flex-col gap-3 md:gap-4">
         {step === 'type' && (
-          <BookTypeStep onSelect={(vt) => { void vt; goTo('programs') }} />
+          <BookTypeStep onSelect={(vt) => {
+            goTo(vt === 'toad' ? 'toad-date' : 'programs')
+          }} />
+        )}
+        {step === 'toad-date' && (
+          <ToadDateStep onContinue={() => goTo('toad-details')} />
+        )}
+        {step === 'toad-details' && (
+          <ToadDetailsStep onContinue={() => goTo('toad-review')} />
+        )}
+        {step === 'toad-review' && (
+          <ToadReviewStep
+            onBack={() => goTo('toad-details')}
+            onConfirmed={(id, code) => { setConfirmedBookingId(id); setConfirmedBookingCode(code); goTo('toad-confirmed') }}
+          />
+        )}
+        {step === 'toad-confirmed' && (
+          <ToadConfirmedStep
+            bookingId={confirmedBookingId}
+            bookingCode={confirmedBookingCode}
+            onDone={handleClose}
+          />
         )}
         {step === 'programs' && (
           <BookProgramsStep onContinue={() => goTo('time')} />
