@@ -31,11 +31,11 @@ export function ToadReviewStep({ onBack, onConfirmed }: Props) {
   const dateStr = intl.formatDate(slot.start, { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })
 
   const rows = [
-    { k: intl.formatMessage({ id: 'toad.review.row.date' }),     v: dateStr },
-    { k: intl.formatMessage({ id: 'review.row.grade' }),          v: classDetails.grade },
-    { k: intl.formatMessage({ id: 'review.row.students' }),       v: String(classDetails.studentCount) },
-    { k: intl.formatMessage({ id: 'toad.review.row.parking' }),   v: classDetails.truckParking },
-    ...(classDetails.accessNeeds ? [{ k: intl.formatMessage({ id: 'review.row.access' }), v: classDetails.accessNeeds }] : []),
+    { id: 'date',     k: intl.formatMessage({ id: 'toad.review.row.date' }),   v: dateStr },
+    { id: 'grade',    k: intl.formatMessage({ id: 'review.row.grade' }),        v: classDetails.grade },
+    { id: 'students', k: intl.formatMessage({ id: 'review.row.students' }),     v: String(classDetails.studentCount) },
+    { id: 'parking',  k: intl.formatMessage({ id: 'toad.review.row.parking' }), v: classDetails.truckParking },
+    ...(classDetails.accessNeeds ? [{ id: 'access', k: intl.formatMessage({ id: 'review.row.access' }), v: classDetails.accessNeeds }] : []),
   ]
 
   const handleSubmit = async () => {
@@ -85,7 +85,7 @@ export function ToadReviewStep({ onBack, onConfirmed }: Props) {
         </div>
         <div className="px-[18px] flex flex-col">
           {rows.map((row) => (
-            <div key={row.k} className="flex items-start gap-3 min-h-[48px] py-3 border-b last:border-b-0" style={{ borderColor: 'var(--border)' }}>
+            <div key={row.id} className="flex items-start gap-3 min-h-[48px] py-3 border-b last:border-b-0" style={{ borderColor: 'var(--border)' }}>
               <span className="w-[110px] text-[13px] mt-0.5 shrink-0" style={{ color: 'var(--muted-foreground)' }}>{row.k}</span>
               <span className="flex-1 text-sm font-semibold leading-relaxed">{row.v}</span>
               <button type="button" onClick={onBack} className="text-[13px] font-medium min-h-[44px] inline-flex items-center tap shrink-0" style={{ color: 'var(--primary)', background: 'none', border: 'none', cursor: 'pointer' }}>

@@ -48,11 +48,11 @@ export function BookReviewStep({ onBack, onConfirmed, onExpired: _onExpired }: P
     : firstSlot.programId === 'cube' ? ['var(--brand-mint)'] : ['var(--brand-yellow)']
 
   const rows = [
-    { k: intl.formatMessage({ id: 'review.row.date' }),     v: dateStr,                          onEdit: onBack },
-    { k: intl.formatMessage({ id: 'review.row.time' }),     v: timeRange,                        onEdit: onBack },
-    { k: intl.formatMessage({ id: 'review.row.grade' }),    v: String(classDetails.grade),       onEdit: onBack },
-    { k: intl.formatMessage({ id: 'review.row.students' }), v: String(classDetails.studentCount), onEdit: onBack },
-    ...(classDetails.accessNeeds ? [{ k: intl.formatMessage({ id: 'review.row.access' }), v: classDetails.accessNeeds, onEdit: onBack }] : []),
+    { id: 'date',     k: intl.formatMessage({ id: 'review.row.date' }),     v: dateStr,                           onEdit: onBack },
+    { id: 'time',     k: intl.formatMessage({ id: 'review.row.time' }),     v: timeRange,                         onEdit: onBack },
+    { id: 'grade',    k: intl.formatMessage({ id: 'review.row.grade' }),    v: String(classDetails.grade),        onEdit: onBack },
+    { id: 'students', k: intl.formatMessage({ id: 'review.row.students' }), v: String(classDetails.studentCount), onEdit: onBack },
+    ...(classDetails.accessNeeds ? [{ id: 'access', k: intl.formatMessage({ id: 'review.row.access' }), v: classDetails.accessNeeds, onEdit: onBack }] : []),
   ]
 
   const handleConfirm = async () => {
@@ -137,7 +137,7 @@ export function BookReviewStep({ onBack, onConfirmed, onExpired: _onExpired }: P
         </div>
         <div className="px-[18px] flex flex-col">
           {rows.map((row) => (
-            <div key={row.k} className="flex items-center gap-3 min-h-[48px] border-b last:border-b-0" style={{ borderColor: 'var(--border)' }}>
+            <div key={row.id} className="flex items-center gap-3 min-h-[48px] border-b last:border-b-0" style={{ borderColor: 'var(--border)' }}>
               <span className="w-[110px] text-[13px]" style={{ color: 'var(--muted-foreground)' }}>{row.k}</span>
               <span className="flex-1 text-sm font-semibold">{row.v}</span>
               <button
