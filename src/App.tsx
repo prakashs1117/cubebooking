@@ -17,6 +17,7 @@ import ProfilePage from './components/pages/ProfilePage'
 import QRScanPage from './components/admin/QRScanPage'
 import BookingVerifyPage from './components/admin/BookingVerifyPage'
 import AdminDashboardPage from './components/admin/AdminDashboardPage'
+import ProgramsPage from './components/pages/ProgramsPage'
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -62,6 +63,9 @@ function ShellRoute({ element }: { element: React.ReactNode }) {
 function AppRoutes() {
   return (
     <Routes>
+      {/* Public — no shell, no auth */}
+      <Route path="/programs" element={<ProgramsPage />} />
+
       {/* Auth — no shell */}
       <Route path="/signin" element={<GuestOnly><SignInPage /></GuestOnly>} />
       <Route path="/forgot-password" element={<ForgotPasswordPage />} />

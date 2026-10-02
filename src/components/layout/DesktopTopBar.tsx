@@ -30,7 +30,7 @@ export default function DesktopTopBar({ onBook }: { onBook: () => void }) {
       }}
     >
       {/* Logo */}
-      <Link to="/home" className="flex items-center gap-3 mr-6 flex-none tap" style={{ textDecoration: 'none' }}>
+      <Link to="/programs" className="flex items-center gap-3 mr-6 flex-none tap" style={{ textDecoration: 'none' }}>
         <MerckLogo width={44} height={21} />
       </Link>
 

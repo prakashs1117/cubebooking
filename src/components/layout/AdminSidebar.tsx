@@ -64,7 +64,7 @@ export default function AdminSidebar({ onClose }: { onClose?: () => void }) {
     >
       {/* Brand header */}
       <div className="flex items-center gap-3 px-6 pt-6 pb-5 flex-none">
-        <Link to="/home" className="tap flex-none" style={{ textDecoration: 'none' }} onClick={onClose}>
+        <Link to="/programs" className="tap flex-none" style={{ textDecoration: 'none' }} onClick={onClose}>
           <MerckLogo width={59} height={28} />
         </Link>
         <div style={{ flexGrow: 1, minWidth: 0 }}>
