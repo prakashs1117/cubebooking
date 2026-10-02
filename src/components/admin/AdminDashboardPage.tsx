@@ -1,7 +1,7 @@
 import { useNavigate } from 'react-router-dom'
-import { QrCode, Clock, Users, GraduationCap } from 'lucide-react'
+import { QrCode, Clock, Users, GraduationCap, Truck, ChevronRight } from 'lucide-react'
 import { useIntl } from 'react-intl'
-import { useAllBookings, type BookingDoc } from '../../hooks/queries/useBookings'
+import { useAllBookings, useAllToadBookings, type BookingDoc } from '../../hooks/queries/useBookings'
 import { slotToDate, slotEndDate } from '../../config/slots'
 
 function todayKey(): string {
@@ -30,6 +30,8 @@ export default function AdminDashboardPage() {
   const intl = useIntl()
   const today = todayKey()
   const { data: bookings = [], isLoading } = useAllBookings(today)
+  const toadBookings = useAllToadBookings()
+  const pendingToad = toadBookings.filter((b) => b.status === 'pending').length
 
   // Sort: arrived last, cancelled last-last, confirmed/pending first; within groups sort by start time
   const sorted = [...bookings].sort((a, b) => {
@@ -64,6 +66,36 @@ export default function AdminDashboardPage() {
       </header>
 
       <main className="flex-1 overflow-y-auto px-5 pb-24 lg:pb-6 flex flex-col gap-3">
+
+        {/* TOAD approvals shortcut */}
+        <button
+          type="button"
+          onClick={() => navigate('/admin/toad')}
+          className="tap w-full flex items-center gap-3 px-4 py-3.5 rounded-2xl border text-left"
+          style={{ background: 'var(--card)', borderColor: 'var(--border)' }}
+        >
+          <span className="grid place-items-center rounded-xl flex-none" style={{ width: 40, height: 40, background: 'var(--tint-magenta)' }}>
+            <Truck style={{ width: 18, height: 18, color: 'var(--brand-magenta)' }} />
+          </span>
+          <span className="flex-1 flex flex-col gap-0.5">
+            <span className="text-sm font-semibold">{intl.formatMessage({ id: 'toad.approvals.title' })}</span>
+            <span className="text-xs" style={{ color: 'var(--muted-foreground)' }}>
+              {pendingToad > 0
+                ? intl.formatMessage({ id: 'toad.approvals.pending' }, { count: pendingToad })
+                : intl.formatMessage({ id: 'toad.approvals.empty' })}
+            </span>
+          </span>
+          {pendingToad > 0 && (
+            <span
+              className="flex-none text-xs font-bold px-2 py-0.5 rounded-full"
+              style={{ background: 'var(--tint-magenta)', color: 'var(--brand-magenta)' }}
+            >
+              {pendingToad}
+            </span>
+          )}
+          <ChevronRight style={{ width: 16, height: 16, color: 'var(--muted-foreground)', flexShrink: 0 }} />
+        </button>
+
         {isLoading && (
           <div className="flex items-center justify-center py-16">
             <div className="w-7 h-7 rounded-full border-2 animate-spin" style={{ borderColor: 'var(--border)', borderTopColor: 'var(--primary)' }} />
