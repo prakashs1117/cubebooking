@@ -1,7 +1,8 @@
 import * as Accordion from '@radix-ui/react-accordion'
+import PageContainer from '../ui/PageContainer'
 import { ChevronDown, MapPin, Clock, FileText, Users, Download } from 'lucide-react'
 import { useIntl } from 'react-intl'
-import { useMyBookings } from '../../hooks/queries/useBookings'
+import { useMyBookings, type BookingDoc } from '../../hooks/queries/useBookings'
 import type { Timestamp } from 'firebase/firestore'
 
 function useKitSections() {
@@ -59,6 +60,23 @@ function useKitSections() {
   ]
 }
 
+function BookingSelector({ booking }: { booking: BookingDoc }) {
+  const intl = useIntl()
+  const seg = booking.segments?.[0] as unknown as { start?: Timestamp }
+  const ids = [...new Set(booking.segments?.map((s) => s.programId) ?? [])]
+  const label = ids.length > 1 ? 'Cube + Lab' : ids[0] === 'cube' ? 'Curiosity Cube' : 'Curiosity Lab'
+  const date = seg?.start ? intl.formatDate(seg.start.toDate(), { day: 'numeric', month: 'short', year: 'numeric' }) : ''
+  return (
+    <div
+      className="flex items-center gap-2 px-3 py-2.5 rounded-xl border text-sm font-medium"
+      style={{ background: 'var(--card)', borderColor: 'var(--border)' }}
+    >
+      <Clock className="w-4 h-4 flex-none" style={{ color: 'var(--muted-foreground)' }} />
+      <span className="flex-1">{label} · {date}</span>
+    </div>
+  )
+}
+
 export default function KitPage() {
   const intl = useIntl()
   const kitSections = useKitSections()
@@ -77,36 +95,14 @@ export default function KitPage() {
   const dash = circumference * (progressPercent / 100)
 
   return (
-    <div
-      className="min-h-screen flex flex-col max-w-2xl lg:max-w-3xl mx-auto w-full"
-      style={{ background: 'var(--app-ground)', fontFamily: 'var(--font-sans)', color: 'var(--foreground)' }}
-    >
-      {/* Header */}
-      <header className="px-5 pt-4 lg:pt-6 pb-3 flex flex-col gap-4">
-        <h1 className="m-0 text-3xl font-extrabold tracking-tight" style={{ fontFamily: 'var(--font-display)' }}>
-          {intl.formatMessage({ id: 'kit.title' })}
-        </h1>
+    <PageContainer className="gap-4">
+      <h1 className="m-0 text-3xl font-extrabold tracking-tight hidden lg:block" style={{ fontFamily: 'var(--font-display)' }}>
+        {intl.formatMessage({ id: 'kit.title' })}
+      </h1>
 
-        {/* Booking selector */}
-        {bookings.length > 0 && nextBooking && (() => {
-          const seg = nextBooking.segments?.[0] as unknown as { start?: Timestamp }
-          const ids = [...new Set(nextBooking.segments?.map((s) => s.programId) ?? [])]
-          const label = ids.length > 1 ? 'Cube + Lab' : ids[0] === 'cube' ? 'Curiosity Cube' : 'Curiosity Lab'
-          const date = seg?.start ? intl.formatDate(seg.start.toDate(), { day: 'numeric', month: 'short', year: 'numeric' }) : ''
-          return (
-            <div
-              className="flex items-center gap-2 px-3 py-2.5 rounded-xl border text-sm font-medium"
-              style={{ background: 'var(--card)', borderColor: 'var(--border)' }}
-            >
-              <Clock className="w-4 h-4 flex-none" style={{ color: 'var(--muted-foreground)' }} />
-              <span className="flex-1">{label} · {date}</span>
-            </div>
-          )
-        })()}
-      </header>
+      {nextBooking && <BookingSelector booking={nextBooking} />}
 
-      <main className="flex-1 scroll overflow-y-auto px-5 pb-24 lg:pb-6 flex flex-col gap-4">
-        {/* Progress card */}
+      {/* Progress card */}
         <section
           className="relative overflow-hidden flex gap-4 items-center p-[18px] rounded-[22px]"
           style={{ background: 'var(--brand-purple)', color: '#ffffff' }}
@@ -186,7 +182,6 @@ export default function KitPage() {
           <Download className="w-4 h-4" />
           {intl.formatMessage({ id: 'kit.download' })}
         </button>
-      </main>
-    </div>
+    </PageContainer>
   )
 }

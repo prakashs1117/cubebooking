@@ -1,6 +1,7 @@
 import { writeBatch, doc, collection, serverTimestamp } from 'firebase/firestore'
 import { db } from '../shared/firebase'
 import { toSlotDocId, toTeacherSlotDocId } from '../config/slots'
+import { toadSlotDocRef } from './toadSlotService'
 import type { BookingSegment } from '../shared/types'
 
 export class SlotTakenError extends Error {
@@ -15,6 +16,7 @@ export interface CreateBookingParams {
   teacherName: string
   teacherEmail: string
   schoolId: string
+  schoolName?: string
   visitType: 'onsite' | 'toad'
   segments: BookingSegment[]
   grade: string
@@ -25,7 +27,7 @@ export interface CreateBookingParams {
 }
 
 export async function createBooking(params: CreateBookingParams): Promise<{ bookingId: string }> {
-  const { uid, teacherName, teacherEmail, schoolId, visitType, segments, grade, studentCount, accessNeeds, bookingCode, truckParking } = params
+  const { uid, teacherName, teacherEmail, schoolId, schoolName, visitType, segments, grade, studentCount, accessNeeds, bookingCode, truckParking } = params
 
   const batch = writeBatch(db)
   const bookingRef = doc(collection(db, 'bookings'))
@@ -36,6 +38,7 @@ export async function createBooking(params: CreateBookingParams): Promise<{ book
     teacherName,
     teacherEmail,
     schoolId,
+    ...(schoolName ? { schoolName } : {}),
     segments,
     grade,
     studentCount,
@@ -45,6 +48,21 @@ export async function createBooking(params: CreateBookingParams): Promise<{ book
     ...(truckParking ? { truckParking } : {}),
     createdAt: serverTimestamp(),
   })
+
+  if (visitType === 'toad') {
+    // Mark the toadSlots date as confirmed atomically with the booking.
+    // Use set+merge so it works whether or not a hold doc exists (hold may
+    // have expired or not been acquired if the teacher navigated directly).
+    const toadDate = segments[0]?.date
+    if (toadDate) {
+      batch.set(toadSlotDocRef(toadDate), {
+        date: toadDate,
+        status: 'confirmed',
+        teacherId: uid,
+        bookingId: bookingRef.id,
+      }, { merge: true })
+    }
+  }
 
   if (visitType !== 'toad') {
     for (const seg of segments) {

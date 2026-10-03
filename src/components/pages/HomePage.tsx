@@ -729,22 +729,27 @@ export default function HomePage() {
   return (
     <div
       className="flex flex-col"
-      style={{ background: 'var(--app-ground)', fontFamily: 'var(--font-sans)', color: 'var(--foreground)', minHeight: '100%' }}
+      style={{ background: 'var(--app-ground)', fontFamily: 'var(--font-sans)', color: 'var(--foreground)' }}
     >
-      <main className="flex-1 px-4 md:px-6 lg:px-10 py-6 flex flex-col gap-5 max-w-3xl lg:max-w-none mx-auto w-full pb-24 lg:pb-10">
+      <main className="flex-1 px-4 md:px-6 lg:px-10 pt-4 lg:pt-6 pb-24 lg:pb-10 flex flex-col gap-5 max-w-3xl lg:max-w-none mx-auto w-full">
 
         {/* Greeting — hidden on desktop (desktop shows its own greeting row below) */}
-        <div className="rise flex flex-col gap-0.5 lg:hidden">
-          <div className="text-sm" style={{ color: 'var(--muted-foreground)' }}>
-            {intl.formatMessage({ id: greetingKey })},
+        <div className="rise flex items-center justify-between gap-2 lg:hidden">
+          <div className="flex flex-col gap-0" style={{ minWidth: 0 }}>
+            <span className="text-xs font-medium" style={{ color: 'var(--muted-foreground)' }}>
+              {intl.formatMessage({ id: greetingKey })}
+            </span>
+            <h1 className="m-0 text-xl font-extrabold tracking-tight leading-tight truncate" style={{ fontFamily: 'var(--font-display)' }}>
+              {name}
+            </h1>
           </div>
-          <h1 className="m-0 text-3xl font-extrabold tracking-tight leading-tight" style={{ fontFamily: 'var(--font-display)' }}>
-            {name}
-          </h1>
           {profile?.schoolName && (
-            <div className="text-xs mt-0.5 font-medium" style={{ color: 'var(--muted-foreground)' }}>
+            <span
+              className="flex-none text-xs font-semibold px-2.5 py-1 rounded-full truncate"
+              style={{ background: 'var(--accent)', color: 'var(--muted-foreground)', maxWidth: '45%' }}
+            >
               {profile.schoolName}
-            </div>
+            </span>
           )}
         </div>
 

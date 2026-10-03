@@ -4,8 +4,10 @@ import { useIntl } from 'react-intl'
 import { useQueryClient } from '@tanstack/react-query'
 import { useAuthContext } from '../../../context/AuthContext'
 import { useBookingStore } from '../../../stores/bookingStore'
+import { useNotificationStore } from '../../../stores/notificationStore'
 import { ContinueButton } from '../BookingLayout'
 import { createBooking } from '../../../services/bookingService'
+import { notifyStaff } from '../../../services/notificationService'
 
 function makeToadCode() {
   const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789'
@@ -19,8 +21,9 @@ interface Props {
 
 export function ToadReviewStep({ onBack, onConfirmed }: Props) {
   const intl = useIntl()
-  const { user, profile } = useAuthContext()
+  const { user, profile, updateProfile } = useAuthContext()
   const { slots, classDetails } = useBookingStore()
+  const pushNotification = useNotificationStore((s) => s.push)
   const queryClient = useQueryClient()
   const [submitting, setSubmitting] = useState(false)
   const [error, setError] = useState<string | null>(null)
@@ -31,6 +34,7 @@ export function ToadReviewStep({ onBack, onConfirmed }: Props) {
   const dateStr = intl.formatDate(slot.start, { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })
 
   const rows = [
+    { id: 'school',   k: intl.formatMessage({ id: 'toadDetails.school.label' }), v: classDetails.schoolName },
     { id: 'date',     k: intl.formatMessage({ id: 'toad.review.row.date' }),   v: dateStr },
     { id: 'grade',    k: intl.formatMessage({ id: 'review.row.grade' }),        v: classDetails.grade },
     { id: 'students', k: intl.formatMessage({ id: 'review.row.students' }),     v: String(classDetails.studentCount) },
@@ -42,12 +46,18 @@ export function ToadReviewStep({ onBack, onConfirmed }: Props) {
     setSubmitting(true)
     setError(null)
     try {
+      // Save school name back to profile if it changed
+      if (classDetails.schoolName && classDetails.schoolName !== profile?.schoolName) {
+        try { await updateProfile({ schoolName: classDetails.schoolName }) } catch { /* non-blocking */ }
+      }
+
       const bookingCode = makeToadCode()
       const { bookingId } = await createBooking({
         uid: user.uid,
         teacherName: profile?.displayName ?? '',
         teacherEmail: user.email ?? '',
         schoolId: profile?.schoolId ?? '',
+        schoolName: classDetails.schoolName,
         visitType: 'toad',
         segments: [{ programId: 'toad', date: slot.date, startHour: 9, order: 1 }],
         grade: classDetails.grade,
@@ -57,8 +67,37 @@ export function ToadReviewStep({ onBack, onConfirmed }: Props) {
         bookingCode,
       })
       queryClient.invalidateQueries({ queryKey: ['bookings'] })
+
+      // Teacher: local notification (pending approval)
+      pushNotification({
+        type: 'info',
+        title: intl.formatMessage({ id: 'toad.notification.teacher.title' }),
+        body: intl.formatMessage(
+          { id: 'toad.notification.teacher.body' },
+          { date: dateStr, code: bookingCode },
+        ),
+        bookingId,
+      })
+
+      // Staff: Firestore fan-out (non-blocking, best-effort)
+      notifyStaff({
+        type: 'info',
+        title: intl.formatMessage({ id: 'toad.notification.staff.title' }),
+        body: intl.formatMessage(
+          { id: 'toad.notification.staff.body' },
+          {
+            school: classDetails.schoolName,
+            date: dateStr,
+            grade: classDetails.grade,
+            count: classDetails.studentCount,
+          },
+        ),
+        bookingId,
+      }).catch(() => { /* non-blocking */ })
+
       onConfirmed(bookingId, bookingCode)
-    } catch {
+    } catch (err) {
+      console.error('[ToadReviewStep] booking failed:', err)
       setError(intl.formatMessage({ id: 'review.error' }))
     } finally {
       setSubmitting(false)

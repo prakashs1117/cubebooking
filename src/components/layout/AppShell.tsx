@@ -2,26 +2,30 @@ import { useState } from 'react'
 import { useNavigate, useLocation } from 'react-router-dom'
 import * as Dialog from '@radix-ui/react-dialog'
 import { useAuthContext } from '../../context/AuthContext'
+import { useStaffNotifications } from '../../hooks/useStaffNotifications'
 
 import DesktopTopBar from './DesktopTopBar'
 import AdminSidebar from './AdminSidebar'
 import { MobileTopBar, MobileTabBar, TabletTopNav, TeacherDrawerContent } from './AppShellMobile'
 
 export default function AppShell({ children }: { children: React.ReactNode }) {
-  const { isStaff } = useAuthContext()
+  const { isStaff, user } = useAuthContext()
   const [drawerOpen, setDrawerOpen] = useState(false)
   const navigate = useNavigate()
   const location = useLocation()
+
+  // Subscribe all signed-in users to their Firestore notification inbox
+  useStaffNotifications(user?.uid)
 
   const handleBook = () => navigate('/home?book=1')
 
   if (isStaff) {
     // ── Staff shell ──────────────────────────────────────────────────────────
     return (
-      <div className="min-h-screen flex" style={{ background: 'var(--app-ground)' }}>
+      <div className="h-screen overflow-hidden flex" style={{ background: 'var(--app-ground)' }}>
 
         {/* Desktop: persistent 264px sidebar */}
-        <aside className="hidden lg:flex flex-col shrink-0 sticky top-0 h-screen overflow-hidden"
+        <aside className="hidden lg:flex flex-col shrink-0 h-full overflow-hidden"
           style={{ width: 264 }}
         >
           <AdminSidebar />
@@ -58,7 +62,7 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
           <TabletTopNav onMenuOpen={() => setDrawerOpen(true)} showBookCta={false} />
 
           {/* Page scroll area */}
-          <div className="flex-1 pb-14 md:pb-0">
+          <div className="flex-1 overflow-y-auto pb-14 md:pb-0">
             {children}
           </div>
         </div>
@@ -71,7 +75,7 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
 
   // ── Teacher shell ──────────────────────────────────────────────────────────
   return (
-    <div className="min-h-screen flex flex-col" style={{ background: 'var(--app-ground)' }}>
+    <div className="h-screen overflow-hidden flex flex-col" style={{ background: 'var(--app-ground)' }}>
 
       {/* Desktop: full-width top bar (hidden on mobile/tablet) */}
       <DesktopTopBar onBook={handleBook} />
@@ -105,7 +109,7 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
       </Dialog.Root>
 
       {/* Page content */}
-      <div className="flex-1 pb-14 md:pb-0">
+      <div className="flex-1 overflow-y-auto pb-14 md:pb-0">
         {children}
       </div>
 

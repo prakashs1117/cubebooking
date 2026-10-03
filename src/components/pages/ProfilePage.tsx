@@ -1,4 +1,5 @@
 import { useRef, useState } from 'react'
+import PageContainer from '../ui/PageContainer'
 import { Shield, Globe, Trash2, Download, ChevronRight, Check, Palette, Pencil, X, Loader2, HelpCircle, MessageSquarePlus, FileText, CheckCircle2 } from 'lucide-react'
 import { useIntl } from 'react-intl'
 import { useAuthContext } from '../../context/AuthContext'
@@ -117,12 +118,8 @@ export default function ProfilePage() {
   }
 
   return (
-    <div
-      className="min-h-dvh flex flex-col max-w-2xl lg:max-w-3xl mx-auto w-full"
-      style={{ background: 'var(--app-ground)', fontFamily: 'var(--font-sans)', color: 'var(--foreground)' }}
-    >
-      <main className="flex-1 scroll overflow-y-auto px-5 pt-6 pb-24 lg:pb-6 flex flex-col gap-4">
-        <h1 className="m-0 text-3xl font-extrabold tracking-tight" style={{ fontFamily: 'var(--font-display)' }}>
+    <PageContainer className="gap-4">
+        <h1 className="m-0 text-3xl font-extrabold tracking-tight hidden lg:block" style={{ fontFamily: 'var(--font-display)' }}>
           {intl.formatMessage({ id: 'profile.title' })}
         </h1>
 
@@ -344,7 +341,6 @@ export default function ProfilePage() {
         <p className="text-center text-xs" style={{ color: 'var(--muted-foreground)' }}>
           {intl.formatMessage({ id: 'profile.footer' })}
         </p>
-      </main>
-    </div>
+    </PageContainer>
   )
 }

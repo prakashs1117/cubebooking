@@ -1,6 +1,10 @@
 import { useState } from 'react'
-import { useParams, useNavigate } from 'react-router-dom'
-import { ChevronLeft, Share2, CalendarPlus, MapPin, Clock, Users, GraduationCap, QrCode, ChevronDown, CheckCircle2 } from 'lucide-react'
+import { useParams, useNavigate, Link } from 'react-router-dom'
+import {
+  ChevronLeft, CalendarPlus, MapPin, Clock, Users, GraduationCap,
+  QrCode, CheckCircle2, AlertCircle, Truck, RefreshCw, XCircle, School,
+  X,
+} from 'lucide-react'
 import { useIntl } from 'react-intl'
 import { doc, writeBatch, serverTimestamp } from 'firebase/firestore'
 import { db } from '../../shared/firebase'
@@ -10,17 +14,102 @@ import { trackBookingCancelled } from '../../services/analyticsService'
 import { CancelBookingDialog } from '../booking/CancelBookingDialog'
 import { BookingQRCode } from '../ui/BookingQRCode'
 
-function makeCalendarUrl(title: string, start: Date, end: Date, details = '') {
+// ─── Helpers ──────────────────────────────────────────────────────────────────
+
+function makeCalendarUrl(title: string, start: Date, end: Date, location: string, details = '') {
   const fmt = (d: Date) => d.toISOString().replace(/[-:]/g, '').replace('.000', '')
-  const params = new URLSearchParams({
-    action: 'TEMPLATE',
-    text: title,
+  return `https://calendar.google.com/calendar/render?${new URLSearchParams({
+    action: 'TEMPLATE', text: title,
     dates: `${fmt(start)}/${fmt(end)}`,
-    details,
-    location: 'Merck KGaA, Frankfurter Str. 250, 64293 Darmstadt',
-  })
-  return `https://calendar.google.com/calendar/render?${params}`
+    details, location,
+  })}`
 }
+
+type BookingStatus = 'pending' | 'approved' | 'declined' | 'confirmed' | 'arrived' | 'cancelled'
+
+interface StatusCfg { label: string; color: string; bg: string; icon: React.ElementType }
+
+function getStatusCfg(status: BookingStatus, isToad: boolean, intl: ReturnType<typeof useIntl>): StatusCfg {
+  switch (status) {
+    case 'confirmed': return { label: intl.formatMessage({ id: 'bookingDetail.status.confirmed' }), color: 'var(--brand-green)', bg: 'rgba(1,136,76,0.15)', icon: CheckCircle2 }
+    case 'arrived':   return { label: intl.formatMessage({ id: 'bookingDetail.status.arrived' }), color: 'var(--brand-green)', bg: 'rgba(1,136,76,0.15)', icon: CheckCircle2 }
+    case 'approved':  return { label: intl.formatMessage({ id: 'bookingDetail.status.approved' }), color: 'var(--brand-green)', bg: 'rgba(1,136,76,0.15)', icon: CheckCircle2 }
+    case 'pending':   return { label: isToad ? intl.formatMessage({ id: 'bookings.status.awaitingApproval' }) : intl.formatMessage({ id: 'bookingDetail.status.pending' }), color: 'var(--brand-orange)', bg: 'rgba(217,119,6,0.15)', icon: Clock }
+    case 'declined':  return { label: intl.formatMessage({ id: 'bookingDetail.status.declined' }), color: 'var(--destructive)', bg: 'rgba(220,38,38,0.12)', icon: XCircle }
+    default:          return { label: intl.formatMessage({ id: 'bookingDetail.status.cancelled' }), color: 'var(--muted-foreground)', bg: 'rgba(100,116,139,0.10)', icon: XCircle }
+  }
+}
+
+// ─── Detail row — compact for mobile ─────────────────────────────────────────
+
+function Row({ icon: Icon, label, value }: { icon: React.ElementType; label: string; value: string }) {
+  return (
+    <div className="flex items-start gap-3 px-3.5 min-h-[44px] py-2.5 border-b last:border-b-0" style={{ borderColor: 'var(--border)' }}>
+      <Icon className="w-3.5 h-3.5 flex-none mt-0.5" style={{ color: 'var(--muted-foreground)' }} />
+      <span className="w-24 text-xs flex-none leading-relaxed" style={{ color: 'var(--muted-foreground)' }}>{label}</span>
+      <span className="flex-1 text-sm font-medium leading-relaxed" style={{ color: 'var(--foreground)' }}>{value}</span>
+    </div>
+  )
+}
+
+// ─── Quick action pill ────────────────────────────────────────────────────────
+
+function ActionPill({ icon: Icon, label, onClick, active, color }: {
+  icon: React.ElementType
+  label: string
+  onClick?: () => void
+  active?: boolean
+  color?: string
+}) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      className="tap flex-1 flex flex-col items-center justify-center gap-1.5 py-3 rounded-2xl"
+      style={{
+        background: active ? 'rgba(99,102,241,0.10)' : 'var(--card)',
+        border: `1.5px solid ${active ? 'var(--primary)' : 'var(--border)'}`,
+        color: color ?? (active ? 'var(--primary)' : 'var(--foreground)'),
+      }}
+    >
+      <Icon style={{ width: 20, height: 20 }} />
+      <span style={{ fontSize: 11, fontWeight: 600, letterSpacing: '0.01em' }}>{label}</span>
+    </button>
+  )
+}
+
+// ─── QR Sheet (full-width panel that slides in below quick actions) ───────────
+
+function QRSheet({ bookingId, onClose }: { bookingId: string; onClose: () => void }) {
+  return (
+    <div
+      className="rounded-2xl overflow-hidden border"
+      style={{ background: 'var(--card)', borderColor: 'var(--border)' }}
+    >
+      {/* Sheet header */}
+      <div className="flex items-center justify-between px-4 py-3 border-b" style={{ borderColor: 'var(--border)' }}>
+        <div className="flex items-center gap-2">
+          <QrCode style={{ width: 16, height: 16, color: 'var(--primary)' }} />
+          <span className="text-sm font-semibold">Entry QR Code</span>
+        </div>
+        <button type="button" onClick={onClose} className="iconbtn tap" style={{ width: 28, height: 28, color: 'var(--muted-foreground)' }}>
+          <X style={{ width: 14, height: 14 }} />
+        </button>
+      </div>
+      {/* QR */}
+      <div className="flex flex-col items-center gap-3 px-5 py-5">
+        <div className="p-3.5 rounded-2xl" style={{ background: '#ffffff', boxShadow: '0 2px 16px rgba(0,0,0,0.10)' }}>
+          <BookingQRCode bookingId={bookingId} size={200} />
+        </div>
+        <p className="m-0 text-xs text-center leading-relaxed" style={{ color: 'var(--muted-foreground)', maxWidth: 220 }}>
+          Show this code at the venue entrance for quick check-in
+        </p>
+      </div>
+    </div>
+  )
+}
+
+// ─── Page ──────────────────────────────────────────────────────────────────────
 
 export default function BookingDetailPage() {
   const { id } = useParams<{ id: string }>()
@@ -31,262 +120,305 @@ export default function BookingDetailPage() {
   const [cancelDialogOpen, setCancelDialogOpen] = useState(false)
   const [qrOpen, setQrOpen] = useState(false)
 
-  // Derive times from segment date+startHour
   const firstSeg = booking?.segments?.[0]
-  const lastSeg = booking?.segments?.[booking.segments.length - 1]
-  const times = firstSeg?.date != null && firstSeg?.startHour != null && lastSeg?.date != null && lastSeg?.startHour != null
-    ? {
-        startDate: slotToDate(firstSeg.date, firstSeg.startHour),
-        endDate: slotEndDate(lastSeg.date, lastSeg.startHour),
-      }
+  const lastSeg  = booking?.segments?.[(booking.segments.length ?? 1) - 1]
+  const times = firstSeg?.date && firstSeg?.startHour != null
+    ? { startDate: slotToDate(firstSeg.date, firstSeg.startHour), endDate: slotEndDate(lastSeg!.date, lastSeg!.startHour) }
     : { startDate: null, endDate: null }
+
+  // Must be called unconditionally before any early returns (Rules of Hooks)
+  const isToadEarly = booking?.type === 'toad'
+  const statusEarly = (booking?.status ?? 'cancelled') as BookingStatus
+  const scfg = getStatusCfg(statusEarly, isToadEarly, intl)
+  const StatusIcon = scfg.icon
 
   const handleConfirmCancel = async () => {
     if (!id || !booking) return
-
     setCancelling(true)
     try {
       const batch = writeBatch(db)
       batch.update(doc(db, 'bookings', id), { status: 'cancelled', updatedAt: serverTimestamp() })
-
       if (booking.type !== 'toad') {
         for (const seg of booking.segments ?? []) {
           batch.delete(doc(db, 'slots', toSlotDocId(seg.date, seg.programId, seg.startHour)))
         }
-
         const uniqueHours = [...new Set((booking.segments ?? []).map((s) => `${s.date}:${s.startHour}`))]
         for (const key of uniqueHours) {
           const [date, hourStr] = key.split(':')
           batch.delete(doc(db, 'teacherSlots', toTeacherSlotDocId(booking.teacherId, date, Number(hourStr))))
         }
       }
-
       await batch.commit()
       trackBookingCancelled(id, 'user_cancelled')
       setCancelDialogOpen(false)
       navigate('/bookings', { replace: true })
-    } catch (err) {
-      console.error('Failed to cancel booking:', err)
-      alert(intl.formatMessage({ id: 'bookingDetail.cancelError' }) || 'Failed to cancel booking. Please try again.')
+    } catch {
+      alert(intl.formatMessage({ id: 'bookingDetail.cancelError' }) || 'Failed to cancel. Please try again.')
       setCancelling(false)
     }
   }
 
   if (isLoading) return (
-    <div className="min-h-screen flex items-center justify-center" style={{ background: 'var(--app-ground)' }}>
+    <div className="flex-1 flex items-center justify-center" style={{ background: 'var(--app-ground)' }}>
       <div className="w-8 h-8 rounded-full border-2 animate-spin" style={{ borderColor: 'var(--border)', borderTopColor: 'var(--primary)' }} />
     </div>
   )
-
   if (error || !booking) return (
-    <div className="min-h-screen flex flex-col items-center justify-center gap-3 px-5" style={{ background: 'var(--app-ground)' }}>
-      <p className="text-sm" style={{ color: 'var(--muted-foreground)' }}>
-        {intl.formatMessage({ id: 'bookingDetail.notFound' })}
-      </p>
+    <div className="flex-1 flex flex-col items-center justify-center gap-3 px-5" style={{ background: 'var(--app-ground)' }}>
+      <p className="text-sm" style={{ color: 'var(--muted-foreground)' }}>{intl.formatMessage({ id: 'bookingDetail.notFound' })}</p>
       <button type="button" onClick={() => navigate('/bookings')} className="tap text-sm font-semibold" style={{ color: 'var(--primary)' }}>
         {intl.formatMessage({ id: 'bookingDetail.backToBookings' })}
       </button>
     </div>
   )
 
-  const ids = [...new Set(booking.segments?.map((s) => s.programId) ?? [])]
-  const isBoth = ids.length > 1
-  const headerBg = isBoth ? 'var(--brand-purple)' : ids[0] === 'cube' ? 'var(--brand-mint)' : ids[0] === 'lab' ? 'var(--brand-yellow)' : 'var(--brand-magenta)'
+  const isToad   = booking.type === 'toad'
+  const progIds  = [...new Set(booking.segments?.map((s) => s.programId) ?? [])]
+  const isBoth   = progIds.length > 1
+  const accentBg = isBoth ? 'var(--brand-purple)'
+    : progIds[0] === 'cube' ? 'var(--brand-mint)'
+    : progIds[0] === 'lab'  ? 'var(--brand-yellow)'
+    : 'var(--brand-magenta)'
+
   const programTitle = isBoth
     ? intl.formatMessage({ id: 'program.both.visit' })
-    : ids[0] === 'cube'
-    ? intl.formatMessage({ id: 'program.cube' })
-    : ids[0] === 'lab'
-    ? intl.formatMessage({ id: 'program.lab' })
+    : progIds[0] === 'cube' ? intl.formatMessage({ id: 'program.cube' })
+    : progIds[0] === 'lab'  ? intl.formatMessage({ id: 'program.lab' })
     : intl.formatMessage({ id: 'program.toad' })
 
-  const startDate = times?.startDate ?? null
-  const endDate   = times?.endDate   ?? null
+  const status = booking.status as BookingStatus
 
-  const statusLabel = booking.status === 'confirmed'
-    ? intl.formatMessage({ id: 'bookingDetail.status.confirmed' })
-    : booking.status === 'arrived'
-    ? intl.formatMessage({ id: 'bookingDetail.status.arrived' })
-    : booking.status === 'pending'
-    ? intl.formatMessage({ id: 'bookingDetail.status.pending' })
-    : booking.status === 'approved'
-    ? intl.formatMessage({ id: 'bookingDetail.status.approved' })
-    : intl.formatMessage({ id: 'bookingDetail.status.cancelled' })
+  const startDate = times.startDate
+  const endDate   = times.endDate
 
   const arrivedAtDate = booking.arrivedAt
     ? new Date((booking.arrivedAt as unknown as { seconds: number }).seconds * 1000)
     : null
 
-  const rows = [
-    ...(startDate ? [{
-      icon: Clock,
-      label: intl.formatMessage({ id: 'bookingDetail.row.dateTime' }),
-      value: `${intl.formatDate(startDate, { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })} · ${intl.formatDate(startDate, { hour: '2-digit', minute: '2-digit', hour12: false })}–${endDate ? intl.formatDate(endDate, { hour: '2-digit', minute: '2-digit', hour12: false }) : ''}`,
-    }] : []),
-    { icon: MapPin, label: intl.formatMessage({ id: 'bookingDetail.row.location' }), value: intl.formatMessage({ id: 'bookingDetail.location.value' }) },
-    { icon: GraduationCap, label: intl.formatMessage({ id: 'bookingDetail.row.grade' }), value: intl.formatMessage({ id: 'bookingDetail.grade.value' }, { grade: booking.grade }) },
-    { icon: Users, label: intl.formatMessage({ id: 'bookingDetail.row.students' }), value: intl.formatMessage({ id: 'bookingDetail.students.value' }, { count: booking.studentCount }) },
-    ...(booking.accessNeeds ? [{ icon: Users, label: intl.formatMessage({ id: 'bookingDetail.row.access' }), value: booking.accessNeeds }] : []),
-    ...(booking.type === 'toad' && booking.truckParking ? [{ icon: MapPin, label: intl.formatMessage({ id: 'bookingDetail.row.parking' }), value: booking.truckParking }] : []),
-  ]
+  const calendarLocation = isToad
+    ? (booking.truckParking ?? booking.schoolName ?? '')
+    : 'Merck KGaA, Frankfurter Str. 250, 64293 Darmstadt'
+
+  const canShowQr  = !!id && status !== 'cancelled' && status !== 'declined' && !(isToad && status === 'pending')
+  const canCalendar = !!startDate && !!endDate && (status === 'confirmed' || status === 'arrived' || (isToad && status === 'approved'))
+  const canCancel  = status !== 'cancelled' && status !== 'declined'
+  const hasActions = canShowQr || canCalendar || (isToad && status === 'declined')
 
   return (
     <div
-      className="min-h-screen flex flex-col max-w-2xl lg:max-w-3xl mx-auto w-full"
+      className="flex flex-col max-w-2xl lg:max-w-3xl mx-auto w-full pb-24 lg:pb-8"
       style={{ background: 'var(--app-ground)', fontFamily: 'var(--font-sans)', color: 'var(--foreground)' }}
     >
-      {/* Mint hero header */}
-      <div className="relative overflow-hidden px-3 pt-3 pb-5" style={{ background: headerBg }}>
-        <div style={{ position: 'absolute', right: -40, bottom: -80, width: 220, height: 220, borderRadius: '9999px', background: 'var(--brand-yellow)', opacity: 0.7 }} />
-        <div style={{ position: 'absolute', right: 120, top: -30, width: 90, height: 90, borderRadius: '9999px', border: '14px solid rgba(255,255,255,0.55)', boxSizing: 'border-box' }} />
 
-        <div className="relative flex justify-between mb-4">
-          <button type="button" onClick={() => navigate(-1)} className="iconbtn tap" aria-label="Back" style={{ background: 'rgba(255,255,255,0.7)' }}>
-            <ChevronLeft className="i" />
+      {/* ── HERO ────────────────────────────────────────────────────────────── */}
+      <div className="relative overflow-hidden px-3 pt-2.5 pb-5" style={{ background: accentBg }}>
+        {/* Subtle decorative circle */}
+        <div style={{ position: 'absolute', right: -30, top: -30, width: 160, height: 160, borderRadius: '9999px', background: 'rgba(255,255,255,0.10)', pointerEvents: 'none' }} />
+        <div style={{ position: 'absolute', right: 80, bottom: -50, width: 100, height: 100, borderRadius: '9999px', background: 'rgba(255,255,255,0.07)', pointerEvents: 'none' }} />
+
+        {/* Nav row */}
+        <div className="relative flex items-center justify-between mb-3">
+          <button
+            type="button"
+            onClick={() => navigate(-1)}
+            className="iconbtn tap"
+            aria-label="Back"
+            style={{ background: 'rgba(255,255,255,0.20)', backdropFilter: 'blur(8px)', color: '#fff', width: 36, height: 36 }}
+          >
+            <ChevronLeft style={{ width: 18, height: 18 }} />
           </button>
-          <button type="button" className="iconbtn tap" aria-label="Share booking" style={{ background: 'rgba(255,255,255,0.7)' }}>
-            <Share2 className="i" />
-          </button>
+
+          {/* Status pill — top right */}
+          <span
+            className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-bold"
+            style={{ background: 'rgba(255,255,255,0.20)', backdropFilter: 'blur(8px)', color: '#fff' }}
+          >
+            <StatusIcon style={{ width: 11, height: 11 }} />
+            {scfg.label}
+          </span>
         </div>
 
-        <div className="relative flex flex-col gap-1.5 px-2">
-          <span
-            className="self-start inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-bold"
-            style={{
-              background: 'var(--background)',
-              color: booking.status === 'confirmed' || booking.status === 'arrived' || booking.status === 'approved'
-                ? 'var(--brand-green)'
-                : booking.status === 'pending'
-                ? 'var(--brand-orange)'
-                : 'var(--muted-foreground)',
-            }}
-          >
-            {(booking.status === 'confirmed' || booking.status === 'arrived' || booking.status === 'approved') && '✓'} {statusLabel}
-          </span>
-          {booking.type === 'toad' && booking.status === 'pending' && (
-            <p className="m-0 text-sm" style={{ color: 'var(--muted-foreground)' }}>
-              {intl.formatMessage({ id: 'bookingDetail.toad.pendingNote' })}
-            </p>
-          )}
-          {booking.type === 'toad' && booking.status === 'approved' && (
-            <p className="m-0 text-sm" style={{ color: 'var(--brand-green)' }}>
-              {intl.formatMessage({ id: 'bookingDetail.toad.approvedNote' })}
-            </p>
-          )}
-          {booking.type === 'toad' && booking.status === 'declined' && (
-            <>
-              <p className="m-0 text-sm font-medium" style={{ color: 'var(--destructive)' }}>
-                {intl.formatMessage({ id: 'bookingDetail.toad.declinedNote' })}
-              </p>
-              {booking.declineReason && (
-                <p className="m-0 text-sm" style={{ color: 'var(--muted-foreground)' }}>
-                  {booking.declineReason}
-                </p>
-              )}
-            </>
-          )}
-          <h1 className="m-0 text-3xl font-extrabold tracking-tight" style={{ fontFamily: 'var(--font-display)', color: isBoth ? '#fff' : 'var(--foreground)' }}>
+        {/* Content */}
+        <div className="relative flex flex-col gap-1 px-0.5">
+          {isToad && <Truck style={{ width: 18, height: 18, color: 'rgba(255,255,255,0.85)', marginBottom: 2 }} />}
+
+          <h1 className="m-0 font-extrabold tracking-tight" style={{ fontFamily: 'var(--font-display)', fontSize: 26, lineHeight: '32px', color: '#fff' }}>
             {programTitle}
           </h1>
+
           {startDate && (
-            <div className="text-sm font-medium" style={{ color: isBoth ? 'rgba(255,255,255,0.85)' : 'var(--muted-foreground)' }}>
-              {intl.formatDate(startDate, { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })}
+            <p className="m-0 text-sm font-medium" style={{ color: 'rgba(255,255,255,0.85)' }}>
+              {intl.formatDate(startDate, { weekday: 'short', day: 'numeric', month: 'short', year: 'numeric' })}
+              {endDate && (
+                <span style={{ color: 'rgba(255,255,255,0.65)' }}>
+                  {' · '}{intl.formatDate(startDate, { hour: '2-digit', minute: '2-digit', hour12: false })}–{intl.formatDate(endDate, { hour: '2-digit', minute: '2-digit', hour12: false })}
+                </span>
+              )}
+            </p>
+          )}
+
+          {isToad && booking.schoolName && (
+            <p className="m-0 text-xs font-medium mt-0.5" style={{ color: 'rgba(255,255,255,0.70)' }}>{booking.schoolName}</p>
+          )}
+
+          {/* Booking code — prominent, scannable */}
+          {booking.bookingCode && (
+            <div className="mt-2 self-start flex items-center gap-1.5 px-3 py-1.5 rounded-xl"
+              style={{ background: 'rgba(0,0,0,0.20)', backdropFilter: 'blur(8px)' }}>
+              <span className="text-xs font-bold tracking-widest" style={{ color: 'rgba(255,255,255,0.75)', letterSpacing: '0.18em', fontSize: 9, textTransform: 'uppercase' }}>CODE</span>
+              <span className="font-extrabold" style={{ color: '#fff', fontSize: 16, fontFamily: 'var(--font-display)', letterSpacing: '0.08em' }}>
+                {booking.bookingCode}
+              </span>
             </div>
           )}
         </div>
       </div>
 
-      {/* Detail rows */}
-      <div className="flex-1 scroll overflow-y-auto px-5 py-5 flex flex-col gap-4 pb-24 lg:pb-6">
-        <div className="rounded-2xl border overflow-hidden" style={{ background: 'var(--card)', borderColor: 'var(--border)' }}>
-          {rows.map((row, i) => (
-            <div key={i} className="flex items-center gap-3 px-4 min-h-[52px] border-b last:border-b-0" style={{ borderColor: 'var(--border)' }}>
-              <row.icon className="w-4 h-4 flex-none" style={{ color: 'var(--muted-foreground)' }} />
-              <span className="w-28 text-xs" style={{ color: 'var(--muted-foreground)' }}>{row.label}</span>
-              <span className="flex-1 text-sm font-semibold">{row.value}</span>
-            </div>
-          ))}
-        </div>
-
-        {/* Attendance confirmation banner */}
-        {arrivedAtDate && (
-          <div
-            className="flex items-center gap-3 px-4 py-3 rounded-2xl"
-            style={{ background: 'rgba(1,136,76,0.08)', color: 'var(--brand-green)' }}
-          >
-            <CheckCircle2 className="w-5 h-5 flex-none" />
-            <span className="text-sm font-semibold">
-              {intl.formatMessage(
-                { id: 'bookingDetail.arrivedAt' },
-                { time: intl.formatDate(arrivedAtDate, { hour: '2-digit', minute: '2-digit', hour12: false }) }
-              )}
-            </span>
-          </div>
-        )}
-
-        {/* QR code — expandable (for TOAD: only show after approval; for onsite: all non-cancelled) */}
-        {id && booking.status !== 'cancelled' && booking.status !== 'declined'
-          && !(booking.type === 'toad' && booking.status === 'pending') && (
-          <div className="rounded-2xl border overflow-hidden" style={{ background: 'var(--card)', borderColor: 'var(--border)' }}>
-            <button
-              type="button"
+      {/* ── QUICK ACTIONS ───────────────────────────────────────────────────── */}
+      {hasActions && (
+        <div className="px-3 pt-3 flex gap-2.5">
+          {canShowQr && (
+            <ActionPill
+              icon={QrCode}
+              label="QR Code"
               onClick={() => setQrOpen((o) => !o)}
-              className="tap w-full flex items-center gap-3 px-4 min-h-[52px]"
-            >
-              <QrCode className="w-4 h-4 flex-none" style={{ color: 'var(--muted-foreground)' }} />
-              <span className="flex-1 text-sm font-semibold text-left">
-                {intl.formatMessage({ id: 'bookingDetail.qr.label' })}
-              </span>
-              <ChevronDown
-                className="w-4 h-4 flex-none transition-transform"
-                style={{
-                  color: 'var(--muted-foreground)',
-                  transform: qrOpen ? 'rotate(180deg)' : 'rotate(0deg)',
-                }}
-              />
-            </button>
-            {qrOpen && (
-              <div className="flex flex-col items-center gap-3 px-4 pb-5 pt-1 border-t" style={{ borderColor: 'var(--border)' }}>
-                <div className="p-3 rounded-2xl" style={{ background: '#ffffff' }}>
-                  <BookingQRCode bookingId={id} size={180} />
-                </div>
-                <p className="m-0 text-xs text-center" style={{ color: 'var(--muted-foreground)' }}>
-                  {intl.formatMessage({ id: 'bookingDetail.qr.hint' })}
-                </p>
-              </div>
-            )}
-          </div>
-        )}
-
-        {/* Actions */}
-        <div className="flex flex-col gap-2.5">
-          {startDate && endDate && (
+              active={qrOpen}
+            />
+          )}
+          {canCalendar && (
             <a
               href={makeCalendarUrl(
-                `Curiosity ${programTitle} – Class ${booking.grade}`,
-                startDate,
-                endDate,
-                `${booking.studentCount} students · Grade ${booking.grade} · ${intl.formatDate(startDate, { hour: '2-digit', minute: '2-digit', hour12: false })}–${intl.formatDate(endDate, { hour: '2-digit', minute: '2-digit', hour12: false })}`,
+                `${programTitle} – Class ${booking.grade}`,
+                startDate!, endDate!, calendarLocation,
+                `${booking.studentCount} students · Grade ${booking.grade}`,
               )}
               target="_blank"
               rel="noopener noreferrer"
-              className="tap w-full h-12 rounded-xl flex items-center justify-center gap-2 text-sm font-semibold"
-              style={{ background: 'var(--primary)', color: '#fff', textDecoration: 'none' }}
+              className="tap flex-1 flex flex-col items-center justify-center gap-1.5 py-3 rounded-2xl"
+              style={{ background: 'var(--card)', border: '1.5px solid var(--border)', color: 'var(--foreground)', textDecoration: 'none' }}
             >
-              <CalendarPlus className="w-4 h-4" />
-              {intl.formatMessage({ id: 'bookingDetail.addToCalendar' })}
+              <CalendarPlus style={{ width: 20, height: 20 }} />
+              <span style={{ fontSize: 11, fontWeight: 600 }}>{intl.formatMessage({ id: 'bookingDetail.addToCalendar' })}</span>
             </a>
           )}
-          {booking.status !== 'cancelled' && (
-            <CancelBookingDialog
-              open={cancelDialogOpen}
-              onOpenChange={setCancelDialogOpen}
-              onConfirm={handleConfirmCancel}
-              isLoading={cancelling}
+          {isToad && status === 'declined' && (
+            <Link
+              to="/home?book=1"
+              className="tap flex-1 flex flex-col items-center justify-center gap-1.5 py-3 rounded-2xl"
+              style={{ background: 'var(--tint-magenta)', border: '1.5px solid rgba(217,70,239,0.25)', color: 'var(--brand-magenta)', textDecoration: 'none' }}
+            >
+              <RefreshCw style={{ width: 20, height: 20 }} />
+              <span style={{ fontSize: 11, fontWeight: 600 }}>{intl.formatMessage({ id: 'bookingDetail.toad.bookAnother' })}</span>
+            </Link>
+          )}
+        </div>
+      )}
+
+      {/* ── QR SHEET (inline, below quick actions) ──────────────────────────── */}
+      {qrOpen && id && (
+        <div className="px-3 pt-2.5">
+          <QRSheet bookingId={id} onClose={() => setQrOpen(false)} />
+        </div>
+      )}
+
+      {/* ── TOAD CONTEXT NOTE ───────────────────────────────────────────────── */}
+      {isToad && status === 'pending' && (
+        <div className="mx-3 mt-3 flex gap-2.5 items-start px-3.5 py-3 rounded-2xl"
+          style={{ background: 'rgba(217,119,6,0.07)', border: '1px solid rgba(217,119,6,0.18)' }}>
+          <Clock style={{ width: 16, height: 16, color: 'var(--brand-orange)', flexShrink: 0, marginTop: 1 }} />
+          <div>
+            <p className="m-0 text-xs font-semibold" style={{ color: 'var(--brand-orange)' }}>
+              {intl.formatMessage({ id: 'bookingDetail.toad.pendingTitle' })}
+            </p>
+            <p className="m-0 text-xs leading-relaxed mt-0.5" style={{ color: 'var(--foreground)', opacity: 0.8 }}>
+              {intl.formatMessage({ id: 'bookingDetail.toad.pendingNote' })}
+            </p>
+          </div>
+        </div>
+      )}
+      {isToad && status === 'approved' && (
+        <div className="mx-3 mt-3 flex gap-2.5 items-start px-3.5 py-3 rounded-2xl"
+          style={{ background: 'rgba(1,136,76,0.07)', border: '1px solid rgba(1,136,76,0.18)' }}>
+          <CheckCircle2 style={{ width: 16, height: 16, color: 'var(--brand-green)', flexShrink: 0, marginTop: 1 }} />
+          <div>
+            <p className="m-0 text-xs font-semibold" style={{ color: 'var(--brand-green)' }}>
+              {intl.formatMessage({ id: 'bookingDetail.toad.approvedTitle' })}
+            </p>
+            <p className="m-0 text-xs leading-relaxed mt-0.5" style={{ color: 'var(--foreground)', opacity: 0.8 }}>
+              {intl.formatMessage({ id: 'bookingDetail.toad.approvedNote' })}
+            </p>
+          </div>
+        </div>
+      )}
+      {isToad && status === 'declined' && (
+        <div className="mx-3 mt-3 flex gap-2.5 items-start px-3.5 py-3 rounded-2xl"
+          style={{ background: 'rgba(220,38,38,0.05)', border: '1px solid rgba(220,38,38,0.18)' }}>
+          <XCircle style={{ width: 16, height: 16, color: 'var(--destructive)', flexShrink: 0, marginTop: 1 }} />
+          <div className="flex flex-col gap-1 min-w-0">
+            <p className="m-0 text-xs font-semibold" style={{ color: 'var(--destructive)' }}>
+              {intl.formatMessage({ id: 'bookingDetail.toad.declinedTitle' })}
+            </p>
+            <p className="m-0 text-xs leading-relaxed" style={{ color: 'var(--foreground)', opacity: 0.8 }}>
+              {intl.formatMessage({ id: 'bookingDetail.toad.declinedNote' })}
+            </p>
+            {booking.declineReason && (
+              <p className="m-0 text-xs font-medium px-2.5 py-1.5 rounded-lg mt-0.5" style={{ background: 'rgba(220,38,38,0.08)', color: 'var(--destructive)' }}>
+                "{booking.declineReason}"
+              </p>
+            )}
+          </div>
+        </div>
+      )}
+
+      {/* ── DETAIL CARD ─────────────────────────────────────────────────────── */}
+      <div className="px-3 mt-3">
+        <div className="rounded-2xl border overflow-hidden" style={{ background: 'var(--card)', borderColor: 'var(--border)' }}>
+          {startDate && (
+            <Row icon={Clock}
+              label={intl.formatMessage({ id: 'bookingDetail.row.dateTime' })}
+              value={`${intl.formatDate(startDate, { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })}`}
             />
+          )}
+          {isToad && booking.schoolName && (
+            <Row icon={School} label={intl.formatMessage({ id: 'toadDetails.school.label' })} value={booking.schoolName} />
+          )}
+          {!isToad && (
+            <Row icon={MapPin} label={intl.formatMessage({ id: 'bookingDetail.row.location' })} value={intl.formatMessage({ id: 'bookingDetail.location.value' })} />
+          )}
+          <Row icon={GraduationCap} label={intl.formatMessage({ id: 'bookingDetail.row.grade' })} value={intl.formatMessage({ id: 'bookingDetail.grade.value' }, { grade: booking.grade })} />
+          <Row icon={Users} label={intl.formatMessage({ id: 'bookingDetail.row.students' })} value={intl.formatMessage({ id: 'bookingDetail.students.value' }, { count: booking.studentCount })} />
+          {booking.accessNeeds && (
+            <Row icon={AlertCircle} label={intl.formatMessage({ id: 'bookingDetail.row.access' })} value={booking.accessNeeds} />
+          )}
+          {isToad && booking.truckParking && (
+            <Row icon={MapPin} label={intl.formatMessage({ id: 'bookingDetail.row.parking' })} value={booking.truckParking} />
           )}
         </div>
       </div>
+
+      {/* ── ATTENDED BANNER ─────────────────────────────────────────────────── */}
+      {arrivedAtDate && (
+        <div className="mx-3 mt-3 flex items-center gap-2.5 px-3.5 py-3 rounded-2xl"
+          style={{ background: 'rgba(1,136,76,0.08)', border: '1px solid rgba(1,136,76,0.15)' }}>
+          <CheckCircle2 style={{ width: 16, height: 16, color: 'var(--brand-green)', flexShrink: 0 }} />
+          <span className="text-sm font-semibold" style={{ color: 'var(--brand-green)' }}>
+            {intl.formatMessage({ id: 'bookingDetail.arrivedAt' },
+              { time: intl.formatDate(arrivedAtDate, { hour: '2-digit', minute: '2-digit', hour12: false }) })}
+          </span>
+        </div>
+      )}
+
+      {/* ── CANCEL (bottom, secondary) ──────────────────────────────────────── */}
+      {canCancel && (
+        <div className="px-3 mt-4">
+          <CancelBookingDialog
+            open={cancelDialogOpen}
+            onOpenChange={setCancelDialogOpen}
+            onConfirm={handleConfirmCancel}
+            isLoading={cancelling}
+          />
+        </div>
+      )}
     </div>
   )
 }

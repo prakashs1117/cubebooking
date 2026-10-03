@@ -1,74 +1,57 @@
-import { useEffect, useRef, useState, useCallback } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { Html5Qrcode } from 'html5-qrcode'
 import { ChevronLeft, QrCode } from 'lucide-react'
 import { useIntl } from 'react-intl'
 
+const READER_ID = 'qr-reader'
+
 export default function QRScanPage() {
-  const navigate = useNavigate()
-  const intl = useIntl()
-  const videoRef = useRef<HTMLVideoElement>(null)
-  const streamRef = useRef<MediaStream | null>(null)
-  const rafRef = useRef<number>(0)
+  const navigate   = useNavigate()
+  const intl       = useIntl()
+  const scannerRef = useRef<Html5Qrcode | null>(null)
   const [manualId, setManualId] = useState('')
   const [cameraError, setCameraError] = useState<string | null>(null)
-  const hasBarcodeDetector = typeof window !== 'undefined' && 'BarcodeDetector' in window
+  const [scanning, setScanning] = useState(false)
 
-  const stopCamera = useCallback(() => {
-    cancelAnimationFrame(rafRef.current)
-    streamRef.current?.getTracks().forEach((t) => t.stop())
-    streamRef.current = null
-  }, [])
-
-  const handleDetected = useCallback((url: string) => {
-    stopCamera()
-    // Accept both /admin/verify/:id and raw booking IDs
-    const match = url.match(/\/admin\/verify\/([^/?#]+)/)
-    const bookingId = match ? match[1] : url.trim()
+  const handleDetected = (decodedText: string) => {
+    // Stop the scanner before navigating
+    scannerRef.current?.stop().catch(() => {})
+    const match = decodedText.match(/\/admin\/verify\/([^/?#]+)/)
+    const bookingId = match ? match[1] : decodedText.trim()
     if (bookingId) navigate(`/admin/verify/${bookingId}`)
-  }, [stopCamera, navigate])
+  }
 
   useEffect(() => {
-    if (!hasBarcodeDetector) return
+    const scanner = new Html5Qrcode(READER_ID, { verbose: false })
+    scannerRef.current = scanner
 
-    let cancelled = false
-
-    navigator.mediaDevices
-      .getUserMedia({ video: { facingMode: 'environment' } })
-      .then((stream) => {
-        if (cancelled) { stream.getTracks().forEach((t) => t.stop()); return }
-        streamRef.current = stream
-        if (videoRef.current) {
-          videoRef.current.srcObject = stream
-          videoRef.current.play().catch(() => {})
-        }
-
-        // @ts-expect-error BarcodeDetector not yet in TS lib
-        const detector = new window.BarcodeDetector({ formats: ['qr_code'] })
-
-        const tick = async () => {
-          if (cancelled || !videoRef.current) return
-          try {
-            const codes = await detector.detect(videoRef.current)
-            if (codes.length > 0) {
-              handleDetected(codes[0].rawValue)
-              return
-            }
-          } catch {
-            // frame not ready — continue
-          }
-          rafRef.current = requestAnimationFrame(tick)
-        }
-        rafRef.current = requestAnimationFrame(tick)
-      })
+    scanner.start(
+      { facingMode: { exact: 'environment' } },
+      { fps: 10, qrbox: { width: 240, height: 240 }, aspectRatio: 1 },
+      (decodedText) => handleDetected(decodedText),
+      () => { /* scan failure — ignore, keep scanning */ },
+    )
+      .then(() => setScanning(true))
       .catch(() => {
-        if (!cancelled) setCameraError('camera')
+        // Back camera failed — try any camera
+        scanner.start(
+          { facingMode: 'environment' },
+          { fps: 10, qrbox: { width: 240, height: 240 }, aspectRatio: 1 },
+          (decodedText) => handleDetected(decodedText),
+          () => {},
+        )
+          .then(() => setScanning(true))
+          .catch((err) => {
+            console.error('[QRScanPage] camera failed:', err)
+            setCameraError('camera')
+          })
       })
 
     return () => {
-      cancelled = true
-      stopCamera()
+      scanner.stop().catch(() => {})
     }
-  }, [hasBarcodeDetector, handleDetected, stopCamera])
+  }, []) // eslint-disable-line react-hooks/exhaustive-deps
 
   const handleManualSubmit = (e: React.FormEvent) => {
     e.preventDefault()
@@ -77,19 +60,12 @@ export default function QRScanPage() {
   }
 
   return (
-    <div
-      className="min-h-screen flex flex-col"
-      style={{ background: '#0a0a0a', color: '#ffffff', fontFamily: 'var(--font-sans)' }}
-    >
+    <div className="min-h-screen flex flex-col" style={{ background: '#0a0a0a', color: '#ffffff', fontFamily: 'var(--font-sans)' }}>
+
       {/* Header */}
       <div className="flex items-center gap-3 px-4 pt-12 pb-4">
-        <button
-          type="button"
-          onClick={() => navigate('/home')}
-          className="tap iconbtn"
-          aria-label="Back"
-          style={{ background: 'rgba(255,255,255,0.12)' }}
-        >
+        <button type="button" onClick={() => navigate('/home')} className="tap iconbtn" aria-label="Back"
+          style={{ background: 'rgba(255,255,255,0.12)' }}>
           <ChevronLeft className="i" style={{ color: '#ffffff' }} />
         </button>
         <h1 className="m-0 text-lg font-bold" style={{ fontFamily: 'var(--font-display)' }}>
@@ -97,74 +73,56 @@ export default function QRScanPage() {
         </h1>
       </div>
 
-      {/* Camera view or unavailable state */}
+      {/* Camera area */}
       <div className="flex-1 flex flex-col items-center justify-center px-5 gap-6">
-        {hasBarcodeDetector && !cameraError ? (
-          <>
-            {/* Video frame with corner brackets */}
-            <div className="relative" style={{ width: 260, height: 260 }}>
-              <video
-                ref={videoRef}
-                muted
-                autoPlay
-                playsInline
-                style={{
-                  width: 260,
-                  height: 260,
-                  objectFit: 'cover',
-                  borderRadius: 16,
-                  display: 'block',
-                  background: '#1a1a1a',
-                }}
-              />
-              {/* Corner brackets */}
-              {['tl', 'tr', 'bl', 'br'].map((pos) => (
-                <span
-                  key={pos}
-                  aria-hidden="true"
-                  style={{
-                    position: 'absolute',
-                    width: 28,
-                    height: 28,
-                    borderColor: 'var(--brand-mint)',
-                    borderStyle: 'solid',
-                    borderWidth: 0,
-                    ...(pos === 'tl' && { top: 10, left: 10, borderTopWidth: 3, borderLeftWidth: 3, borderTopLeftRadius: 6 }),
-                    ...(pos === 'tr' && { top: 10, right: 10, borderTopWidth: 3, borderRightWidth: 3, borderTopRightRadius: 6 }),
-                    ...(pos === 'bl' && { bottom: 10, left: 10, borderBottomWidth: 3, borderLeftWidth: 3, borderBottomLeftRadius: 6 }),
-                    ...(pos === 'br' && { bottom: 10, right: 10, borderBottomWidth: 3, borderRightWidth: 3, borderBottomRightRadius: 6 }),
-                  }}
-                />
-              ))}
+
+        {/* html5-qrcode mounts the video feed inside this div */}
+        <div className="relative" style={{ width: 280, height: 280 }}>
+          <div
+            id={READER_ID}
+            style={{
+              width: 280,
+              height: 280,
+              borderRadius: 16,
+              overflow: 'hidden',
+              background: '#1a1a1a',
+            }}
+          />
+          {/* Corner bracket overlay */}
+          {scanning && !cameraError && ['tl', 'tr', 'bl', 'br'].map((pos) => (
+            <span key={pos} aria-hidden="true" style={{
+              position: 'absolute', width: 28, height: 28,
+              borderColor: 'var(--brand-mint)', borderStyle: 'solid', borderWidth: 0,
+              ...(pos === 'tl' && { top: 10, left: 10, borderTopWidth: 3, borderLeftWidth: 3, borderTopLeftRadius: 6 }),
+              ...(pos === 'tr' && { top: 10, right: 10, borderTopWidth: 3, borderRightWidth: 3, borderTopRightRadius: 6 }),
+              ...(pos === 'bl' && { bottom: 10, left: 10, borderBottomWidth: 3, borderLeftWidth: 3, borderBottomLeftRadius: 6 }),
+              ...(pos === 'br' && { bottom: 10, right: 10, borderBottomWidth: 3, borderRightWidth: 3, borderBottomRightRadius: 6 }),
+            }} />
+          ))}
+
+          {/* Fallback if camera failed */}
+          {cameraError && (
+            <div className="absolute inset-0 flex flex-col items-center justify-center gap-3 rounded-2xl"
+              style={{ background: 'rgba(255,255,255,0.04)' }}>
+              <QrCode className="w-10 h-10" style={{ color: 'rgba(255,255,255,0.3)' }} />
+              <p className="m-0 text-xs text-center px-4" style={{ color: 'rgba(255,255,255,0.5)' }}>
+                {intl.formatMessage({ id: 'adminScan.cameraError' }, { defaultMessage: 'Camera unavailable. Enter booking ID below.' })}
+              </p>
             </div>
-            <p className="m-0 text-sm text-center" style={{ color: 'rgba(255,255,255,0.6)' }}>
-              {intl.formatMessage({ id: 'adminScan.instruction' }, { defaultMessage: "Point camera at the teacher's QR code" })}
-            </p>
-          </>
-        ) : (
-          <div className="flex flex-col items-center gap-4">
-            <div
-              className="grid place-items-center w-20 h-20 rounded-2xl"
-              style={{ background: 'rgba(255,255,255,0.08)' }}
-            >
-              <QrCode className="w-9 h-9" style={{ color: 'rgba(255,255,255,0.5)' }} />
-            </div>
-            <p className="m-0 text-sm text-center" style={{ color: 'rgba(255,255,255,0.5)' }}>
-              {cameraError
-                ? intl.formatMessage({ id: 'adminScan.cameraError' }, { defaultMessage: 'Camera unavailable. Enter booking ID below.' })
-                : intl.formatMessage({ id: 'adminScan.noScanner' }, { defaultMessage: 'QR scanning not supported on this device. Enter booking ID below.' })}
-            </p>
-          </div>
+          )}
+        </div>
+
+        {scanning && !cameraError && (
+          <p className="m-0 text-sm text-center" style={{ color: 'rgba(255,255,255,0.6)' }}>
+            {intl.formatMessage({ id: 'adminScan.instruction' }, { defaultMessage: "Point camera at the teacher's QR code" })}
+          </p>
         )}
 
         {/* Manual entry */}
-        <form
-          onSubmit={handleManualSubmit}
-          className="w-full max-w-xs flex flex-col gap-3"
-        >
+        <form onSubmit={handleManualSubmit} className="w-full max-w-xs flex flex-col gap-3">
           <div className="flex items-center gap-1" style={{ color: 'rgba(255,255,255,0.4)', fontSize: 11, letterSpacing: '0.08em', textTransform: 'uppercase', fontWeight: 600 }}>
             <span style={{ flex: 1, height: 1, background: 'rgba(255,255,255,0.12)' }} />
-            {intl.formatMessage({ id: 'adminScan.or' }, { defaultMessage: "or enter manually" })}
+            {intl.formatMessage({ id: 'adminScan.or' }, { defaultMessage: 'or enter manually' })}
             <span style={{ flex: 1, height: 1, background: 'rgba(255,255,255,0.12)' }} />
           </div>
           <input
@@ -173,12 +131,7 @@ export default function QRScanPage() {
             onChange={(e) => setManualId(e.target.value)}
             placeholder={intl.formatMessage({ id: 'adminScan.inputPlaceholder' }, { defaultMessage: 'Booking ID' })}
             className="w-full h-11 px-4 rounded-xl text-sm"
-            style={{
-              background: 'rgba(255,255,255,0.09)',
-              border: '1px solid rgba(255,255,255,0.15)',
-              color: '#ffffff',
-              outline: 'none',
-            }}
+            style={{ background: 'rgba(255,255,255,0.09)', border: '1px solid rgba(255,255,255,0.15)', color: '#ffffff', outline: 'none' }}
           />
           <button
             type="submit"

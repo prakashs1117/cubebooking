@@ -20,6 +20,8 @@ import { initializeAnalytics } from './shared/firebase.ts'
 // Initialize Firebase Analytics
 initializeAnalytics().catch(console.error)
 
+document.addEventListener('contextmenu', (e) => e.preventDefault())
+
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
     <ThemeProvider>

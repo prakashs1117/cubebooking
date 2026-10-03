@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { ChevronLeft } from 'lucide-react'
 import { useIntl } from 'react-intl'
@@ -105,6 +105,8 @@ export function BookingModal({ open, onClose, initialVisitType }: BookingModalPr
   const [step, setStep] = useState<Step>(firstStep)
   const [confirmedBookingId, setConfirmedBookingId] = useState<string | null>(null)
   const [confirmedBookingCode, setConfirmedBookingCode] = useState<string | null>(null)
+  // Signals ToadDateStep not to release its hold on unmount once booking is committed
+  const toadConfirmedRef = useRef(false)
 
   useEffect(() => {
     if (open) {
@@ -168,7 +170,7 @@ export function BookingModal({ open, onClose, initialVisitType }: BookingModalPr
           }} />
         )}
         {step === 'toad-date' && (
-          <ToadDateStep onContinue={() => goTo('toad-details')} />
+          <ToadDateStep onContinue={() => goTo('toad-details')} confirmedRef={toadConfirmedRef} />
         )}
         {step === 'toad-details' && (
           <ToadDetailsStep onContinue={() => goTo('toad-review')} />
@@ -176,7 +178,12 @@ export function BookingModal({ open, onClose, initialVisitType }: BookingModalPr
         {step === 'toad-review' && (
           <ToadReviewStep
             onBack={() => goTo('toad-details')}
-            onConfirmed={(id, code) => { setConfirmedBookingId(id); setConfirmedBookingCode(code); goTo('toad-confirmed') }}
+            onConfirmed={(id, code) => {
+              toadConfirmedRef.current = true
+              setConfirmedBookingId(id)
+              setConfirmedBookingCode(code)
+              goTo('toad-confirmed')
+            }}
           />
         )}
         {step === 'toad-confirmed' && (

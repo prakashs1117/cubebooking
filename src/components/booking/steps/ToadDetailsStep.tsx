@@ -1,10 +1,11 @@
-import { forwardRef } from 'react'
+import { forwardRef, useEffect } from 'react'
 import { Minus, Plus } from 'lucide-react'
 import { ChevronDownIcon, ChevronUpIcon, CheckIcon } from '@radix-ui/react-icons'
 import * as Select from '@radix-ui/react-select'
 import { useIntl } from 'react-intl'
 import { ContinueButton } from '../BookingLayout'
 import { useBookingStore } from '../../../stores/bookingStore'
+import { useAuthContext } from '../../../context/AuthContext'
 
 const GRADES = ['1','2','3','4','5','6','7','8','9','10','11','12']
 const MAX_STUDENTS = 30
@@ -29,14 +30,44 @@ GradeSelectItem.displayName = 'GradeSelectItem'
 
 export function ToadDetailsStep({ onContinue }: { onContinue: () => void }) {
   const intl = useIntl()
+  const { profile } = useAuthContext()
   const { classDetails, setClassDetails } = useBookingStore()
-  const isValid = !!classDetails.grade && classDetails.studentCount >= 1 && classDetails.truckParking.trim().length > 0
+
+  useEffect(() => {
+    if (profile?.schoolName && !classDetails.schoolName) {
+      setClassDetails({ schoolName: profile.schoolName })
+    }
+  }, [profile?.schoolName])
+
+  const isValid = !!classDetails.grade && classDetails.studentCount >= 1 && classDetails.truckParking.trim().length > 0 && classDetails.schoolName.trim().length > 0
 
   return (
     <>
       <h1 className="m-0 text-[28px] font-extrabold leading-[34px] tracking-tight" style={{ fontFamily: 'var(--font-display)' }}>
         {intl.formatMessage({ id: 'bookDetails.heading' })}
       </h1>
+
+      {/* School name */}
+      <div className="flex flex-col gap-2">
+        <label htmlFor="schoolName" className="text-sm font-medium">
+          {intl.formatMessage({ id: 'toadDetails.school.label' })}
+        </label>
+        <input
+          id="schoolName"
+          type="text"
+          required
+          placeholder={intl.formatMessage({ id: 'toadDetails.school.placeholder' })}
+          value={classDetails.schoolName}
+          onChange={(e) => setClassDetails({ schoolName: e.target.value })}
+          className="w-full px-3 py-2.5 rounded-xl border text-sm"
+          style={{ borderColor: classDetails.schoolName.trim() ? 'var(--input)' : 'var(--input)', background: 'var(--input-surface)', color: 'var(--foreground)', height: 44, fontFamily: 'inherit' }}
+        />
+        {!classDetails.schoolName.trim() && (
+          <p className="m-0 text-xs" style={{ color: 'var(--muted-foreground)' }}>
+            {intl.formatMessage({ id: 'toadDetails.school.required' })}
+          </p>
+        )}
+      </div>
 
       {/* Grade */}
       <div className="flex flex-col gap-2">

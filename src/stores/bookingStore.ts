@@ -19,6 +19,7 @@ export interface ClassDetails {
   studentCount: number
   accessNeeds: string
   truckParking: string
+  schoolName: string
 }
 
 interface BookingState {
@@ -52,6 +53,7 @@ const DEFAULT_CLASS_DETAILS: ClassDetails = {
   studentCount: 25,
   accessNeeds: '',
   truckParking: '',
+  schoolName: '',
 }
 
 export const useBookingStore = create<BookingState>((set, get) => ({

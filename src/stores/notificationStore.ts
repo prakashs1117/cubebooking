@@ -15,7 +15,7 @@ export interface AppNotification {
 
 interface NotificationState {
   notifications: AppNotification[]
-  push: (n: Omit<AppNotification, 'id' | 'time' | 'read'>) => void
+  push: (n: Omit<AppNotification, 'id' | 'time' | 'read'> & { id?: string }) => void
   markRead: (id: string) => void
   markAllRead: () => void
   clear: () => void
@@ -25,17 +25,17 @@ export const useNotificationStore = create<NotificationState>((set) => ({
   notifications: [],
 
   push: (n) =>
-    set((s) => ({
-      notifications: [
-        {
-          ...n,
-          id: `notif-${Date.now()}-${Math.random().toString(36).slice(2)}`,
-          time: new Date(),
-          read: false,
-        },
-        ...s.notifications,
-      ].slice(0, 50), // keep last 50
-    })),
+    set((s) => {
+      const id = n.id ?? `notif-${Date.now()}-${Math.random().toString(36).slice(2)}`
+      // Deduplicate: if a notification with this id already exists, skip
+      if (s.notifications.some((x) => x.id === id)) return s
+      return {
+        notifications: [
+          { ...n, id, time: new Date(), read: false },
+          ...s.notifications,
+        ].slice(0, 50),
+      }
+    }),
 
   markRead: (id) =>
     set((s) => ({

@@ -1,9 +1,12 @@
 import { useState, useDebugValue, useSyncExternalStore } from 'react'
+import { useNavigate } from 'react-router-dom'
 import * as Popover from '@radix-ui/react-popover'
 import * as Dialog from '@radix-ui/react-dialog'
 import { Bell, CalendarCheck, Clock, Check, AlertCircle, Info, CalendarPlus, X } from 'lucide-react'
 import { formatDistanceToNow } from 'date-fns'
 import { useNotificationStore, type NotificationType } from '../../stores/notificationStore'
+import { useAuthContext } from '../../context/AuthContext'
+import { markFirestoreNotificationRead } from '../../hooks/useStaffNotifications'
 
 // useSyncExternalStore is the correct hook for subscribing to external browser APIs
 // (window.matchMedia). It avoids the useState+useEffect pattern which can cause
@@ -46,8 +49,9 @@ const TYPE_BG: Record<NotificationType, string> = {
 
 // ─── Shared notification list content ────────────────────────────────────────
 
-function NotificationList({ onClose }: { onClose?: () => void }) {
+function NotificationList({ onClose, staffUid }: { onClose?: () => void; staffUid?: string }) {
   const { notifications, markRead, markAllRead } = useNotificationStore()
+  const navigate = useNavigate()
   const unread = notifications.filter((n) => !n.read).length
 
   return (
@@ -93,7 +97,14 @@ function NotificationList({ onClose }: { onClose?: () => void }) {
                   borderColor: 'var(--border)',
                   background: n.read ? 'transparent' : 'color-mix(in srgb, var(--brand-purple) 5%, var(--background))',
                 }}
-                onClick={() => markRead(n.id)}
+                onClick={() => {
+                  markRead(n.id)
+                  if (staffUid) markFirestoreNotificationRead(staffUid, n.id)
+                  if (n.bookingId) {
+                    onClose?.()
+                    navigate(`/bookings/${n.bookingId}`)
+                  }
+                }}
               >
                 <span className="flex-none grid place-items-center w-9 h-9 rounded-xl mt-0.5" style={{ background: TYPE_BG[n.type] }}>
                   <Icon className="w-4 h-4" style={{ color: TYPE_COLOR[n.type] }} />
@@ -120,9 +131,14 @@ function NotificationList({ onClose }: { onClose?: () => void }) {
                     </a>
                   )}
                 </div>
-                {!n.read && (
-                  <span className="flex-none w-2 h-2 rounded-full self-center" style={{ background: 'var(--brand-magenta)' }} />
-                )}
+                <div className="flex flex-col items-center gap-1.5 flex-none self-center">
+                  {!n.read && (
+                    <span className="w-2 h-2 rounded-full" style={{ background: 'var(--brand-magenta)' }} />
+                  )}
+                  {n.bookingId && (
+                    <span style={{ color: 'var(--muted-foreground)', opacity: 0.5, fontSize: 10 }}>›</span>
+                  )}
+                </div>
               </div>
             )
           })
@@ -136,6 +152,8 @@ function NotificationList({ onClose }: { onClose?: () => void }) {
 
 export default function NotificationPopover() {
   const { notifications } = useNotificationStore()
+  const { isStaff, user } = useAuthContext()
+  const staffUid = isStaff ? user?.uid : undefined
   const unread = notifications.filter((n) => !n.read).length
   const isMobile = useIsMobile()
   const [mobileOpen, setMobileOpen] = useState(false)
@@ -180,7 +198,7 @@ export default function NotificationPopover() {
               style={{ ...contentStyle, top: 52 }}
               aria-label="Notifications"
             >
-              <NotificationList onClose={() => setMobileOpen(false)} />
+              <NotificationList onClose={() => setMobileOpen(false)} staffUid={staffUid} />
             </Dialog.Content>
           </Dialog.Portal>
         </Dialog.Root>
@@ -207,7 +225,7 @@ export default function NotificationPopover() {
           className="z-50 w-80 rounded-2xl border shadow-lg overflow-hidden focus:outline-none"
           style={contentStyle}
         >
-          <NotificationList />
+          <NotificationList staffUid={staffUid} />
           <Popover.Arrow style={{ fill: 'var(--border)' }} />
         </Popover.Content>
       </Popover.Portal>

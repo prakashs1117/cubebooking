@@ -6,15 +6,16 @@ service cloud.firestore {
       return request.auth != null;
     }
 
+    function userRole() {
+      return get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role;
+    }
+
     function isAdmin() {
-      return isSignedIn() && request.auth.token.role == 'admin';
+      return isSignedIn() && userRole() == 'admin';
     }
 
     function isStaff() {
-      return isSignedIn() && (
-        request.auth.token.role == 'admin' ||
-        request.auth.token.role == 'coordinator'
-      );
+      return isSignedIn() && userRole() in ['admin', 'coordinator'];
     }
 
     // Default: deny everything
@@ -26,6 +27,26 @@ service cloud.firestore {
     match /users/{uid} {
       allow read, write: if isSignedIn() && request.auth.uid == uid;
       allow read: if isAdmin();
+    }
+
+    // ── User lists (staff discovery for notification fan-out) ───────────────
+    match /users/{uid} {
+      allow list: if isSignedIn();
+    }
+
+    // ── Notifications (per-user sub-collection) ────────────────────────────
+    // Users read/update their own; any signed-in user can create into any inbox
+    // (needed so teachers can fan-out TOAD notifications to staff on booking).
+    match /notifications/{uid}/items/{notifId} {
+      allow read, update: if isSignedIn() && request.auth.uid == uid;
+      allow create: if isSignedIn();
+      allow delete: if isSignedIn() && request.auth.uid == uid;
+    }
+
+    // ── Config (maintenance mode etc — signed-in read, admin write) ───────
+    match /config/{docId} {
+      allow read: if isSignedIn();
+      allow write: if isAdmin();
     }
 
     // ── Programs (public read, admin write) ────────────────────────────────
@@ -82,6 +103,23 @@ service cloud.firestore {
       allow update: if false;
       allow delete: if isSignedIn() && resource.data.teacherId == request.auth.uid;
       allow delete: if isAdmin();
+    }
+
+    // ── TOAD date slots (one doc per calendar date, atomic collision prevention)
+    // Doc ID = 'YYYY-MM-DD'. Status: 'held' (10-min soft lock) | 'confirmed' (booked).
+    // create: any signed-in teacher can try — batch fails if doc already exists.
+    // update: only the holding teacher may upgrade held→confirmed (booking committed).
+    // delete: holding teacher may release their own hold; staff can clear any.
+    match /toadSlots/{date} {
+      allow read: if isSignedIn();
+      allow create: if isSignedIn()
+        && request.resource.data.teacherId == request.auth.uid;
+      allow update: if isSignedIn()
+        && resource.data.teacherId == request.auth.uid
+        && resource.data.status == 'held'
+        && request.resource.data.status == 'confirmed';
+      allow delete: if isSignedIn() && resource.data.teacherId == request.auth.uid;
+      allow delete: if isStaff();
     }
 
     // ── Bookings ───────────────────────────────────────────────────────────

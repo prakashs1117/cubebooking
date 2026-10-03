@@ -1,6 +1,6 @@
 import { Link, useLocation, useNavigate } from 'react-router-dom'
 import {
-  Home, CalendarCheck, Package, BarChart2, Truck, CalendarCog, LogOut, X,
+  Home, CalendarCheck, Package, BarChart2, CalendarCog, LogOut, X,
 } from 'lucide-react'
 import { useIntl } from 'react-intl'
 import { useAuthContext } from '../../context/AuthContext'
@@ -23,8 +23,7 @@ function useAdminNav(isAdmin: boolean): NavItem[] {
     { type: 'link', labelKey: 'nav.bookings', href: '/bookings', Icon: CalendarCheck },
     { type: 'link', labelKey: 'nav.kit',      href: '/kit',      Icon: Package },
     { type: 'heading', labelKey: 'nav.roleLabel.admin' },
-    { type: 'link', labelKey: 'nav.impact',        href: '/admin',          Icon: BarChart2 },
-    { type: 'link', labelKey: 'nav.toadApprovals', href: '/admin/toad',     Icon: Truck },
+    { type: 'link', labelKey: 'nav.impact', href: '/admin', Icon: BarChart2 },
   ]
   if (isAdmin) {
     base.push({ type: 'link', labelKey: 'nav.calendarRules', href: '/admin/calendar', Icon: CalendarCog })

@@ -135,10 +135,10 @@ export function useSlotAvailability(
  * Callers MUST be in a staff-gated component (isStaff === true).
  */
 export function useAllBookings(date?: string) {
-  const { user } = useAuthContext()
+  const { user, isStaff } = useAuthContext()
   const result = useQuery({
     queryKey: ['bookings', 'all', date ?? 'all'],
-    enabled: !!user?.uid,
+    enabled: !!user?.uid && isStaff,
     queryFn: async () => {
       // Firestore doesn't support querying nested array fields (segments[].date).
       // Fetch all active bookings and filter client-side by date if provided.
@@ -164,21 +164,29 @@ export function useAllBookings(date?: string) {
  * Staff-only: real-time listener for all TOAD bookings (pending, approved, declined).
  */
 export function useAllToadBookings(): BookingDoc[] {
-  const { user } = useAuthContext()
+  const { user, isStaff } = useAuthContext()
   const [bookings, setBookings] = useState<BookingDoc[]>([])
 
   useEffect(() => {
-    if (!user) return
+    // Wait until the Firestore profile is loaded and role confirmed as staff.
+    // The security rule does a get() on users/{uid} to verify role — subscribing
+    // before the profile loads causes a permission-denied that silently empties the list.
+    if (!user || !isStaff) return
     const q = query(
       collection(db, 'bookings'),
       where('type', '==', 'toad'),
       where('status', 'in', ['pending', 'approved', 'declined']),
       orderBy('createdAt', 'desc'),
     )
-    return onSnapshot(q, (snap) => {
-      setBookings(snap.docs.map((d) => ({ id: d.id, ...d.data() }) as BookingDoc))
-    })
-  }, [user])
+    return onSnapshot(q,
+      (snap) => {
+        setBookings(snap.docs.map((d) => ({ id: d.id, ...d.data() }) as BookingDoc))
+      },
+      (err) => {
+        console.error('[useAllToadBookings] Firestore error:', err.code, err.message)
+      },
+    )
+  }, [user, isStaff])
 
   return bookings
 }

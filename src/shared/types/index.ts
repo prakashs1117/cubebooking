@@ -84,6 +84,7 @@ export interface Booking {
   id: string
   type: BookingType
   schoolId: string
+  schoolName?: string
   teacherId: string
   teacherName: string
   teacherEmail: string

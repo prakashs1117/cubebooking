@@ -32,7 +32,7 @@ export function Modal({
   return (
     <AnimatePresence>
       {/* ── Mobile: bottom sheet ───────────────────────────────────────────── */}
-      <div className="md:hidden fixed inset-0 z-[9998] flex items-end">
+      <div key="mobile-sheet" className="md:hidden fixed inset-0 z-[9998] flex items-end">
         <motion.div
           key="backdrop-mobile"
           initial={{ opacity: 0 }}
@@ -81,7 +81,7 @@ export function Modal({
       </div>
 
       {/* ── Desktop/tablet: centred dialog ────────────────────────────────── */}
-      <div className="hidden md:flex fixed inset-0 z-[9998] items-center justify-center p-4">
+      <div key="desktop-dialog" className="hidden md:flex fixed inset-0 z-[9998] items-center justify-center p-4">
         <motion.div
           key="backdrop-desktop"
           initial={{ opacity: 0 }}
