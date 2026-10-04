@@ -1,0 +1,271 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Curiosity programs information page</title>
+<script src="./vendor/react.js"></script>
+<script src="./vendor/react-dom.js"></script>
+<script src="./support.js"></script>
+<link rel="stylesheet" href="ds/liquidcarbon/components/bundle.css">
+<script src="ds/liquidcarbon/components/bundle.js"></script>
+<link rel="stylesheet" href="theme.css">
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Display:wght@500;600;700;800&amp;family=Noto+Sans:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
+<style>body{margin:0} .navlink:hover{background:var(--accent)} .prog:hover{transform:translateY(-4px);box-shadow:var(--shadow-float)}</style>
+</helmet>
+<div style="width: 1440px; height: 3320px; position: relative; overflow: hidden; display: flex; flex-direction: column; background: var(--background); font-family: var(--font-sans); color: var(--foreground)">
+
+  <header style="position: relative; z-index: 2; flex: none; height: 76px; padding: 0 64px; display: flex; align-items: center; gap: 32px; border-bottom: 1px solid var(--border); background: rgba(255,255,255,0.92); backdrop-filter: blur(12px)">
+    <a href="DesktopInfo.dc.html" style="display: flex; align-items: center; gap: 12px; text-decoration: none">
+      <img src="./assets/4f8ae70f888133bf2907e3d9a3a80a93.png" alt="Merck" style="width: 59px; height: 28px">
+      <span style="font-family: var(--font-display); font-size: 18px; font-weight: 800">Curiosity</span>
+    </a>
+    <nav aria-label="Page sections" style="display: flex; gap: 4px; flex-grow: 1">
+      <a href="#programs" class="navlink" style="padding: 8px 14px; border-radius: 10px; text-decoration: none; font-size: 14px; font-weight: 500">Programs</a>
+      <a href="#how" class="navlink" style="padding: 8px 14px; border-radius: 10px; text-decoration: none; font-size: 14px; font-weight: 500">How booking works</a>
+      <a href="#toad" class="navlink" style="padding: 8px 14px; border-radius: 10px; text-decoration: none; font-size: 14px; font-weight: 500">TOAD truck</a>
+      <a href="#faq" class="navlink" style="padding: 8px 14px; border-radius: 10px; text-decoration: none; font-size: 14px; font-weight: 500">FAQ</a>
+    </nav>
+    <div role="group" aria-label="Language" style="display: flex; padding: 3px; border-radius: 9999px; background: var(--muted)">
+      <button type="button" class="tap" onClick="{{setDe}}" aria-pressed="{{isDe}}" style="{{deStyle}}">DE</button>
+      <button type="button" class="tap" onClick="{{setEn}}" aria-pressed="{{isEn}}" style="{{enStyle}}">EN</button>
+    </div>
+    <a href="DesktopHome.dc.html" class="lc-btn lc-btn--outline tap" style="height: 40px">{{t.signIn}}</a>
+    <a href="DesktopBook.dc.html" class="lc-btn lc-btn--default tap" style="height: 40px; padding: 0 18px">{{t.book}}</a>
+  </header>
+
+  <section style="position: relative; flex: none; overflow: hidden; margin: 24px 32px 0; height: 600px; border-radius: 36px; background: var(--brand-purple); color: #ffffff">
+    <div class="float" style="position: absolute; width: 420px; height: 420px; border-radius: 9999px; background: var(--brand-mint); right: -90px; top: -150px"></div>
+    <div class="float" style="position: absolute; width: 230px; height: 230px; border-radius: 9999px; background: var(--brand-magenta); right: 330px; bottom: -90px; animation-delay: -3s"></div>
+    <div style="position: absolute; width: 180px; height: 180px; border-radius: 9999px; border: 28px solid var(--brand-lime); box-sizing: border-box; left: 560px; top: -70px; opacity: 0.9"></div>
+    <div style="position: absolute; width: 90px; height: 90px; border-radius: 9999px; background: var(--brand-yellow); right: 180px; top: 330px"></div>
+
+    <div class="rise" style="position: relative; padding: 88px 0 0 72px; width: 620px; display: flex; flex-direction: column; gap: 22px">
+      <span style="font-size: 13px; letter-spacing: 0.16em; text-transform: uppercase; font-weight: 700; color: var(--brand-mint)">Curiosity Cube · Curiosity Lab · TOAD</span>
+      <h1 style="margin: 0; font-family: var(--font-display); font-size: 68px; line-height: 70px; font-weight: 800; letter-spacing: -0.03em; text-wrap: balance">{{t.headline}}</h1>
+      <p style="margin: 0; font-size: 19px; line-height: 29px; color: rgba(255,255,255,0.88); max-width: 520px">{{t.sub}}</p>
+      <div style="display: flex; gap: 12px; margin-top: 8px">
+        <a href="DesktopBook.dc.html" class="tap" style="display: inline-flex; align-items: center; gap: 10px; height: 54px; padding: 0 26px; border-radius: 16px; background: #ffffff; color: var(--brand-purple); text-decoration: none; font-size: 16px; font-weight: 700">{{t.book}}<svg class="i" viewBox="0 0 24 24"><path d="M5 12h14"></path><path d="m12 5 7 7-7 7"></path></svg></a>
+        <a href="#programs" class="tap" style="display: inline-flex; align-items: center; height: 54px; padding: 0 24px; border-radius: 16px; background: rgba(255,255,255,0.14); color: #ffffff; text-decoration: none; font-size: 16px; font-weight: 600">{{t.explore}}</a>
+      </div>
+    </div>
+
+    <div style="position: absolute; right: 96px; top: 96px; width: 400px; display: flex; flex-direction: column; gap: 14px">
+      <div class="rise-2" style="align-self: flex-end; width: 300px; padding: 20px; border-radius: 26px; background: var(--background); color: var(--foreground); box-shadow: 0 30px 60px -20px rgba(14,14,17,0.45); display: flex; flex-direction: column; gap: 14px">
+        <div style="display: flex; justify-content: space-between; align-items: center">
+          <span style="font-size: 12px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted-foreground)">Your visit</span>
+          <span style="display: inline-flex; gap: 5px; align-items: center; padding: 3px 10px; border-radius: 9999px; background: var(--accent); color: var(--brand-green); font-size: 12px; font-weight: 700"><svg class="i" viewBox="0 0 24 24" style="width: 13px; height: 13px; stroke-width: 3"><path d="M20 6 9 17l-5-5"></path></svg>Confirmed</span>
+        </div>
+        <div style="font-family: var(--font-display); font-size: 24px; font-weight: 800">Thu, 15 Oct</div>
+        <div style="display: flex; gap: 6px">
+          <div style="flex-grow: 1; padding: 10px 12px; border-radius: 14px; background: var(--brand-mint)"><div style="font-size: 13px; font-weight: 700">Cube</div><div style="font-size: 12px">09:00–09:45</div></div>
+          <div style="flex-grow: 1; padding: 10px 12px; border-radius: 14px; background: var(--brand-yellow)"><div style="font-size: 13px; font-weight: 700">Lab</div><div style="font-size: 12px">09:45–10:30</div></div>
+        </div>
+        <div style="font-size: 13px; color: var(--muted-foreground)">Class 4b · 24 students</div>
+      </div>
+      <div class="rise-3" style="width: 260px; padding: 16px 18px; border-radius: 22px; background: var(--brand-yellow); color: var(--foreground); display: flex; gap: 12px; align-items: center; box-shadow: 0 24px 48px -20px rgba(14,14,17,0.45); transform: rotate(-3deg)">
+        <span style="display: grid; place-items: center; width: 42px; height: 42px; border-radius: 12px; background: rgba(255,255,255,0.7)"><svg class="i" viewBox="0 0 24 24"><path d="M10 2h4"></path><path d="M12 14l3-3"></path><circle cx="12" cy="14" r="8"></circle></svg></span>
+        <div><div style="font-size: 14px; font-weight: 700">Seats held for 10:00</div><div style="font-size: 12px">while you add class details</div></div>
+      </div>
+    </div>
+  </section>
+
+  <section aria-label="At a glance" style="margin: -44px 96px 0; position: relative; z-index: 1; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); padding: 28px 12px; border-radius: 24px; background: var(--background); border: 1px solid var(--border); box-shadow: var(--shadow-float)">
+    <sc-for list="{{facts}}" as="f" hint-placeholder-count="4">
+      <div style="padding: 0 28px; border-left: {{f.border}}; display: flex; flex-direction: column; gap: 4px">
+        <span style="font-family: var(--font-display); font-size: 34px; line-height: 40px; font-weight: 800; letter-spacing: -0.02em">{{f.v}}</span>
+        <span style="font-size: 14px; color: var(--muted-foreground)">{{f.k}}</span>
+      </div>
+    </sc-for>
+  </section>
+
+  <section id="programs" style="padding: 104px 96px 0; display: flex; flex-direction: column; gap: 36px">
+    <div style="display: flex; justify-content: space-between; align-items: flex-end; gap: 40px">
+      <div style="max-width: 640px">
+        <span style="font-size: 13px; letter-spacing: 0.14em; text-transform: uppercase; font-weight: 700; color: var(--muted-foreground)">Programs</span>
+        <h2 style="margin: 8px 0 0; font-family: var(--font-display); font-size: 44px; line-height: 50px; font-weight: 800; letter-spacing: -0.02em">Three ways to bring science to your class</h2>
+      </div>
+      <p style="margin: 0; max-width: 380px; font-size: 16px; line-height: 25px; color: var(--muted-foreground)">Visit us in Darmstadt, or request the truck to come to your school. Every session is hands-on.</p>
+    </div>
+    <div style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 24px">
+      <sc-for list="{{programs}}" as="p" hint-placeholder-count="3">
+        <a href="{{p.href}}" class="prog tap" style="display: flex; flex-direction: column; border-radius: 28px; overflow: hidden; background: var(--card); border: 1px solid var(--border); text-decoration: none; transition: transform .25s, box-shadow .25s">
+          <div style="position: relative; height: 200px; background: {{p.bg}}; overflow: hidden">
+            <div style="position: absolute; width: 180px; height: 180px; border-radius: 9999px; background: {{p.shape}}; right: -40px; top: -50px; opacity: 0.85"></div>
+            <span style="position: absolute; left: 28px; bottom: 24px; display: grid; place-items: center; width: 68px; height: 68px; border-radius: 20px; background: var(--background); box-shadow: var(--shadow-sm)"><svg class="i" viewBox="0 0 24 24" style="width: 32px; height: 32px"><path d="{{p.icon}}"></path></svg></span>
+            <span style="position: absolute; right: 24px; bottom: 24px; padding: 5px 12px; border-radius: 9999px; background: var(--background); font-size: 12px; font-weight: 700">{{p.tag}}</span>
+          </div>
+          <div style="padding: 24px 28px 28px; display: flex; flex-direction: column; gap: 10px; flex-grow: 1">
+            <h3 style="margin: 0; font-family: var(--font-display); font-size: 26px; line-height: 32px; font-weight: 800">{{p.name}}</h3>
+            <p style="margin: 0; font-size: 15px; line-height: 23px; color: var(--muted-foreground); flex-grow: 1">{{p.desc}}</p>
+            <div style="display: flex; gap: 8px; flex-wrap: wrap; margin-top: 6px">
+              <sc-for list="{{p.meta}}" as="m" hint-placeholder-count="2"><span style="padding: 5px 11px; border-radius: 9999px; background: var(--muted); font-size: 12px; font-weight: 600">{{m}}</span></sc-for>
+            </div>
+            <span style="margin-top: 10px; display: inline-flex; align-items: center; gap: 8px; font-size: 15px; font-weight: 700">{{p.cta}}<svg class="i i-sm" viewBox="0 0 24 24"><path d="M5 12h14"></path><path d="m12 5 7 7-7 7"></path></svg></span>
+          </div>
+        </a>
+      </sc-for>
+    </div>
+  </section>
+
+  <section id="how" style="margin: 104px 32px 0; padding: 72px 64px; border-radius: 36px; background: var(--app-ground); border: 1px solid var(--border); display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 64px; align-items: center">
+    <div style="display: flex; flex-direction: column; gap: 28px">
+      <div>
+        <span style="font-size: 13px; letter-spacing: 0.14em; text-transform: uppercase; font-weight: 700; color: var(--muted-foreground)">How booking works</span>
+        <h2 style="margin: 8px 0 0; font-family: var(--font-display); font-size: 44px; line-height: 50px; font-weight: 800; letter-spacing: -0.02em">Booked in under three minutes</h2>
+      </div>
+      <ol style="margin: 0; padding: 0; list-style: none; display: flex; flex-direction: column; gap: 6px">
+        <sc-for list="{{steps}}" as="s" hint-placeholder-count="4">
+          <li>
+            <button type="button" class="tap" onClick="{{s.pick}}" aria-pressed="{{s.on}}" style="width: 100%; display: flex; gap: 18px; align-items: flex-start; padding: 16px 18px; border-radius: 18px; border: 1px solid {{s.border}}; background: {{s.bg}}; text-align: left; font: inherit; color: inherit; cursor: pointer">
+              <span style="flex: none; display: grid; place-items: center; width: 40px; height: 40px; border-radius: 12px; background: {{s.numBg}}; color: {{s.numC}}; font-family: var(--font-display); font-weight: 800; font-size: 17px">{{s.n}}</span>
+              <span style="display: flex; flex-direction: column; gap: 4px">
+                <span style="font-size: 17px; font-weight: 700">{{s.title}}</span>
+                <span style="font-size: 14px; line-height: 21px; color: var(--muted-foreground)">{{s.body}}</span>
+              </span>
+            </button>
+          </li>
+        </sc-for>
+      </ol>
+    </div>
+    <div style="position: relative; height: 520px; border-radius: 32px; background: var(--brand-mint); overflow: hidden; display: grid; place-items: center">
+      <div style="position: absolute; width: 300px; height: 300px; border-radius: 9999px; background: var(--brand-yellow); left: -80px; bottom: -90px"></div>
+      <div style="position: absolute; width: 140px; height: 140px; border-radius: 9999px; background: var(--brand-magenta); right: 40px; top: 36px"></div>
+      <div class="rise" style="position: relative; width: 380px; padding: 26px; border-radius: 28px; background: var(--background); box-shadow: 0 30px 60px -24px rgba(14,14,17,0.35); display: flex; flex-direction: column; gap: 18px">
+        <div style="display: flex; justify-content: space-between; align-items: center">
+          <span style="font-size: 12px; letter-spacing: 0.12em; text-transform: uppercase; font-weight: 700; color: var(--muted-foreground)">Step {{stepN}} of 4</span>
+          <span style="display: flex; gap: 4px"><sc-for list="{{dots}}" as="d" hint-placeholder-count="4"><span style="width: 22px; height: 5px; border-radius: 9999px; background: {{d.c}}"></span></sc-for></span>
+        </div>
+        <div style="font-family: var(--font-display); font-size: 26px; line-height: 32px; font-weight: 800">{{preview.title}}</div>
+        <div style="display: flex; flex-direction: column; gap: 8px">
+          <sc-for list="{{preview.rows}}" as="r" hint-placeholder-count="3">
+            <div style="display: flex; align-items: center; gap: 12px; padding: 12px 14px; border-radius: 14px; border: 1.5px solid {{r.border}}; background: {{r.bg}}">
+              <span style="width: 14px; height: 14px; border-radius: 9999px; background: {{r.dot}}"></span>
+              <span style="flex-grow: 1; font-size: 15px; font-weight: 600">{{r.label}}</span>
+              <span style="font-size: 13px; color: var(--muted-foreground)">{{r.note}}</span>
+            </div>
+          </sc-for>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="toad" style="margin: 104px 96px 0; display: grid; grid-template-columns: 520px minmax(0, 1fr); gap: 72px; align-items: center">
+    <div style="position: relative; height: 420px; border-radius: 32px; background: var(--brand-magenta); overflow: hidden">
+      <div style="position: absolute; width: 320px; height: 320px; border-radius: 9999px; background: var(--brand-purple); right: -100px; top: -110px"></div>
+      <div style="position: absolute; width: 120px; height: 120px; border-radius: 9999px; background: var(--brand-yellow); right: 60px; top: 150px"></div>
+      <span style="position: absolute; left: 48px; top: 48px; display: grid; place-items: center; width: 112px; height: 112px; border-radius: 32px; background: var(--background); box-shadow: var(--shadow-float)">
+        <svg class="i" viewBox="0 0 24 24" style="width: 56px; height: 56px; stroke-width: 1.6"><path d="M14 18V6a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2v11a1 1 0 0 0 1 1h2"></path><path d="M15 18H9"></path><path d="M19 18h2a1 1 0 0 0 1-1v-3.65a1 1 0 0 0-.22-.624l-3.48-4.35A1 1 0 0 0 17.52 8H14"></path><circle cx="17" cy="18" r="2"></circle><circle cx="7" cy="18" r="2"></circle></svg></span>
+      <div style="position: absolute; left: 48px; right: 48px; bottom: 48px; padding: 18px 20px; border-radius: 20px; background: var(--background); display: flex; gap: 12px; align-items: center">
+        <svg class="i" viewBox="0 0 24 24"><path d="M20 10c0 4.993-5.539 10.193-7.399 11.799a1 1 0 0 1-1.202 0C9.539 20.193 4 14.993 4 10a8 8 0 0 1 16 0"></path><circle cx="12" cy="10" r="3"></circle></svg>
+        <span style="font-size: 15px; font-weight: 600">Darmstadt area for now. More cities later.</span>
+      </div>
+    </div>
+    <div style="display: flex; flex-direction: column; gap: 24px">
+      <span style="font-size: 13px; letter-spacing: 0.14em; text-transform: uppercase; font-weight: 700; color: var(--muted-foreground)">TOAD truck</span>
+      <h2 style="margin: 0; font-family: var(--font-display); font-size: 44px; line-height: 50px; font-weight: 800; letter-spacing: -0.02em">The lab comes to your schoolyard</h2>
+      <p style="margin: 0; font-size: 17px; line-height: 27px; color: var(--muted-foreground); max-width: 560px">Request an open truck session and tell us where it can park. Merck reviews each request and emails you at every step.</p>
+      <div style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px">
+        <div style="padding: 18px; border-radius: 20px; background: var(--card); border: 1px solid var(--border)"><div style="font-size: 15px; font-weight: 700">Request</div><div style="font-size: 13px; line-height: 19px; color: var(--muted-foreground); margin-top: 4px">Pick a session, add your address and parking.</div></div>
+        <div style="padding: 18px; border-radius: 20px; background: var(--tint-yellow)"><div style="font-size: 15px; font-weight: 700">Merck review</div><div style="font-size: 13px; line-height: 19px; margin-top: 4px">Usually within 2 working days. Your session is held.</div></div>
+        <div style="padding: 18px; border-radius: 20px; background: var(--accent)"><div style="font-size: 15px; font-weight: 700">Visit day</div><div style="font-size: 13px; line-height: 19px; margin-top: 4px">Approved? You get the pre-visit kit and reminders.</div></div>
+      </div>
+      <a href="ToadRequest.dc.html" class="lc-btn lc-btn--default lc-btn--size-lg tap" style="align-self: flex-start; padding: 0 24px">Request the truck</a>
+    </div>
+  </section>
+
+  <section id="faq" style="margin: 104px 96px 96px; display: grid; grid-template-columns: 380px minmax(0, 1fr); gap: 72px">
+    <div>
+      <span style="font-size: 13px; letter-spacing: 0.14em; text-transform: uppercase; font-weight: 700; color: var(--muted-foreground)">FAQ</span>
+      <h2 style="margin: 8px 0 12px; font-family: var(--font-display); font-size: 44px; line-height: 50px; font-weight: 800; letter-spacing: -0.02em">Good to know</h2>
+      <p style="margin: 0; font-size: 16px; line-height: 25px; color: var(--muted-foreground)">Still have a question? Write to the Curiosity team at <span style="color: var(--foreground); font-weight: 600">[team email]</span>.</p>
+    </div>
+    <div style="display: flex; flex-direction: column; border-top: 1px solid var(--border)">
+      <sc-for list="{{faqs}}" as="q" hint-placeholder-count="4">
+        <div style="border-bottom: 1px solid var(--border)">
+          <button type="button" onClick="{{q.toggle}}" aria-expanded="{{q.open}}" style="width: 100%; display: flex; align-items: center; gap: 16px; min-height: 72px; padding: 0; border: 0; background: transparent; text-align: left; font: inherit; color: inherit; cursor: pointer">
+            <span style="flex-grow: 1; font-size: 19px; font-weight: 600">{{q.q}}</span>
+            <span style="display: grid; place-items: center; width: 36px; height: 36px; border-radius: 9999px; background: {{q.iconBg}}; transition: transform .25s, background .25s; transform: {{q.rot}}"><svg class="i i-sm" viewBox="0 0 24 24"><path d="M5 12h14"></path><path d="M12 5v14"></path></svg></span>
+          </button>
+          <sc-if value="{{q.open}}" hint-placeholder-val="{{false}}">
+            <p class="rise" style="margin: 0 0 24px; max-width: 640px; font-size: 16px; line-height: 25px; color: var(--muted-foreground)">{{q.a}}</p>
+          </sc-if>
+        </div>
+      </sc-for>
+    </div>
+  </section>
+
+  <footer style="margin-top: auto; padding: 36px 96px; border-top: 1px solid var(--border); display: flex; align-items: center; gap: 24px; background: var(--app-ground)">
+    <img src="./assets/4f8ae70f888133bf2907e3d9a3a80a93.png" alt="Merck" style="width: 59px; height: 28px">
+    <span style="flex-grow: 1; font-size: 13px; color: var(--muted-foreground)">©2025 Merck KGaA, Darmstadt, Germany or its affiliates. All rights reserved.</span>
+    <a href="#" style="font-size: 13px; font-weight: 500">Privacy notice</a>
+    <a href="#" style="font-size: 13px; font-weight: 500">Imprint</a>
+    <a href="#" style="font-size: 13px; font-weight: 500">Cookie settings</a>
+  </footer>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":3320}}'>
+class Component extends DCLogic {
+  constructor(p) { super(p); this.state = { lang: 'en', step: 0, faq: 0 }; }
+  renderVals() {
+    const de = this.state.lang === 'de';
+    const on = 'min-width: 40px; height: 32px; border: 0; border-radius: 9999px; font: 600 12px/1 var(--font-sans); background: var(--background); color: var(--foreground); box-shadow: var(--shadow-sm)';
+    const off = 'min-width: 40px; height: 32px; border: 0; border-radius: 9999px; font: 600 12px/1 var(--font-sans); background: transparent; color: var(--muted-foreground)';
+    const t = de
+      ? { headline: 'Echte Wissenschaft für Ihre Klasse.', sub: 'Buchen Sie Curiosity Cube, Curiosity Lab oder den TOAD-Truck, in unter 3 Minuten und ohne Papierkram.', book: 'Besuch buchen', signIn: 'Anmelden', explore: 'Programme ansehen' }
+      : { headline: 'Bring your class to real science.', sub: 'Book the Curiosity Cube, the Curiosity Lab or the TOAD truck in under 3 minutes, without email back-and-forth.', book: 'Book a visit', signIn: 'Sign in', explore: 'Explore programs' };
+    const P = {
+      cube: 'M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16ZM3.3 7l8.7 5 8.7-5M12 22V12',
+      lab: 'M10 2v7.527a2 2 0 0 1-.211.896L4.72 20.55a1 1 0 0 0 .9 1.45h12.76a1 1 0 0 0 .9-1.45l-5.069-10.127A2 2 0 0 1 14 9.527V2M8.5 2h7M7 16h10',
+      toad: 'M14 18V6a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2v11a1 1 0 0 0 1 1h2M15 18H9M19 18h2a1 1 0 0 0 1-1v-3.65a1 1 0 0 0-.22-.624l-3.48-4.35A1 1 0 0 0 17.52 8H14M17 16a2 2 0 1 0 0 4a2 2 0 1 0 0-4M7 16a2 2 0 1 0 0 4a2 2 0 1 0 0-4'
+    };
+    const stepDefs = [
+      { title: 'Choose how to visit', body: 'Come to Curiosity Labs in Darmstadt, or request the TOAD truck at your school.',
+        preview: { title: 'How would you like to visit?', rows: [['Onsite STEM visit', 'Instant', 'var(--brand-mint)', true], ['TOAD truck visit', 'Approval', 'var(--brand-magenta)', false]] } },
+      { title: 'Pick programs and a time', body: 'Cube, Lab, or both back to back. Only times where both are free are shown.',
+        preview: { title: 'Thu, 15 Oct · Cube first', rows: [['09:00 → 10:30', '30 seats', 'var(--brand-mint)', true], ['10:30 → 12:00', '12 seats', 'var(--brand-yellow)', false], ['12:00 → 13:30', 'Full', 'var(--muted)', false]] } },
+      { title: 'Add class details', body: 'Grade, class size and accessibility needs. No student names, ever.',
+        preview: { title: 'Grade 4 · 24 students', rows: [['Wheelchair access', 'Added', 'var(--primary)', true], ['Hearing support', '', 'var(--muted)', false]] } },
+      { title: 'Get confirmed and prepared', body: 'Confirmation by email, a calendar invite, the pre-visit kit and reminders.',
+        preview: { title: 'You are booked!', rows: [['Add to calendar', '.ics', 'var(--brand-yellow)', false], ['Pre-visit kit', '4 steps', 'var(--brand-purple)', true]] } }
+    ];
+    const cur = stepDefs[this.state.step];
+    const faqDefs = [
+      ['Who can book a visit?', 'Teachers at approved schools. Your school is approved once by the Merck team, then every teacher at the school can book directly.'],
+      ['Can we split a large class?', 'Yes. Each session takes up to 30 students. Book the second group as its own visit; it can run on the other program at the same time.'],
+      ['What data do you store?', 'Only your name, school email and class-level details such as grade and class size. No student data. Everything is stored in the EU (Frankfurt).'],
+      ['Can I reschedule or cancel?', 'Yes, from My bookings at any time. The freed seats go straight back to other schools.']
+    ];
+    return {
+      t, isDe: de, isEn: !de, deStyle: de ? on : off, enStyle: de ? off : on,
+      setDe: () => this.setState({ lang: 'de' }), setEn: () => this.setState({ lang: 'en' }),
+      facts: [['45 min', 'per session'], ['Up to 30', 'students per session'], ['< 3 min', 'to book online'], ['EU', 'data hosting, GDPR-ready']].map(([v, k], i) => ({ v, k, border: i ? '1px solid var(--border)' : '0' })),
+      programs: [
+        { name: 'Curiosity Cube', desc: 'A mobile science lab inside a shipping container. Students run real experiments in small teams.', bg: 'var(--brand-mint)', shape: 'var(--brand-yellow)', icon: P.cube, tag: 'Onsite', meta: ['45 min', 'Up to 30'], cta: 'Book the Cube', href: 'DesktopBook.dc.html' },
+        { name: 'Curiosity Lab', desc: 'Our STEM center in Darmstadt, with guided hands-on activities. Pair it with the Cube for a full morning.', bg: 'var(--brand-yellow)', shape: 'var(--brand-lime)', icon: P.lab, tag: 'Onsite', meta: ['45 min', 'Up to 30'], cta: 'Book the Lab', href: 'DesktopBook.dc.html' },
+        { name: 'TOAD truck', desc: 'The truck brings the experiments to your school. Merck approves each request before it is confirmed.', bg: 'var(--brand-magenta)', shape: 'var(--brand-purple)', icon: P.toad, tag: 'At your school', meta: ['Darmstadt area', 'Approval'], cta: 'Request the truck', href: 'ToadRequest.dc.html' }
+      ],
+      steps: stepDefs.map((s, i) => {
+        const a = i === this.state.step;
+        return { n: i + 1, title: s.title, body: s.body, on: a,
+          bg: a ? 'var(--background)' : 'transparent', border: a ? 'var(--border)' : 'transparent',
+          numBg: a ? 'var(--foreground)' : 'var(--muted)', numC: a ? 'var(--background)' : 'var(--foreground)',
+          pick: () => this.setState({ step: i }) };
+      }),
+      stepN: this.state.step + 1,
+      dots: stepDefs.map((_, i) => ({ c: i <= this.state.step ? 'var(--primary)' : 'var(--border)' })),
+      preview: { title: cur.preview.title, rows: cur.preview.rows.map(([label, note, dot, sel]) => ({ label, note, dot, border: sel ? 'var(--primary)' : 'var(--border)', bg: sel ? 'var(--accent)' : 'var(--card)' })) },
+      faqs: faqDefs.map(([q, a], i) => {
+        const open = this.state.faq === i;
+        return { q, a, open, rot: open ? 'rotate(45deg)' : 'none', iconBg: open ? 'var(--accent)' : 'var(--muted)',
+          toggle: () => this.setState({ faq: open ? -1 : i }) };
+      })
+    };
+  }
+}
+</script>
+</body>
+</html>

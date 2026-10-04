@@ -1,0 +1,63 @@
+/* Liquid Carbon tokens as CSS variables (light), plus a thin mobile layer for the Curiosity app */
+:root{
+  --background:#ffffff; --foreground:#0e0e11;
+  --card:#ffffff; --card-foreground:#0e0e11;
+  --popover:#ffffff; --popover-foreground:#0e0e11;
+  --primary:#149b5f; --primary-foreground:#ffffff;
+  --secondary:#f4f4f5; --secondary-foreground:#18181b;
+  --muted:#f4f4f5; --muted-foreground:#71717a;
+  --accent:#ebf7ec; --accent-foreground:#18181b;
+  --destructive:#e7000b; --destructive-foreground:#ffffff;
+  --border:#e4e4e7; --input:#e4e4e7; --input-surface:#ffffff; --ring:#18181b;
+  --chart-1:#149b5f; --chart-2:rgba(20,155,95,.25); --chart-3:#2dbecd; --chart-4:#ffc832; --chart-5:#eb3c96;
+  --sidebar-background:#fafafa;
+  --brand-green:#01884c; --brand-yellow:#ffc832; --brand-lime:#a5cd50; --brand-mint:#96d7d2;
+  --brand-blue:#0f69af; --brand-purple:#503291; --brand-cyan:#2dbecd; --brand-magenta:#eb3c96;
+  --brand-red:#e61e50; --brand-orange:#de7b22;
+  --font-sans:"Noto Sans",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --font-display:"Noto Sans Display","Noto Sans",system-ui,sans-serif;
+  --space-1:4px; --space-2:8px; --space-3:12px; --space-4:16px; --space-6:24px; --space-8:32px; --space-12:48px;
+  --radius-sm:6px; --radius-md:8px; --radius-lg:10px; --radius-xl:14px; --radius-2xl:16px; --radius-full:9999px;
+  --shadow-xs:0 1px 2px 0 rgba(0,0,0,.05);
+  --shadow-sm:0 1px 3px 0 rgba(0,0,0,.1),0 1px 2px -1px rgba(0,0,0,.1);
+  --control-sm:32px; --control-md:36px; --control-lg:40px;
+  /* app aliases */
+  --app-ground:var(--sidebar-background);
+  --cube:var(--brand-mint); --lab:var(--brand-yellow); --toad:var(--brand-magenta);
+  --tint-purple:color-mix(in srgb,var(--brand-purple) 9%,var(--background));
+  --tint-yellow:color-mix(in srgb,var(--brand-yellow) 22%,var(--background));
+  --tint-magenta:color-mix(in srgb,var(--brand-magenta) 12%,var(--background));
+  --tint-red:color-mix(in srgb,var(--destructive) 8%,var(--background));
+  --shadow-float:0 12px 32px -12px rgba(80,50,145,.28),0 2px 6px -2px rgba(14,14,17,.08);
+}
+body{margin:0;font-family:var(--font-sans);color:var(--foreground);background:var(--app-ground);-webkit-font-smoothing:antialiased}
+a{color:inherit}
+.i{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;flex:none}
+.i-sm{width:16px;height:16px}
+.i-lg{width:24px;height:24px}
+.scroll{overflow-y:auto;scrollbar-width:none}
+.scroll::-webkit-scrollbar{display:none}
+.scroll > *{flex-shrink:0}
+.tap{transition:transform .16s cubic-bezier(.2,.8,.2,1),box-shadow .2s,background-color .2s,border-color .2s;cursor:pointer;-webkit-tap-highlight-color:transparent}
+.tap:active{transform:scale(.97)}
+.iconbtn{display:inline-grid;place-items:center;width:44px;height:44px;border-radius:var(--radius-full);border:0;background:transparent;color:var(--foreground);cursor:pointer;text-decoration:none;position:relative}
+.iconbtn:hover{background:var(--accent)}
+/* Liquid Carbon Button, mobile sizing (48px touch target) and <a> as button (asChild) */
+a.lc-btn{text-decoration:none;box-sizing:border-box}
+.lc-btn--size-lg{height:48px;border-radius:var(--radius-xl);font-size:15px;font-weight:600;padding:0 20px}
+.lc-select__native{height:44px}
+.lc-input{height:44px;font-size:15px}
+:focus-visible{outline:2px solid var(--ring);outline-offset:2px}
+@keyframes lcSlideIn{from{transform:translateX(-104%)}to{transform:none}}
+@keyframes lcFade{from{opacity:0}to{opacity:1}}
+@keyframes lcPop{0%{transform:scale(.3);opacity:0}60%{transform:scale(1.1);opacity:1}100%{transform:scale(1)}}
+@keyframes lcRise{from{transform:translateY(14px);opacity:0}to{transform:none;opacity:1}}
+@keyframes lcFloat{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
+@keyframes lcPulse{0%{box-shadow:0 0 0 0 rgba(235,60,150,.45)}100%{box-shadow:0 0 0 10px rgba(235,60,150,0)}}
+@keyframes lcSheet{from{transform:translateY(100%)}to{transform:none}}
+.rise{animation:lcRise .5s cubic-bezier(.2,.8,.2,1) both}
+.rise-2{animation:lcRise .5s .08s cubic-bezier(.2,.8,.2,1) both}
+.rise-3{animation:lcRise .5s .16s cubic-bezier(.2,.8,.2,1) both}
+.rise-4{animation:lcRise .5s .24s cubic-bezier(.2,.8,.2,1) both}
+.float{animation:lcFloat 6s ease-in-out infinite}
+.pulse{animation:lcPulse 1.6s ease-out infinite}

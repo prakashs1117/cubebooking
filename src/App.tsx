@@ -18,6 +18,7 @@ import QRScanPage from './components/admin/QRScanPage'
 import BookingVerifyPage from './components/admin/BookingVerifyPage'
 import AdminDashboardPage from './components/admin/AdminDashboardPage'
 import ProgramsPage from './components/pages/ProgramsPage'
+import InformationPage from './components/pages/InformationPage'
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -71,6 +72,7 @@ function AppRoutes() {
     <Routes>
       {/* Public — no shell, no auth */}
       <Route path="/programs" element={<ProgramsPage />} />
+      <Route path="/info" element={<InformationPage />} />
 
       {/* Auth — no shell */}
       <Route path="/signin" element={<GuestOnly><SignInPage /></GuestOnly>} />

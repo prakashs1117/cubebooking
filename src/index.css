@@ -1,4 +1,12 @@
 @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500&family=Noto+Sans+Display:wght@500;600;700;800&display=swap');
+
+@font-face {
+  font-family: 'Merck';
+  src: url('./assets/merck.otf') format('opentype');
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
 @import "tailwindcss";
 
 /* ─── Liquid Carbon design tokens ─────────────────────────────────────────── */
@@ -47,6 +55,7 @@
   /* Typography */
   --font-sans: "Poppins", system-ui, -apple-system, "Segoe UI", sans-serif;
   --font-display: "Noto Sans Display", "Poppins", system-ui, sans-serif;
+  --font-merck: "Merck", "Noto Sans Display", system-ui, sans-serif;
 
   /* Spacing scale */
   --space-1: 4px;
