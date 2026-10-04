@@ -97,7 +97,7 @@ function AppRoutes() {
       {/* Future routes */}
       {/* <Route path="/toad" element={<ProtectedRoute><ToadRequestPage /></ProtectedRoute>} /> */}
 
-      <Route path="/" element={<Navigate to="/home" replace />} />
+      <Route path="/" element={<Navigate to="/info" replace />} />
       <Route path="*" element={<Navigate to="/home" replace />} />
     </Routes>
   )

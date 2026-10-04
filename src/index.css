@@ -1,4 +1,5 @@
 @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500&family=Noto+Sans+Display:wght@500;600;700;800&display=swap');
+@import "tailwindcss";
 
 @font-face {
   font-family: 'Merck';
@@ -7,7 +8,6 @@
   font-style: normal;
   font-display: swap;
 }
-@import "tailwindcss";
 
 /* ─── Liquid Carbon design tokens ─────────────────────────────────────────── */
 :root {

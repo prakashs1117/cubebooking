@@ -416,6 +416,13 @@ const en: Record<string, string> = {
   'bookingDetail.toad.bookAnother': 'Book another date',
   'adminVerify.toad.pendingWarning': 'This booking is still pending Merck approval',
 
+  // ── Info page header ─────────────────────────────────────────────────────
+  'info.lang.en': 'EN',
+  'info.lang.de': 'DE',
+  'info.lang.toggle': 'Switch language',
+  'info.menu.open': 'Open menu',
+  'info.menu.close': 'Close menu',
+
   // ── Programs info page ────────────────────────────────────────────────────
   'programs.nav.programs': 'Programs',
   'programs.nav.how': 'How booking works',
@@ -470,6 +477,64 @@ const en: Record<string, string> = {
   'programs.footer.copy': '©2025 Merck KGaA, Darmstadt, Germany. All rights reserved.',
   'programs.footer.privacy': 'Privacy notice',
   'programs.footer.imprint': 'Imprint',
+  'programs.footer.cookies': 'Cookie settings',
+  'programs.footer.quickLinks': 'Quick links',
+  'programs.footer.contact': 'Contact',
+  'programs.footer.contactBody': 'Questions? Write to the Curiosity team:',
+  'programs.footer.merckNote': 'Merck KGaA, Darmstadt, Germany',
+
+  // ── /info page — impact section ───────────────────────────────────────────
+  'info.impact.heading': 'Sparking curiosity worldwide',
+  'info.impact.label': 'Our Impact',
+  'info.impact.students': 'Students Reached',
+  'info.impact.countries': 'Countries Reached',
+  'info.impact.titleI': 'Title I Schools',
+  'info.impact.hours': 'Volunteer Hours',
+  'info.impact.titleINote': '* Title I classification means a majority of students receive free or reduced lunch programs and federal support due to low-income backgrounds.',
+
+  // ── /info page — what is section ──────────────────────────────────────────
+  'info.what.label': 'About the program',
+  'info.what.heading': 'What is the Curiosity Cube?',
+  'info.what.sparkHeading': 'A new way to SPARK™ Curiosity',
+  'info.what.body1': 'The Curiosity Cube™ mobile science lab features interactive, hands-on science experiments led by Merck employees. Visitors ask questions and explore the possibilities of a future career in Science, Technology, Engineering and Math (STEM).',
+  'info.what.body2': 'The Curiosity Cube™ travels throughout Europe and Africa visiting schools, summer camps and public spaces — including parks, festivals and museums — to foster engagement in science and interest in STEM careers.',
+  'info.what.ctaBook': 'Book a visit',
+  'info.what.ctaToad': 'Learn about TOAD truck',
+  'info.what.imgCaption': 'Real experiments · Real scientists · Real inspiration',
+  'info.what.imgAlt': 'Students doing hands-on science experiments inside the Curiosity Cube',
+  'info.what.stat': 'of students found the Curiosity Cube™ experience valuable — sparking real interest in STEM careers and science education.',
+
+  // ── /info page — video section ────────────────────────────────────────────
+  'info.video.heading': 'See a session in action',
+  'info.video.sub': 'Watch students experience real science inside the Curiosity Cube.',
+
+  // ── /info page — where section ────────────────────────────────────────────
+  'info.where.findLabel': 'Find us',
+  'info.where.findHeading': 'Where is the Curiosity Cube?',
+  'info.where.findBody': 'The Cube travels across Europe and Africa. Check the 2026 tour schedule to find a visit near you.',
+  'info.where.findCta': 'View the schedule →',
+  'info.where.findImgAlt': 'Curiosity Cube container in Europe',
+  'info.where.hostLabel': 'Host us',
+  'info.where.hostHeading': 'Request the Curiosity Cube',
+  'info.where.hostBody': 'Interested in hosting the Curiosity Cube™ at your school or event? Submit a request and our team will be in touch.',
+  'info.where.hostCta': 'Submit request →',
+  'info.where.hostImgAlt': 'Curiosity Cube container',
+
+  // ── /info page — footer brand description ─────────────────────────────────
+  'info.footer.brandDesc': 'The Curiosity Cube™ mobile science lab brings hands-on STEM education to students across Europe and Africa, inspiring the next generation of scientists.',
+
+  // ── Sign-in page (new strings) ────────────────────────────────────────────
+  'auth.info.headline': 'Bring real science to your classroom.',
+  'auth.info.sub': 'Book the Curiosity Cube, Curiosity Lab or TOAD truck in under 3 minutes — no emails, no waiting.',
+  'auth.info.stat1.value': '286k',
+  'auth.info.stat1.label': 'Students reached',
+  'auth.info.stat2.value': '20',
+  'auth.info.stat2.label': 'Countries',
+  'auth.info.stat3.value': '< 3m',
+  'auth.info.stat3.label': 'To book',
+  'auth.notTeacher': 'Not a teacher yet?',
+  'auth.learnPrograms': 'Learn about our programs →',
+
 }
 
 export default en

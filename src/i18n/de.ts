@@ -416,6 +416,13 @@ const de: Record<string, string> = {
   'bookingDetail.toad.bookAnother': 'Anderen Termin buchen',
   'adminVerify.toad.pendingWarning': 'Diese Buchung wartet noch auf Merck-Genehmigung',
 
+  // ── Info-Seiten-Kopfzeile ─────────────────────────────────────────────────
+  'info.lang.en': 'EN',
+  'info.lang.de': 'DE',
+  'info.lang.toggle': 'Sprache wechseln',
+  'info.menu.open': 'Menü öffnen',
+  'info.menu.close': 'Menü schließen',
+
   // ── Programm-Informationsseite ────────────────────────────────────────────
   'programs.nav.programs': 'Programme',
   'programs.nav.how': 'So funktioniert die Buchung',
@@ -470,6 +477,64 @@ const de: Record<string, string> = {
   'programs.footer.copy': '©2025 Merck KGaA, Darmstadt, Deutschland. Alle Rechte vorbehalten.',
   'programs.footer.privacy': 'Datenschutzhinweis',
   'programs.footer.imprint': 'Impressum',
+  'programs.footer.cookies': 'Cookie-Einstellungen',
+  'programs.footer.quickLinks': 'Schnelllinks',
+  'programs.footer.contact': 'Kontakt',
+  'programs.footer.contactBody': 'Fragen? Schreiben Sie dem Curiosity-Team:',
+  'programs.footer.merckNote': 'Merck KGaA, Darmstadt, Deutschland',
+
+  // ── /info-Seite — Impact-Bereich ──────────────────────────────────────────
+  'info.impact.heading': 'Neugier weltweit entfachen',
+  'info.impact.label': 'Unsere Wirkung',
+  'info.impact.students': 'Erreichte Schüler',
+  'info.impact.countries': 'Erreichte Länder',
+  'info.impact.titleI': 'Title-I-Schulen',
+  'info.impact.hours': 'Freiwilligenstunden',
+  'info.impact.titleINote': '* Title-I-Klassifizierung bedeutet, dass die Mehrheit der Schüler kostenlose oder vergünstigte Mahlzeiten und staatliche Förderung erhält.',
+
+  // ── /info-Seite — Was ist der Cube? ───────────────────────────────────────
+  'info.what.label': 'Über das Programm',
+  'info.what.heading': 'Was ist der Curiosity Cube?',
+  'info.what.sparkHeading': 'Eine neue Art, SPARK™-Neugier zu wecken',
+  'info.what.body1': 'Das mobile Wissenschaftslabor Curiosity Cube™ bietet interaktive, praxisorientierte Experimente, die von Merck-Mitarbeitern geleitet werden. Besucher stellen Fragen und erkunden Möglichkeiten für eine Karriere in MINT.',
+  'info.what.body2': 'Der Curiosity Cube™ reist durch Europa und Afrika und besucht Schulen, Sommercamps und öffentliche Räume – um das Interesse an Wissenschaft und MINT-Berufen zu fördern.',
+  'info.what.ctaBook': 'Besuch buchen',
+  'info.what.ctaToad': 'Mehr über den TOAD-Truck',
+  'info.what.imgCaption': 'Echte Experimente · Echte Wissenschaftler · Echte Inspiration',
+  'info.what.imgAlt': 'Schüler bei praktischen Wissenschaftsexperimenten im Curiosity Cube',
+  'info.what.stat': 'der Schüler fanden das Curiosity Cube™-Erlebnis wertvoll – und entwickelten echtes Interesse an MINT-Berufen.',
+
+  // ── /info-Seite — Video-Bereich ───────────────────────────────────────────
+  'info.video.heading': 'Eine Einheit in Aktion erleben',
+  'info.video.sub': 'Erleben Sie, wie Schüler echte Wissenschaft im Curiosity Cube entdecken.',
+
+  // ── /info-Seite — Wo-Bereich ──────────────────────────────────────────────
+  'info.where.findLabel': 'Finden Sie uns',
+  'info.where.findHeading': 'Wo ist der Curiosity Cube?',
+  'info.where.findBody': 'Der Cube reist durch Europa und Afrika. Prüfen Sie den Tourplan 2026, um einen Besuch in Ihrer Nähe zu finden.',
+  'info.where.findCta': 'Zeitplan ansehen →',
+  'info.where.findImgAlt': 'Curiosity-Cube-Container in Europa',
+  'info.where.hostLabel': 'Laden Sie uns ein',
+  'info.where.hostHeading': 'Curiosity Cube anfragen',
+  'info.where.hostBody': 'Möchten Sie den Curiosity Cube™ an Ihrer Schule oder Veranstaltung begrüßen? Senden Sie eine Anfrage und unser Team meldet sich.',
+  'info.where.hostCta': 'Anfrage senden →',
+  'info.where.hostImgAlt': 'Curiosity-Cube-Container',
+
+  // ── /info-Seite — Footer-Markenbeschreibung ───────────────────────────────
+  'info.footer.brandDesc': 'Das mobile Wissenschaftslabor Curiosity Cube™ bringt praxisorientierte MINT-Bildung zu Schülern in Europa und Afrika.',
+
+  // ── Anmeldeseite (neue Strings) ───────────────────────────────────────────
+  'auth.info.headline': 'Echte Wissenschaft für Ihre Klasse.',
+  'auth.info.sub': 'Curiosity Cube, Curiosity Lab oder TOAD-Truck in unter 3 Minuten buchen – ohne E-Mails, ohne Warten.',
+  'auth.info.stat1.value': '286k',
+  'auth.info.stat1.label': 'Erreichte Schüler',
+  'auth.info.stat2.value': '20',
+  'auth.info.stat2.label': 'Länder',
+  'auth.info.stat3.value': '< 3 Min.',
+  'auth.info.stat3.label': 'Zum Buchen',
+  'auth.notTeacher': 'Noch kein Lehrer?',
+  'auth.learnPrograms': 'Programme entdecken →',
+
 }
 
 export default de

@@ -1,7 +1,14 @@
 import { useEffect, useRef, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { useIntl } from 'react-intl'
+import * as Dialog from '@radix-ui/react-dialog'
 import MerckLogo from '../auth/MerckLogo'
+import UpcomingVisitCard from '../ui/UpcomingVisitCard'
+import { Carousel } from '../ui/carousel'
+import { useAuthContext } from '../../context/AuthContext'
+import { useLocale } from '../../context/LocaleContext'
+import ThemeToggle from '../ui/ThemeToggle'
+import NotificationPopover from '../layout/NotificationPopover'
 import { Menu, X, MapPin, Plus } from 'lucide-react'
 import gsap from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
@@ -71,6 +78,11 @@ const SCOPED_CSS = `
   .info-how { grid-template-columns: 1fr !important; }
   .info-how-preview { display: none !important; }
 }
+/* ── How: inline preview shown only on mobile ── */
+.info-how-inline { display: none !important; }
+@media (max-width: 900px) {
+  .info-how-inline { display: flex !important; }
+}
 
 /* ── TOAD: stack on tablet/mobile ── */
 @media (max-width: 900px) {
@@ -98,6 +110,21 @@ const SCOPED_CSS = `
 @media (max-width: 480px) {
   .info-section { margin-left: 12px !important; margin-right: 12px !important; }
 }
+
+/* ── Impact grid: 2-col on mobile (default), 4-col on desktop ── */
+@media (min-width: 640px) {
+  .info-impact-grid { grid-template-columns: repeat(4,minmax(0,1fr)) !important; }
+}
+
+/* ── What is / Where grids: stack on mobile ── */
+@media (max-width: 768px) {
+  .info-what-grid, .info-where-grid { grid-template-columns: 1fr !important; }
+}
+
+/* ── Footer grid: stack on mobile ── */
+@media (max-width: 768px) {
+  .info-footer-grid { grid-template-columns: 1fr !important; }
+}
 `
 
 function ScopedStyles() {
@@ -106,10 +133,36 @@ function ScopedStyles() {
 
 // ─── Header ───────────────────────────────────────────────────────────────────
 
+function LangPill({ size }: { size: 'sm' | 'md' }) {
+  const intl = useIntl()
+  const { locale, setLocale } = useLocale()
+  const pad = size === 'sm' ? '4px 9px' : '6px 13px'
+  const fs = size === 'sm' ? 11 : 13
+  return (
+    <div
+      aria-label={intl.formatMessage({ id: 'info.lang.toggle' })}
+      style={{ display: 'flex', borderRadius: 8, overflow: 'hidden', border: '1px solid var(--border)', flexShrink: 0 }}
+    >
+      {(['en', 'de'] as const).map(l => (
+        <button key={l} type="button" onClick={() => setLocale(l)}
+          style={{
+            padding: pad, border: 'none', fontSize: fs, fontWeight: 600, cursor: 'pointer', lineHeight: 1,
+            background: locale === l ? 'var(--primary)' : 'transparent',
+            color: locale === l ? '#fff' : 'var(--foreground)',
+            fontFamily: 'inherit',
+          }}>
+          {intl.formatMessage({ id: `info.lang.${l}` })}
+        </button>
+      ))}
+    </div>
+  )
+}
+
 function PageHeader() {
   const intl = useIntl()
-  const [open, setOpen] = useState(false)
+  const [drawerOpen, setDrawerOpen] = useState(false)
   const isDesktop = useBreakpoint('(min-width: 768px)')
+  const { user } = useAuthContext()
 
   const navItems = [
     { label: intl.formatMessage({ id: 'programs.nav.programs' }), id: 'programs' },
@@ -124,7 +177,7 @@ function PageHeader() {
         position: 'sticky', top: 0, zIndex: 50, height: 64,
         display: 'flex', alignItems: 'center', gap: 12,
         padding: '0 clamp(16px,4vw,56px)',
-        background: 'rgba(255,255,255,0.92)', backdropFilter: 'blur(12px)',
+        background: 'var(--surface-glass, rgba(255,255,255,0.92))', backdropFilter: 'blur(12px)',
         borderBottom: '1px solid var(--border)',
       }}>
         {/* Logo */}
@@ -148,6 +201,12 @@ function PageHeader() {
         <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginLeft: 'auto' }}>
           {isDesktop ? (
             <>
+              {/* Language pill */}
+              <LangPill size="sm" />
+              {/* Theme toggle */}
+              <ThemeToggle variant="icon" />
+              {/* Notification bell — only for signed-in users */}
+              {user && <NotificationPopover />}
               <Link to="/signin"
                 style={{ padding: '6px 14px', borderRadius: 10, border: '1px solid var(--border)', textDecoration: 'none', color: 'var(--foreground)', fontSize: 13, fontWeight: 600, display: 'inline-flex', alignItems: 'center' }}>
                 {intl.formatMessage({ id: 'programs.signIn' })}
@@ -158,35 +217,85 @@ function PageHeader() {
               </Link>
             </>
           ) : (
-            /* Hamburger — mobile only */
-            <button type="button" onClick={() => setOpen(o => !o)} aria-label="Menu"
-              style={{ width: 40, height: 40, border: 'none', borderRadius: 10, background: 'var(--muted)', cursor: 'pointer', display: 'grid', placeItems: 'center', color: 'var(--foreground)' }}>
-              {open ? <X size={18} /> : <Menu size={18} />}
-            </button>
+            /* Mobile: theme + notification + hamburger */
+            <>
+              <ThemeToggle variant="icon" />
+              {user && <NotificationPopover />}
+              <button
+                type="button"
+                onClick={() => setDrawerOpen(true)}
+                aria-label={intl.formatMessage({ id: 'info.menu.open' })}
+                style={{ width: 40, height: 40, border: 'none', borderRadius: 10, background: 'var(--muted)', cursor: 'pointer', display: 'grid', placeItems: 'center', color: 'var(--foreground)' }}
+              >
+                <Menu size={18} />
+              </button>
+            </>
           )}
         </div>
       </header>
 
-      {/* Mobile dropdown */}
-      {!isDesktop && open && (
-        <div style={{ position: 'fixed', top: 64, left: 0, right: 0, zIndex: 40, background: 'var(--background)', padding: '8px 16px 16px', borderBottom: '1px solid var(--border)', display: 'flex', flexDirection: 'column', gap: 2 }}>
-          {navItems.map(({ label, id }) => (
-            <button key={id} type="button" onClick={() => { scrollTo(id); setOpen(false) }}
-              style={{ padding: '13px 12px', border: 'none', borderRadius: 10, background: 'transparent', textAlign: 'left', fontSize: 15, fontWeight: 500, cursor: 'pointer', fontFamily: 'inherit', color: 'var(--foreground)' }}>
-              {label}
-            </button>
-          ))}
-          <div style={{ height: 1, background: 'var(--border)', margin: '6px 0' }} />
-          <Link to="/signin" onClick={() => setOpen(false)}
-            style={{ padding: '13px 12px', fontSize: 15, fontWeight: 500, textDecoration: 'none', color: 'var(--foreground)' }}>
-            {intl.formatMessage({ id: 'programs.signIn' })}
-          </Link>
-          <Link to="/home?book=1" onClick={() => setOpen(false)}
-            style={{ margin: '4px 12px 4px', padding: '14px 20px', borderRadius: 12, background: 'var(--primary)', color: '#fff', textDecoration: 'none', fontSize: 15, fontWeight: 700, textAlign: 'center' }}>
-            {intl.formatMessage({ id: 'programs.book' })}
-          </Link>
-        </div>
-      )}
+      {/* Mobile drawer — section nav */}
+      <Dialog.Root open={drawerOpen} onOpenChange={setDrawerOpen}>
+        <Dialog.Portal>
+          <Dialog.Overlay
+            style={{ position: 'fixed', inset: 0, zIndex: 49, background: 'rgba(14,14,17,0.45)', backdropFilter: 'blur(2px)', animation: 'lcFade .2s ease both' }}
+          />
+          <Dialog.Content
+            aria-label={intl.formatMessage({ id: 'info.menu.open' })}
+            style={{
+              position: 'fixed', inset: 0, zIndex: 50,
+              background: 'var(--background)',
+              display: 'flex', flexDirection: 'column',
+              animation: 'lcSlideIn .28s cubic-bezier(.2,.8,.2,1) both',
+              outline: 'none',
+            }}
+          >
+            {/* Drawer header */}
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '0 16px', height: 64, borderBottom: '1px solid var(--border)', flexShrink: 0 }}>
+              <Link to="/info" onClick={() => setDrawerOpen(false)} style={{ display: 'flex', alignItems: 'center', gap: 10, textDecoration: 'none', color: 'inherit', fontWeight: 800, fontSize: 17, fontFamily: 'var(--font-display)' }}>
+                <MerckLogo width={52} height={25} />
+              </Link>
+              <Dialog.Close asChild>
+                <button
+                  type="button"
+                  aria-label={intl.formatMessage({ id: 'info.menu.close' })}
+                  style={{ width: 40, height: 40, border: 'none', borderRadius: 10, background: 'var(--muted)', cursor: 'pointer', display: 'grid', placeItems: 'center', color: 'var(--foreground)' }}
+                >
+                  <X size={18} />
+                </button>
+              </Dialog.Close>
+            </div>
+
+            {/* Section nav links */}
+            <nav style={{ flex: 1, overflowY: 'auto', padding: '8px 12px', display: 'flex', flexDirection: 'column', gap: 2 }}>
+              {navItems.map(({ label, id }) => (
+                <button key={id} type="button"
+                  onClick={() => { scrollTo(id); setDrawerOpen(false) }}
+                  style={{ padding: '14px 12px', border: 'none', borderRadius: 10, background: 'transparent', textAlign: 'left', fontSize: 15, fontWeight: 500, cursor: 'pointer', fontFamily: 'inherit', color: 'var(--foreground)' }}>
+                  {label}
+                </button>
+              ))}
+
+              <div style={{ height: 1, background: 'var(--border)', margin: '8px 0' }} />
+
+              <Link to="/signin" onClick={() => setDrawerOpen(false)}
+                style={{ padding: '14px 12px', fontSize: 15, fontWeight: 500, textDecoration: 'none', color: 'var(--foreground)', borderRadius: 10, display: 'block' }}>
+                {intl.formatMessage({ id: 'programs.signIn' })}
+              </Link>
+              <Link to="/home?book=1" onClick={() => setDrawerOpen(false)}
+                style={{ margin: '4px 0', padding: '14px 20px', borderRadius: 12, background: 'var(--primary)', color: '#fff', textDecoration: 'none', fontSize: 15, fontWeight: 700, textAlign: 'center', display: 'block' }}>
+                {intl.formatMessage({ id: 'programs.book' })}
+              </Link>
+            </nav>
+
+            {/* Footer: language + theme */}
+            <div style={{ padding: '12px 16px', borderTop: '1px solid var(--border)', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexShrink: 0 }}>
+              <LangPill size="md" />
+              <ThemeToggle variant="segmented" />
+            </div>
+          </Dialog.Content>
+        </Dialog.Portal>
+      </Dialog.Root>
     </>
   )
 }
@@ -341,28 +450,7 @@ function FlaskScene({ motionReady }: { motionReady: boolean }) {
         </div>
       ))}
 
-      {/* Seats note */}
-      <div className="info-hero-note" style={{position:'absolute',left:'-1%',top:'50%',width:'min(210px,36%)',padding:'12px 14px',borderRadius:18,background:'var(--brand-yellow)',color:'var(--foreground)',display:'flex',gap:10,alignItems:'center',boxShadow:'0 24px 48px -20px rgba(14,14,17,.5)',transform:'rotate(-3deg)'}}>
-        <span style={{flexShrink:0,display:'grid',placeItems:'center',width:34,height:34,borderRadius:10,background:'rgba(255,255,255,.7)'}}>🕙</span>
-        <div>
-          <b style={{display:'block',fontSize:13,lineHeight:1.25}}>Seats held for 10:00</b>
-          <small style={{fontSize:11.5}}>while you add class details</small>
-        </div>
-      </div>
-
-      {/* Visit card */}
-      <div className="info-hero-visit" style={{position:'absolute',right:'-2%',bottom:'-6%',width:'min(250px,43%)',padding:16,borderRadius:22,background:'var(--background)',color:'var(--foreground)',boxShadow:'0 30px 60px -20px rgba(14,14,17,.5)',display:'flex',flexDirection:'column',gap:10}}>
-        <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',fontSize:12,fontWeight:700,color:'var(--muted-foreground)'}}>
-          <span>Your visit</span>
-          <span style={{padding:'2px 9px',borderRadius:9999,background:'var(--accent)',color:'var(--brand-green)'}}>✓ Confirmed</span>
-        </div>
-        <div style={{fontFamily:'var(--font-display)',fontWeight:800,fontSize:21}}>Thu, 15 Oct</div>
-        <div style={{display:'flex',gap:6}}>
-          <div style={{flex:1,padding:'8px 10px',borderRadius:12,background:'var(--brand-mint)'}}><b style={{display:'block',fontSize:13}}>Cube</b><small style={{fontSize:11.5}}>09:00–09:45</small></div>
-          <div style={{flex:1,padding:'8px 10px',borderRadius:12,background:'var(--brand-yellow)'}}><b style={{display:'block',fontSize:13}}>Lab</b><small style={{fontSize:11.5}}>09:45–10:30</small></div>
-        </div>
-        <small style={{fontSize:12,color:'var(--muted-foreground)'}}>Class 4b · 24 students</small>
-      </div>
+      {/* No booking preview card — /info is a public page, no auth context */}
     </div>
   )
 }
@@ -371,6 +459,7 @@ function FlaskScene({ motionReady }: { motionReady: boolean }) {
 
 function HeroSection({ motionReady }: { motionReady: boolean }) {
   const intl = useIntl()
+  const { user } = useAuthContext()
   const copyRef  = useRef<HTMLDivElement>(null)
   const sceneRef = useRef<HTMLDivElement>(null)
   const blobRefs = useRef<HTMLElement[]>([])
@@ -420,11 +509,28 @@ function HeroSection({ motionReady }: { motionReady: boolean }) {
             {intl.formatMessage({ id: 'programs.hero.explore' })}
           </button>
         </div>
+        {/* "View all bookings" — only shown when logged in */}
+        {user && (
+          <Link to="/bookings" style={{alignSelf:'flex-start',display:'inline-flex',alignItems:'center',gap:6,fontSize:13,fontWeight:600,color:'rgba(255,255,255,.75)',textDecoration:'none',marginTop:-4}}>
+            {intl.formatMessage({ id: 'nav.bookings' })} →
+          </Link>
+        )}
       </div>
 
-      {/* Flask scene */}
+      {/* Flask scene + real upcoming booking card */}
       <div ref={sceneRef} className="info-hero-flask" style={{position:'relative',zIndex:1,width:'100%',maxWidth:580,justifySelf:'center'}}>
         <FlaskScene motionReady={motionReady}/>
+        {/* Floating visit card — only rendered if user is logged in and has upcoming booking */}
+        <UpcomingVisitCard
+          variant="hero"
+          style={{
+            position: 'absolute',
+            right: '-2%',
+            bottom: '-6%',
+            width: 'min(250px,43%)',
+          }}
+          className="info-hero-visit"
+        />
       </div>
     </section>
   )
@@ -593,16 +699,17 @@ function PeriodicStrip({ motionReady }: { motionReady: boolean }) {
   )
 }
 
-// ─── Video placeholder ────────────────────────────────────────────────────────
+// ─── Video section ────────────────────────────────────────────────────────────
 
 function VideoSection({ motionReady }: { motionReady: boolean }) {
+  const intl = useIntl()
   const frameRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
-    if (!motionReady) return
+    if (!motionReady) return undefined
     const t = gsap.fromTo(frameRef.current, {scale:0.82,borderRadius:72}, {scale:1,borderRadius:28,ease:'none',
       scrollTrigger:{trigger:frameRef.current,start:'top 92%',end:'top 35%',scrub:true}})
-    return () => t.kill()
+    return () => { t.kill() }
   }, [motionReady])
 
   return (
@@ -614,24 +721,21 @@ function VideoSection({ motionReady }: { motionReady: boolean }) {
     }}>
       <div style={{position:'relative',zIndex:1,margin:'0 auto 32px',display:'flex',flexDirection:'column',gap:12,alignItems:'center',textAlign:'center'}}>
         <h2 style={{margin:0,fontFamily:'var(--font-display)',fontWeight:800,fontSize:'clamp(26px,3.5vw,44px)',lineHeight:1.14,letterSpacing:'-0.02em'}}>
-          See a session in action
+          {intl.formatMessage({ id: 'info.video.heading' })}
         </h2>
         <p style={{margin:0,fontSize:'clamp(15px,1.4vw,17px)',lineHeight:1.55,color:'rgba(255,255,255,.85)',maxWidth:480}}>
-          Step inside the Cube with a class like yours. Our film is almost ready.
+          {intl.formatMessage({ id: 'info.video.sub' })}
         </p>
       </div>
-      <div ref={frameRef} style={{position:'relative',zIndex:1,maxWidth:960,margin:'0 auto',aspectRatio:'16/9',borderRadius:28,overflow:'hidden',background:'#1d1140',border:'1px solid rgba(255,255,255,.22)',boxShadow:'0 40px 80px -30px rgba(0,0,0,.6)'}}>
-        <div style={{position:'absolute',inset:0,display:'grid',placeItems:'center',background:'radial-gradient(circle at 50% 40%,#6a45b8,#26154f 70%)'}}>
-          <div style={{display:'flex',flexDirection:'column',alignItems:'center',gap:2,textAlign:'center',padding:'0 16px'}}>
-            <div style={{display:'grid',placeItems:'center',width:'clamp(60px,8vw,96px)',aspectRatio:'1',borderRadius:'50%',background:'#fff',color:'var(--brand-purple)',marginBottom:48}}>
-              <svg viewBox="0 0 24 24" aria-hidden="true" style={{width:'42%',marginLeft:'6%'}}>
-                <path d="M8 5.5v13a1 1 0 0 0 1.5.86l11-6.5a1 1 0 0 0 0-1.72l-11-6.5A1 1 0 0 0 8 5.5Z" fill="currentColor"/>
-              </svg>
-            </div>
-            <b style={{fontFamily:'var(--font-display)',fontWeight:800,fontSize:'clamp(16px,2vw,24px)'}}>Video coming soon</b>
-            <span style={{fontSize:13,color:'rgba(255,255,255,.8)'}}>A look inside the Curiosity Cube</span>
-          </div>
-        </div>
+      <div ref={frameRef} style={{position:'relative',zIndex:1,maxWidth:960,margin:'0 auto',aspectRatio:'16/9',borderRadius:28,overflow:'hidden',background:'#000',border:'1px solid rgba(255,255,255,.22)',boxShadow:'0 40px 80px -30px rgba(0,0,0,.6)'}}>
+        <video
+          controls
+          preload="metadata"
+          playsInline
+          style={{width:'100%',height:'100%',display:'block',objectFit:'cover'}}
+        >
+          <source src="/Merck-1.mp4" type="video/mp4"/>
+        </video>
       </div>
     </section>
   )
@@ -652,6 +756,7 @@ function HowSection({ motionReady }: { motionReady: boolean }) {
   const autoRef  = useRef(true)
   const barRef   = useRef<gsap.core.Tween|null>(null)
   const barEls   = useRef<HTMLElement[]>([])
+  const isMobile = useBreakpoint('(max-width: 900px)')
 
   function gotoStep(i: number, fromUser = false) {
     setActiveStep(i)
@@ -682,62 +787,129 @@ function HowSection({ motionReady }: { motionReady: boolean }) {
     intl.formatMessage({ id: 'programs.how.step4.body' }),
   ]
 
-  return (
-    <section id="how" className="info-how" style={{
-      margin:'clamp(48px,6vw,88px) clamp(10px,2vw,24px) 0',
-      padding:'clamp(24px,4vw,64px) clamp(16px,3.5vw,56px)',
-      borderRadius:'clamp(20px,3vw,32px)', background:'var(--app-ground)', border:'1px solid var(--border)',
-      display:'grid', gridTemplateColumns:'repeat(2,minmax(0,1fr))', gap:'clamp(24px,4vw,56px)', alignItems:'center',
-    }}>
-      {/* Steps list */}
-      <div style={{display:'flex',flexDirection:'column',gap:24}}>
-        <h2 style={{margin:0,fontFamily:'var(--font-display)',fontWeight:800,fontSize:'clamp(26px,3.5vw,44px)',lineHeight:1.14,letterSpacing:'-0.02em'}}>
-          {intl.formatMessage({ id: 'programs.how.heading' })}
-        </h2>
-        <ol style={{margin:0,padding:0,listStyle:'none',display:'flex',flexDirection:'column',gap:6}}>
-          {HOW_STEPS_DATA.map((s,i) => {
-            const active = i === activeStep
-            return (
-              <li key={i}>
-                <button type="button" onClick={() => gotoStep(i,true)} className="info-step-btn"
-                  style={{position:'relative',width:'100%',display:'flex',gap:16,alignItems:'flex-start',padding:'14px 16px 16px',borderRadius:16,border:`1px solid ${active?'var(--border)':'transparent'}`,background:active?'var(--background)':'transparent',textAlign:'left',font:'inherit',color:'inherit',cursor:'pointer',overflow:'hidden'}}>
-                  <span style={{flexShrink:0,display:'grid',placeItems:'center',width:38,height:38,borderRadius:10,background:active?'var(--foreground)':'var(--muted)',color:active?'var(--background)':undefined,fontFamily:'var(--font-display)',fontWeight:800,fontSize:16}}>{i+1}</span>
-                  <span>
-                    <b style={{display:'block',fontSize:16,marginBottom:3}}>{s.title}</b>
-                    <small style={{fontSize:13,lineHeight:1.5,color:'var(--muted-foreground)'}}>{stepBodies[i]}</small>
-                  </span>
-                  <i ref={el => { if (el) barEls.current[i] = el }}
-                    style={{position:'absolute',left:0,right:0,bottom:0,height:3,background:'var(--primary)',transform:'scaleX(0)',transformOrigin:'0 50%',display:'block'}}/>
-                </button>
-              </li>
-            )
-          })}
-        </ol>
-      </div>
+  // Accent colours per step
+  const STEP_ACCENTS = [
+    'var(--brand-purple)',
+    'linear-gradient(135deg,var(--brand-purple),var(--brand-cyan))',
+    'linear-gradient(135deg,var(--brand-cyan),var(--brand-green))',
+    'linear-gradient(135deg,var(--brand-green),var(--brand-lime))',
+  ]
 
-      {/* Preview card — hidden on mobile via CSS class */}
-      <div className="info-how-preview" style={{position:'relative',minHeight:'clamp(340px,38vw,500px)',borderRadius:28,background:'var(--brand-mint)',overflow:'hidden',display:'grid',placeItems:'center',padding:20}}>
-        <div style={{position:'absolute',width:280,height:280,borderRadius:'50%',background:'var(--brand-yellow)',left:-80,bottom:-90}}/>
-        <div style={{position:'absolute',width:120,height:120,borderRadius:'50%',background:'var(--brand-magenta)',right:36,top:32}}/>
-        <div style={{position:'relative',width:'min(360px,100%)',padding:24,borderRadius:24,background:'var(--background)',boxShadow:'0 30px 60px -24px rgba(14,14,17,.35)',display:'flex',flexDirection:'column',gap:16}}>
-          <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',fontSize:12,fontWeight:700,color:'var(--muted-foreground)'}}>
-            <span>Step {activeStep+1} of 4</span>
-            <span style={{display:'flex',gap:4}}>
-              {[0,1,2,3].map(i => <span key={i} style={{width:20,height:5,borderRadius:9999,background:i<=activeStep?'var(--primary)':'var(--border)',display:'block'}}/>)}
-            </span>
-          </div>
-          <div style={{fontFamily:'var(--font-display)',fontWeight:800,fontSize:22,lineHeight:1.25}}>{preview.title}</div>
-          <div style={{display:'flex',flexDirection:'column',gap:8}}>
-            {preview.rows.map(([label,note,dot,sel],ri) => (
-              <div key={ri} style={{display:'flex',alignItems:'center',gap:12,padding:'11px 13px',borderRadius:12,border:`1.5px solid ${sel?'var(--primary)':'var(--border)'}`,background:sel?'var(--accent)':'var(--card)'}}>
-                <i style={{flexShrink:0,width:13,height:13,borderRadius:'50%',background:dot as string}}/>
-                <b style={{flexGrow:1,fontSize:14}}>{label}</b>
-                <span style={{fontSize:12,color:'var(--muted-foreground)'}}>{note}</span>
-              </div>
-            ))}
-          </div>
+  // Carousel slides for mobile — each slide is a rich step card
+  const carouselSlides = HOW_STEPS_DATA.map((s, i) => ({
+    title: s.title,
+    accent: STEP_ACCENTS[i],
+    content: (
+      <div style={{display:'flex',flexDirection:'column',gap:12,width:'100%',padding:'0 4px'}}>
+        {/* Step badge + title */}
+        <div style={{display:'flex',alignItems:'center',gap:10,marginBottom:2}}>
+          <span style={{flexShrink:0,display:'grid',placeItems:'center',width:32,height:32,borderRadius:9,background:'rgba(255,255,255,.22)',color:'#fff',fontFamily:'var(--font-display)',fontWeight:800,fontSize:15}}>
+            {i+1}
+          </span>
+          <b style={{fontSize:'clamp(14px,3.5vmin,18px)',fontFamily:'var(--font-display)',fontWeight:800,color:'#fff',lineHeight:1.2,textAlign:'left'}}>
+            {s.title}
+          </b>
+        </div>
+        {/* Step body */}
+        <p style={{margin:0,fontSize:'clamp(11px,2.5vmin,13px)',lineHeight:1.55,color:'rgba(255,255,255,.82)',textAlign:'left'}}>
+          {stepBodies[i]}
+        </p>
+        {/* Option rows */}
+        <div style={{display:'flex',flexDirection:'column',gap:5,marginTop:2}}>
+          {s.rows.map(([label,note,dot,sel],ri) => (
+            <div key={ri} style={{display:'flex',alignItems:'center',gap:8,padding:'8px 10px',borderRadius:10,background:sel?'rgba(255,255,255,.22)':'rgba(255,255,255,.10)',border:`1.5px solid ${sel?'rgba(255,255,255,.55)':'rgba(255,255,255,.18)'}`}}>
+              <i style={{flexShrink:0,width:10,height:10,borderRadius:'50%',background:dot as string,boxShadow:'0 0 0 2px rgba(255,255,255,.3)'}}/>
+              <b style={{flexGrow:1,fontSize:'clamp(10px,2.2vmin,12px)',color:'#fff',textAlign:'left'}}>{label}</b>
+              {note ? <span style={{fontSize:'clamp(9px,2vmin,11px)',color:'rgba(255,255,255,.7)',flexShrink:0}}>{note}</span> : null}
+            </div>
+          ))}
         </div>
       </div>
+    ),
+  }))
+
+  return (
+    <section id="how" style={{
+      margin:'clamp(48px,6vw,88px) clamp(10px,2vw,24px) 0',
+    }}>
+      {/* Section heading — always visible */}
+      <h2 style={{margin:'0 clamp(14px,3.5vw,56px) clamp(24px,3vw,40px)',fontFamily:'var(--font-display)',fontWeight:800,fontSize:'clamp(22px,3.5vw,44px)',lineHeight:1.14,letterSpacing:'-0.02em'}}>
+        {intl.formatMessage({ id: 'programs.how.heading' })}
+      </h2>
+
+      {/* ── Mobile: beautiful carousel ── */}
+      {isMobile ? (
+        <div style={{
+          padding:'clamp(24px,4vw,40px) clamp(14px,3vw,32px) clamp(40px,5vw,56px)',
+          borderRadius:'clamp(20px,3vw,32px)',
+          background:'var(--app-ground)',
+          border:'1px solid var(--border)',
+          overflow:'hidden',
+        }}>
+          <div className="relative overflow-hidden w-full" style={{paddingBottom:'80px'}}>
+            <Carousel slides={carouselSlides} />
+          </div>
+        </div>
+      ) : (
+        /* ── Desktop: original 2-col layout ── */
+        <div className="info-how" style={{
+          padding:'clamp(16px,3vw,56px) clamp(14px,3.5vw,56px)',
+          borderRadius:'clamp(20px,3vw,32px)',
+          background:'var(--app-ground)',
+          border:'1px solid var(--border)',
+          display:'grid',
+          gridTemplateColumns:'repeat(2,minmax(0,1fr))',
+          gap:'clamp(24px,4vw,56px)',
+          alignItems:'center',
+        }}>
+          {/* Steps list */}
+          <div style={{display:'flex',flexDirection:'column',gap:20}}>
+            <ol style={{margin:0,padding:0,listStyle:'none',display:'flex',flexDirection:'column',gap:4}}>
+              {HOW_STEPS_DATA.map((s,i) => {
+                const active = i === activeStep
+                return (
+                  <li key={i}>
+                    <button type="button" onClick={() => gotoStep(i,true)} className="info-step-btn"
+                      style={{position:'relative',width:'100%',display:'flex',gap:14,alignItems:'flex-start',padding:'12px 14px 14px',borderRadius:14,border:`1px solid ${active?'var(--border)':'transparent'}`,background:active?'var(--background)':'transparent',textAlign:'left',font:'inherit',color:'inherit',cursor:'pointer',overflow:'hidden'}}>
+                      <span style={{flexShrink:0,display:'grid',placeItems:'center',width:34,height:34,borderRadius:9,background:active?'var(--foreground)':'var(--muted)',color:active?'var(--background)':undefined,fontFamily:'var(--font-display)',fontWeight:800,fontSize:15}}>{i+1}</span>
+                      <span>
+                        <b style={{display:'block',fontSize:15,marginBottom:2}}>{s.title}</b>
+                        <small style={{fontSize:12,lineHeight:1.5,color:'var(--muted-foreground)'}}>{stepBodies[i]}</small>
+                      </span>
+                      <i ref={el => { if (el) barEls.current[i] = el }}
+                        style={{position:'absolute',left:0,right:0,bottom:0,height:3,background:'var(--primary)',transform:'scaleX(0)',transformOrigin:'0 50%',display:'block'}}/>
+                    </button>
+                  </li>
+                )
+              })}
+            </ol>
+          </div>
+
+          {/* Preview card */}
+          <div className="info-how-preview" style={{position:'relative',minHeight:'clamp(340px,38vw,500px)',borderRadius:28,background:'var(--brand-mint)',overflow:'hidden',display:'grid',placeItems:'center',padding:20}}>
+            <div style={{position:'absolute',width:280,height:280,borderRadius:'50%',background:'var(--brand-yellow)',left:-80,bottom:-90}}/>
+            <div style={{position:'absolute',width:120,height:120,borderRadius:'50%',background:'var(--brand-magenta)',right:36,top:32}}/>
+            <div style={{position:'relative',width:'min(360px,100%)',padding:24,borderRadius:24,background:'var(--background)',boxShadow:'0 30px 60px -24px rgba(14,14,17,.35)',display:'flex',flexDirection:'column',gap:16}}>
+              <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',fontSize:12,fontWeight:700,color:'var(--muted-foreground)'}}>
+                <span>{intl.formatMessage({ id: 'programs.how.step' })} {activeStep+1} / 4</span>
+                <span style={{display:'flex',gap:4}}>
+                  {[0,1,2,3].map(i => <span key={i} style={{width:20,height:5,borderRadius:9999,background:i<=activeStep?'var(--primary)':'var(--border)',display:'block'}}/>)}
+                </span>
+              </div>
+              <div style={{fontFamily:'var(--font-display)',fontWeight:800,fontSize:22,lineHeight:1.25}}>{preview.title}</div>
+              <div style={{display:'flex',flexDirection:'column',gap:8}}>
+                {preview.rows.map(([label,note,dot,sel],ri) => (
+                  <div key={ri} style={{display:'flex',alignItems:'center',gap:12,padding:'11px 13px',borderRadius:12,border:`1.5px solid ${sel?'var(--primary)':'var(--border)'}`,background:sel?'var(--accent)':'var(--card)'}}>
+                    <i style={{flexShrink:0,width:13,height:13,borderRadius:'50%',background:dot as string}}/>
+                    <b style={{flexGrow:1,fontSize:14}}>{label}</b>
+                    <span style={{fontSize:12,color:'var(--muted-foreground)'}}>{note}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </section>
   )
 }
@@ -755,7 +927,7 @@ function ToadSection({ motionReady }: { motionReady: boolean }) {
   useEffect(() => {
     if (!motionReady) return
     const drive = { trigger:'.info-truck-stage', start:'top 88%', end:'bottom 62%', scrub:0.5 }
-    const t1 = gsap.fromTo(truckRef.current, {x:-430}, {x:0, ease:'none', scrollTrigger:drive})
+    const t1 = gsap.fromTo(truckRef.current, {x:-430}, {x:200, ease:'none', scrollTrigger:drive})
     const t2 = gsap.to([wheel1Ref.current,wheel2Ref.current], {rotation:900, transformOrigin:'50% 50%', ease:'none', scrollTrigger:drive})
     const t3 = gsap.fromTo(roadRef.current, {strokeDashoffset:0}, {strokeDashoffset:128, ease:'none', scrollTrigger:drive})
     const puffT = puffRefs.current.map(p => {
@@ -904,17 +1076,312 @@ function FaqSection({ motionReady }: { motionReady: boolean }) {
   )
 }
 
+// ─── Impact stats ─────────────────────────────────────────────────────────────
+
+function ImpactSection({ motionReady }: { motionReady: boolean }) {
+  const intl = useIntl()
+  const numRefs = useRef<HTMLElement[]>([])
+
+  // Lucide icons — single brand-purple colour, no emoji
+  const stats = [
+    {
+      icon: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" style={{ width: 28, height: 28 }}><path d="M22 10v6M2 10l10-5 10 5-10 5z"/><path d="M6 12v5c3 3 9 3 12 0v-5"/></svg>,
+      val: 286075, label: intl.formatMessage({ id: 'info.impact.students' }), suffix: '',
+    },
+    {
+      icon: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" style={{ width: 28, height: 28 }}><circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>,
+      val: 20, label: intl.formatMessage({ id: 'info.impact.countries' }), suffix: '+',
+    },
+    {
+      icon: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" style={{ width: 28, height: 28 }}><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>,
+      val: 94, label: intl.formatMessage({ id: 'info.impact.titleI' }), suffix: '%',
+    },
+    {
+      icon: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" style={{ width: 28, height: 28 }}><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>,
+      val: 55068, label: intl.formatMessage({ id: 'info.impact.hours' }), suffix: '',
+    },
+  ]
+
+  useEffect(() => {
+    if (!motionReady) return
+    numRefs.current.forEach((el, i) => {
+      if (!el) return
+      const obj = { v: 0 }
+      gsap.to(obj, { v: stats[i].val, duration: 2, ease: 'power2.out', snap: { v: 1 },
+        onUpdate: () => { el.textContent = stats[i].val > 999 ? Math.round(obj.v).toLocaleString() : String(Math.round(obj.v)) },
+        scrollTrigger: { trigger: el, start: 'top 88%', once: true } })
+    })
+  }, [motionReady])
+
+  return (
+    <section style={{ margin: 'clamp(48px,6vw,80px) clamp(16px,5vw,80px) 0' }}>
+      <div style={{ textAlign: 'center', marginBottom: 32 }}>
+        <span style={{ fontSize: 13, fontWeight: 700, letterSpacing: '0.12em', textTransform: 'uppercase', color: 'var(--muted-foreground)' }}>
+          {intl.formatMessage({ id: 'info.impact.label' })}
+        </span>
+        <h2 style={{ margin: '8px 0 0', fontFamily: 'var(--font-display)', fontWeight: 800, fontSize: 'clamp(26px,3.5vw,40px)', letterSpacing: '-0.02em' }}>
+          {intl.formatMessage({ id: 'info.impact.heading' })}
+        </h2>
+      </div>
+
+      {/* 2-col on mobile, 4-col on desktop */}
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2,minmax(0,1fr))', gap: 12 }}
+        className="info-impact-grid">
+        {stats.map((s, i) => (
+          <div key={i} style={{ padding: 'clamp(16px,2vw,28px)', borderRadius: 18, background: 'var(--card)', border: '1px solid var(--border)', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 8, textAlign: 'center' }}>
+            {/* Single-colour icon */}
+            <span style={{ color: 'var(--brand-purple)', display: 'flex' }}>
+              {s.icon}
+            </span>
+            <span style={{ fontFamily: 'var(--font-merck)', fontWeight: 800, fontSize: 'clamp(22px,2.8vw,36px)', letterSpacing: '0.03em', color: 'var(--brand-purple)', lineHeight: 1 }}>
+              <b ref={el => { if (el) numRefs.current[i] = el }}>
+                {s.val > 999 ? s.val.toLocaleString() : s.val}
+              </b>{s.suffix}
+            </span>
+            <span style={{ fontSize: 'clamp(11px,1.1vw,14px)', fontWeight: 600, color: 'var(--muted-foreground)', lineHeight: 1.35 }}>{s.label}</span>
+          </div>
+        ))}
+      </div>
+
+      <p style={{ margin: '14px 0 0', fontSize: 12, color: 'var(--muted-foreground)', textAlign: 'center' }}>
+        {intl.formatMessage({ id: 'info.impact.titleINote' })}
+      </p>
+    </section>
+  )
+}
+
+// ─── What is section ──────────────────────────────────────────────────────────
+
+function WhatIsSection() {
+  const intl = useIntl()
+  return (
+    <section style={{ margin: 'clamp(48px,6vw,80px) clamp(16px,5vw,80px) 0' }}>
+      <div style={{ textAlign: 'center', marginBottom: 32 }}>
+        <span style={{ fontSize: 13, fontWeight: 700, letterSpacing: '0.12em', textTransform: 'uppercase', color: 'var(--muted-foreground)' }}>
+          {intl.formatMessage({ id: 'info.what.label' })}
+        </span>
+        <h2 style={{ margin: '8px 0 0', fontFamily: 'var(--font-display)', fontWeight: 800, fontSize: 'clamp(26px,3.5vw,40px)', letterSpacing: '-0.02em' }}>
+          {intl.formatMessage({ id: 'info.what.heading' })}
+        </h2>
+      </div>
+
+      {/* Two-column: text + image */}
+      <div className="info-what-grid" style={{ display: 'grid', gridTemplateColumns: 'minmax(0,1fr) minmax(0,1fr)', gap: 'clamp(24px,4vw,56px)', alignItems: 'center', marginBottom: 40 }}>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 18 }}>
+          <h3 style={{ margin: 0, fontFamily: 'var(--font-display)', fontWeight: 800, fontSize: 'clamp(22px,2.5vw,30px)', lineHeight: 1.2 }}>
+            {intl.formatMessage({ id: 'info.what.sparkHeading' })}
+          </h3>
+          <p style={{ margin: 0, fontSize: 16, lineHeight: 1.7, color: 'var(--muted-foreground)' }}>
+            {intl.formatMessage({ id: 'info.what.body1' })}
+          </p>
+          <p style={{ margin: 0, fontSize: 16, lineHeight: 1.7, color: 'var(--muted-foreground)' }}>
+            {intl.formatMessage({ id: 'info.what.body2' })}
+          </p>
+          <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap', marginTop: 4 }}>
+            <Link to="/home?book=1" style={{ display: 'inline-flex', alignItems: 'center', gap: 8, height: 44, padding: '0 20px', borderRadius: 12, background: 'var(--primary)', color: '#fff', textDecoration: 'none', fontSize: 14, fontWeight: 700 }}>
+              {intl.formatMessage({ id: 'info.what.ctaBook' })}
+            </Link>
+            <button type="button" onClick={() => scrollTo('toad')} style={{ height: 44, padding: '0 20px', borderRadius: 12, border: '1px solid var(--border)', background: 'transparent', color: 'var(--foreground)', fontSize: 14, fontWeight: 600, cursor: 'pointer', fontFamily: 'inherit' }}>
+              {intl.formatMessage({ id: 'info.what.ctaToad' })}
+            </button>
+          </div>
+        </div>
+        {/* Real photo */}
+        <div style={{ borderRadius: 24, overflow: 'hidden', minHeight: 320, position: 'relative' }}>
+          <img
+            src="/banner-x1-min-scaled.jpg"
+            alt={intl.formatMessage({ id: 'info.what.imgAlt' })}
+            style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block', position: 'absolute', inset: 0 }}
+          />
+          <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to top, rgba(80,50,145,.45) 0%, transparent 60%)' }} />
+          <div style={{ position: 'absolute', bottom: 20, left: 20, right: 20 }}>
+            <span style={{ display: 'inline-block', padding: '6px 14px', borderRadius: 99, background: 'rgba(255,255,255,.18)', backdropFilter: 'blur(8px)', color: '#fff', fontSize: 13, fontWeight: 600 }}>
+              {intl.formatMessage({ id: 'info.what.imgCaption' })}
+            </span>
+          </div>
+        </div>
+      </div>
+
+      {/* 98% stat callout */}
+      <div style={{ padding: 'clamp(24px,3vw,40px)', borderRadius: 20, background: 'linear-gradient(135deg,var(--brand-purple),#2b1a57)', color: '#fff', display: 'flex', alignItems: 'center', gap: 24, flexWrap: 'wrap' }}>
+        <span style={{ fontFamily: 'var(--font-merck)', fontWeight: 800, fontSize: 'clamp(48px,6vw,72px)', color: 'var(--brand-yellow)', letterSpacing: '0.04em', flexShrink: 0, lineHeight: 1 }}>98%</span>
+        <p style={{ margin: 0, fontSize: 'clamp(15px,1.5vw,18px)', lineHeight: 1.6, color: 'rgba(255,255,255,.9)', maxWidth: 560 }}>
+          {intl.formatMessage({ id: 'info.what.stat' })}
+        </p>
+      </div>
+    </section>
+  )
+}
+
+// ─── Where to find us ─────────────────────────────────────────────────────────
+
+function WhereSection() {
+  const intl = useIntl()
+  return (
+    <section style={{ margin: 'clamp(48px,6vw,80px) clamp(16px,5vw,80px) 0' }}>
+      <div className="info-where-grid" style={{ display: 'grid', gridTemplateColumns: 'minmax(0,1fr) minmax(0,1fr)', gap: 'clamp(20px,4vw,48px)' }}>
+        {/* Where is it? — green Cube (Europe) */}
+        <div style={{ borderRadius: 24, overflow: 'hidden', position: 'relative', minHeight: 380, display: 'flex', flexDirection: 'column', justifyContent: 'flex-end' }}>
+          <img
+            src="/europe-cube-image-min.jpg"
+            alt={intl.formatMessage({ id: 'info.where.findImgAlt' })}
+            style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
+          />
+          {/* Dark gradient from bottom so text is legible */}
+          <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to top, rgba(20,10,50,.88) 0%, rgba(20,10,50,.3) 55%, transparent 100%)' }} />
+          <div style={{ position: 'relative', zIndex: 1, padding: 'clamp(20px,3vw,36px)', display: 'flex', flexDirection: 'column', gap: 12 }}>
+            <span style={{ fontSize: 11, fontWeight: 700, letterSpacing: '0.12em', textTransform: 'uppercase', color: 'var(--brand-yellow)' }}>
+              {intl.formatMessage({ id: 'info.where.findLabel' })}
+            </span>
+            <h3 style={{ margin: 0, fontFamily: 'var(--font-display)', fontWeight: 800, fontSize: 'clamp(22px,2.5vw,30px)', color: '#fff', lineHeight: 1.15 }}>
+              {intl.formatMessage({ id: 'info.where.findHeading' })}
+            </h3>
+            <p style={{ margin: 0, fontSize: 14, lineHeight: 1.6, color: 'rgba(255,255,255,.8)' }}>
+              {intl.formatMessage({ id: 'info.where.findBody' })}
+            </p>
+            <Link to="/home?book=1" style={{ alignSelf: 'flex-start', display: 'inline-flex', alignItems: 'center', gap: 8, height: 44, padding: '0 20px', borderRadius: 12, background: 'var(--brand-yellow)', color: 'var(--brand-purple)', textDecoration: 'none', fontSize: 14, fontWeight: 700, marginTop: 4 }}>
+              {intl.formatMessage({ id: 'info.where.findCta' })}
+            </Link>
+          </div>
+        </div>
+
+        {/* Request the Cube — blue Cube (North America) */}
+        <div style={{ borderRadius: 24, overflow: 'hidden', position: 'relative', minHeight: 380, display: 'flex', flexDirection: 'column', justifyContent: 'flex-end' }}>
+          <img
+            src="/tcb-cube-notus-min.webp"
+            alt={intl.formatMessage({ id: 'info.where.hostImgAlt' })}
+            style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
+          />
+          <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to top, rgba(80,50,145,.92) 0%, rgba(80,50,145,.35) 55%, transparent 100%)' }} />
+          <div style={{ position: 'relative', zIndex: 1, padding: 'clamp(20px,3vw,36px)', display: 'flex', flexDirection: 'column', gap: 12 }}>
+            <span style={{ fontSize: 11, fontWeight: 700, letterSpacing: '0.12em', textTransform: 'uppercase', color: 'var(--brand-mint)' }}>
+              {intl.formatMessage({ id: 'info.where.hostLabel' })}
+            </span>
+            <h3 style={{ margin: 0, fontFamily: 'var(--font-display)', fontWeight: 800, fontSize: 'clamp(22px,2.5vw,30px)', color: '#fff', lineHeight: 1.15 }}>
+              {intl.formatMessage({ id: 'info.where.hostHeading' })}
+            </h3>
+            <p style={{ margin: 0, fontSize: 14, lineHeight: 1.6, color: 'rgba(255,255,255,.8)' }}>
+              {intl.formatMessage({ id: 'info.where.hostBody' })}
+            </p>
+            <Link to="/home?book=1" style={{ alignSelf: 'flex-start', display: 'inline-flex', alignItems: 'center', gap: 8, height: 44, padding: '0 20px', borderRadius: 12, background: '#fff', color: 'var(--brand-purple)', textDecoration: 'none', fontSize: 14, fontWeight: 700, marginTop: 4 }}>
+              {intl.formatMessage({ id: 'info.where.hostCta' })}
+            </Link>
+          </div>
+        </div>
+      </div>
+    </section>
+  )
+}
+
 // ─── Footer ───────────────────────────────────────────────────────────────────
+
+const SOCIAL_LINKS = [
+  {
+    label: 'Facebook', href: 'https://facebook.com/MilliporeSigma',
+    icon: (
+      <svg viewBox="0 0 24 24" fill="currentColor" style={{ width: 20, height: 20 }}>
+        <path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"/>
+      </svg>
+    ),
+  },
+  {
+    label: 'X (Twitter)', href: 'https://twitter.com/MilliporeSigma',
+    icon: (
+      <svg viewBox="0 0 24 24" fill="currentColor" style={{ width: 20, height: 20 }}>
+        <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
+      </svg>
+    ),
+  },
+  {
+    label: 'Instagram', href: 'https://www.instagram.com/curiositycube_milliporesigma',
+    icon: (
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ width: 20, height: 20 }}>
+        <rect x="2" y="2" width="20" height="20" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/>
+      </svg>
+    ),
+  },
+  {
+    label: 'LinkedIn', href: 'https://www.linkedin.com/company/milliporesigma',
+    icon: (
+      <svg viewBox="0 0 24 24" fill="currentColor" style={{ width: 20, height: 20 }}>
+        <path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"/><rect x="2" y="9" width="4" height="12"/><circle cx="4" cy="4" r="2"/>
+      </svg>
+    ),
+  },
+]
 
 function PageFooter() {
   const intl = useIntl()
   return (
-    <footer style={{position:'relative',zIndex:1,padding:'28px clamp(16px,4vw,56px)',borderTop:'1px solid var(--border)',display:'flex',alignItems:'center',flexWrap:'wrap',gap:'10px 20px',background:'var(--app-ground)',fontSize:13}}>
-      <MerckLogo width={52} height={25}/>
-      <span style={{flexGrow:1,color:'var(--muted-foreground)'}}>{intl.formatMessage({ id: 'programs.footer.copy' })}</span>
-      <a href="#" style={{fontWeight:500,textDecoration:'none',color:'inherit'}}>{intl.formatMessage({ id: 'programs.footer.privacy' })}</a>
-      <a href="#" style={{fontWeight:500,textDecoration:'none',color:'inherit'}}>{intl.formatMessage({ id: 'programs.footer.imprint' })}</a>
-      <a href="#" style={{fontWeight:500,textDecoration:'none',color:'inherit'}}>Cookie settings</a>
+    <footer style={{ position: 'relative', zIndex: 1, background: 'var(--brand-purple)', color: '#fff', marginTop: 'clamp(48px,6vw,80px)' }}>
+      {/* Main footer body */}
+      <div style={{ padding: 'clamp(40px,5vw,72px) clamp(16px,5vw,80px)', display: 'grid', gridTemplateColumns: 'minmax(0,1.4fr) minmax(0,1fr) minmax(0,1fr)', gap: 'clamp(32px,4vw,56px)' }}
+        className="info-footer-grid">
+        {/* Brand column */}
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+          <MerckLogo width={64} height={30} />
+          <p style={{ margin: 0, fontSize: 14, lineHeight: 1.7, color: 'rgba(255,255,255,.75)', maxWidth: 320 }}>
+            {intl.formatMessage({ id: 'info.footer.brandDesc' })}
+          </p>
+          {/* Social links */}
+          <div style={{ display: 'flex', gap: 10, marginTop: 4 }}>
+            {SOCIAL_LINKS.map(s => (
+              <a key={s.label} href={s.href} target="_blank" rel="noopener noreferrer" aria-label={s.label}
+                style={{ width: 40, height: 40, borderRadius: 10, display: 'grid', placeItems: 'center', background: 'rgba(255,255,255,.12)', color: '#fff', textDecoration: 'none', transition: 'background .2s' }}
+                onMouseEnter={e => (e.currentTarget.style.background = 'rgba(255,255,255,.22)') }
+                onMouseLeave={e => (e.currentTarget.style.background = 'rgba(255,255,255,.12)') }>
+                {s.icon}
+              </a>
+            ))}
+          </div>
+        </div>
+
+        {/* Quick links */}
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+          <span style={{ fontSize: 11, fontWeight: 700, letterSpacing: '0.12em', textTransform: 'uppercase', color: 'rgba(255,255,255,.5)', marginBottom: 4 }}>
+            {intl.formatMessage({ id: 'programs.footer.quickLinks' })}
+          </span>
+          {[
+            { label: intl.formatMessage({ id: 'programs.nav.programs' }), id: 'programs' },
+            { label: intl.formatMessage({ id: 'programs.nav.how' }),      id: 'how' },
+            { label: intl.formatMessage({ id: 'programs.nav.toad' }),     id: 'toad' },
+            { label: intl.formatMessage({ id: 'programs.nav.faq' }),      id: 'faq' },
+            { label: intl.formatMessage({ id: 'programs.book' }),         href: '/home?book=1' },
+          ].map(l => (
+            l.href
+              ? <Link key={l.label} to={l.href} style={{ fontSize: 14, color: 'rgba(255,255,255,.8)', textDecoration: 'none', fontWeight: 500 }}>{l.label}</Link>
+              : <button key={l.label} type="button" onClick={() => scrollTo(l.id!)}
+                  style={{ border: 'none', background: 'none', padding: 0, fontSize: 14, color: 'rgba(255,255,255,.8)', cursor: 'pointer', fontFamily: 'inherit', fontWeight: 500, textAlign: 'left' }}>
+                  {l.label}
+                </button>
+          ))}
+        </div>
+
+        {/* Contact */}
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+          <span style={{ fontSize: 11, fontWeight: 700, letterSpacing: '0.12em', textTransform: 'uppercase', color: 'rgba(255,255,255,.5)', marginBottom: 4 }}>
+            {intl.formatMessage({ id: 'programs.footer.contact' })}
+          </span>
+          <p style={{ margin: 0, fontSize: 14, lineHeight: 1.6, color: 'rgba(255,255,255,.75)' }}>
+            {intl.formatMessage({ id: 'programs.footer.contactBody' })}
+          </p>
+          <a href="mailto:CuriosityCube@milliporesigma.com"
+            style={{ fontSize: 14, color: 'var(--brand-yellow)', textDecoration: 'none', fontWeight: 600, wordBreak: 'break-all' }}>
+            CuriosityCube@milliporesigma.com
+          </a>
+          <p style={{ margin: '8px 0 0', fontSize: 13, lineHeight: 1.6, color: 'rgba(255,255,255,.55)' }}>
+            {intl.formatMessage({ id: 'programs.footer.merckNote' })}
+          </p>
+        </div>
+      </div>
+
+      {/* Bottom bar */}
+      <div style={{ borderTop: '1px solid rgba(255,255,255,.12)', padding: '18px clamp(16px,5vw,80px)', display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: '8px 20px', fontSize: 12, color: 'rgba(255,255,255,.5)' }}>
+        <span style={{ flexGrow: 1 }}>{intl.formatMessage({ id: 'programs.footer.copy' })}</span>
+        <a href="#" style={{ color: 'rgba(255,255,255,.6)', textDecoration: 'none', fontWeight: 500 }}>{intl.formatMessage({ id: 'programs.footer.privacy' })}</a>
+        <a href="#" style={{ color: 'rgba(255,255,255,.6)', textDecoration: 'none', fontWeight: 500 }}>{intl.formatMessage({ id: 'programs.footer.imprint' })}</a>
+        <a href="#" style={{ color: 'rgba(255,255,255,.6)', textDecoration: 'none', fontWeight: 500 }}>{intl.formatMessage({ id: 'programs.footer.cookies' })}</a>
+      </div>
     </footer>
   )
 }
@@ -948,9 +1415,9 @@ function BackgroundFx({ motionReady }: { motionReady: boolean }) {
 function ProgressBar({ motionReady }: { motionReady: boolean }) {
   const barRef = useRef<HTMLDivElement>(null)
   useEffect(() => {
-    if (!motionReady) return
+    if (!motionReady) return undefined
     const t = gsap.to(barRef.current, {scaleX:1, ease:'none', scrollTrigger:{start:0,end:'max',scrub:0.2}})
-    return () => t.kill()
+    return () => { t.kill() }
   }, [motionReady])
   return (
     <div ref={barRef} aria-hidden="true" style={{position:'fixed',left:0,top:0,right:0,height:4,zIndex:60,transform:'scaleX(0)',transformOrigin:'0 50%',background:'linear-gradient(90deg,var(--brand-green),var(--brand-cyan),var(--brand-magenta),var(--brand-yellow))'}}/>
@@ -977,11 +1444,14 @@ export default function InformationPage() {
       <main style={{position:'relative',zIndex:1,overflowX:'clip'}}>
         <HeroSection motionReady={motionReady}/>
         <StatsStrip motionReady={motionReady}/>
+        <WhatIsSection/>
+        <ImpactSection motionReady={motionReady}/>
         <ProgramsSection motionReady={motionReady}/>
         <PeriodicStrip motionReady={motionReady}/>
         <VideoSection motionReady={motionReady}/>
         <HowSection motionReady={motionReady}/>
         <ToadSection motionReady={motionReady}/>
+        <WhereSection/>
         <FaqSection motionReady={motionReady}/>
       </main>
       <PageFooter/>

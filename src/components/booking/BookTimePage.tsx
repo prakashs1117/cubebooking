@@ -95,17 +95,24 @@ export default function BookTimePage() {
   )
 
   const programIds = getProgramIds(programSelection, programOrder)
-  const dateKey = selectedDate ? formatDateKey(selectedDate) : null
+
+  // Compute effective date synchronously so time slots are visible on first render.
+  // If the store has no date yet, fall back to the first bookable day of the current week.
+  const effectiveDate = useMemo(() => {
+    if (selectedDate) return selectedDate
+    return weekDays.find((d) => d >= tomorrow) ?? null
+  }, [selectedDate, weekDays, tomorrow])
+
+  const dateKey = effectiveDate ? formatDateKey(effectiveDate) : null
 
   const availabilityMap = useSlotAvailability(programIds, dateKey)
 
-  // Auto-advance to first bookable day of this week if no date selected
+  // Persist the auto-selected date back to the store (after render, non-blocking)
   useEffect(() => {
-    if (!selectedDate) {
-      const firstBookable = weekDays.find((d) => d >= tomorrow)
-      if (firstBookable) setSelectedDate(new Date(firstBookable))
+    if (!selectedDate && effectiveDate) {
+      setSelectedDate(new Date(effectiveDate))
     }
-  }, [selectedDate, weekDays, tomorrow, setSelectedDate])
+  }, [selectedDate, effectiveDate, setSelectedDate])
 
   const singleTimes = useMemo((): SingleSlotItem[] => {
     if (!dateKey || programSelection === 'both') return []
@@ -221,7 +228,7 @@ export default function BookTimePage() {
         {weekDays.map((day, i) => {
           const dayMidnight = new Date(day.getFullYear(), day.getMonth(), day.getDate())
           const isPast = dayMidnight < tomorrow
-          const isSel = selectedDate ? isSameDay(day, selectedDate) : false
+          const isSel = effectiveDate ? isSameDay(day, effectiveDate) : false
           const closed = isPast
 
           return (
@@ -254,10 +261,10 @@ export default function BookTimePage() {
       </div>
 
       {/* Time slots for selected day */}
-      {selectedDate && dateKey && (
+      {effectiveDate && dateKey && (
         <div className="rise flex flex-col gap-5">
           <h2 className="text-sm font-semibold" style={{ color: 'var(--muted-foreground)' }}>
-            {intl.formatDate(selectedDate, { weekday: 'long', day: 'numeric', month: 'long' })}
+            {intl.formatDate(effectiveDate, { weekday: 'long', day: 'numeric', month: 'long' })}
           </h2>
 
           {programSelection !== 'both'
