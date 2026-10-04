@@ -5,6 +5,7 @@ import * as Dialog from '@radix-ui/react-dialog'
 import MerckLogo from '../auth/MerckLogo'
 import UpcomingVisitCard from '../ui/UpcomingVisitCard'
 import { Carousel } from '../ui/carousel'
+import SchoolIllustration from '../../assets/SchoolIllustration'
 import { useAuthContext } from '../../context/AuthContext'
 import { useLocale } from '../../context/LocaleContext'
 import ThemeToggle from '../ui/ThemeToggle'
@@ -923,6 +924,7 @@ function ToadSection({ motionReady }: { motionReady: boolean }) {
   const wheel2Ref = useRef<SVGGElement>(null)
   const roadRef   = useRef<SVGLineElement>(null)
   const puffRefs  = useRef<SVGCircleElement[]>([])
+  const overlayRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
     if (!motionReady) return
@@ -937,7 +939,13 @@ function ToadSection({ motionReady }: { motionReady: boolean }) {
         .fromTo(p,{opacity:0},{opacity:0.9,duration:d*0.2,ease:'none'},0)
         .to(p,{opacity:0,duration:d*0.25,ease:'none'},d*0.75)
     })
-    return () => { t1.kill(); t2.kill(); t3.kill(); puffT.forEach(t => t.kill()) }
+    // Crossfade: magenta overlay fades out in the final 20% of the scroll window
+    // revealing the school building photo behind the truck ("arrived at school")
+    const arrive = { trigger:'.info-truck-stage', start:'top 72%', end:'bottom 62%', scrub:0.8 }
+    const t4 = gsap.fromTo(overlayRef.current, {opacity:1}, {opacity:0, ease:'power1.inOut', scrollTrigger:arrive})
+    // Exhaust puffs fade out as the truck parks
+    const t5 = gsap.to(puffRefs.current, {opacity:0, ease:'none', scrollTrigger:arrive})
+    return () => { t1.kill(); t2.kill(); t3.kill(); t4.kill(); t5.kill(); puffT.forEach(t => t.kill()) }
   }, [motionReady])
 
   return (
@@ -947,8 +955,17 @@ function ToadSection({ motionReady }: { motionReady: boolean }) {
       gap:'clamp(24px,4vw,64px)', alignItems:'center',
     }}>
       {/* Truck panel */}
-      <div className="info-toad-panel" style={{borderRadius:28,background:'var(--brand-magenta)',overflow:'hidden',display:'flex',flexDirection:'column'}}>
-        <svg className="info-truck-stage" viewBox="0 0 520 380" aria-hidden="true" style={{width:'100%',height:'auto'}}>
+      <div className="info-toad-panel" style={{
+        borderRadius:28, overflow:'hidden', display:'flex', flexDirection:'column',
+        position:'relative', background:'#3fc4ea',
+      }}>
+        {/* School illustration — revealed as truck arrives */}
+        <SchoolIllustration style={{position:'absolute',inset:0,width:'100%',height:'100%',objectFit:'cover'}}/>
+        {/* Permanent brand-purple tint to keep brand feel after reveal */}
+        <div style={{position:'absolute',inset:0,zIndex:0,background:'rgba(80,50,145,0.22)',pointerEvents:'none'}}/>
+        {/* Magenta overlay — GSAP fades this out when truck arrives */}
+        <div ref={overlayRef} style={{position:'absolute',inset:0,zIndex:1,background:'var(--brand-magenta)',pointerEvents:'none'}}/>
+        <svg className="info-truck-stage" viewBox="0 0 520 380" aria-hidden="true" style={{width:'100%',height:'auto',position:'relative',zIndex:2}}>
           <circle cx="440" cy="60" r="150" fill="var(--brand-purple)"/>
           <circle cx="430" cy="200" r="58" fill="var(--brand-yellow)"/>
           <rect x="0" y="336" width="520" height="44" fill="#0e0e11" fillOpacity=".85"/>
@@ -976,7 +993,7 @@ function ToadSection({ motionReady }: { motionReady: boolean }) {
             </g>
           </g>
         </svg>
-        <div style={{margin:'0 20px 20px',padding:'14px 16px',borderRadius:18,background:'var(--background)',display:'flex',gap:10,alignItems:'center',fontSize:14,fontWeight:600}}>
+        <div style={{margin:'0 20px 20px',padding:'14px 16px',borderRadius:18,background:'var(--background)',display:'flex',gap:10,alignItems:'center',fontSize:14,fontWeight:600,position:'relative',zIndex:2}}>
           <MapPin style={{width:18,height:18,flexShrink:0}}/>
           <span>{intl.formatMessage({ id: 'programs.toad.area' })}</span>
         </div>
