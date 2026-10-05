@@ -2,7 +2,7 @@ import React from 'react';
 import { StyleSheet, View } from 'react-native';
 import { useSwipeHint, type SwipeHintScreen } from '@hooks/useSwipeHint';
 import SwipeHintBubble from '@components/common/SwipeHintBubble';
-import type { Swipeable } from 'react-native-gesture-handler';
+import type { SwipeableMethods } from 'react-native-gesture-handler/ReanimatedSwipeable';
 
 interface Props {
   screenKey: SwipeHintScreen;
@@ -10,7 +10,7 @@ interface Props {
   children: React.ReactNode;
   tooltipTitle: string;
   tooltipMessage?: string;
-  swipeableRef?: (ref: Swipeable | null) => void;
+  swipeableRef?: (ref: SwipeableMethods | null) => void;
 }
 
 /**
@@ -28,12 +28,18 @@ const SwipeHintOverlay: React.FC<Props> = ({
   tooltipMessage,
   swipeableRef,
 }) => {
-  const { registerSwipeRef, tooltipVisible, dismiss } = useSwipeHint(screenKey, ready);
+  const { registerSwipeRef, tooltipVisible, dismiss } = useSwipeHint(
+    screenKey,
+    ready,
+  );
 
-  const handleRef = React.useCallback((ref: Swipeable | null) => {
-    registerSwipeRef(ref);
-    swipeableRef?.(ref);
-  }, [registerSwipeRef, swipeableRef]);
+  const handleRef = React.useCallback(
+    (ref: SwipeableMethods | null) => {
+      registerSwipeRef(ref);
+      swipeableRef?.(ref);
+    },
+    [registerSwipeRef, swipeableRef],
+  );
 
   return (
     <View style={styles.wrapper}>
@@ -45,7 +51,9 @@ const SwipeHintOverlay: React.FC<Props> = ({
         />
       </View>
       {React.isValidElement(children)
-        ? React.cloneElement(children as React.ReactElement<any>, { swipeHintRef: handleRef })
+        ? React.cloneElement(children as React.ReactElement<any>, {
+            swipeHintRef: handleRef,
+          })
         : children}
     </View>
   );

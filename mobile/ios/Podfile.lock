@@ -1,4 +1,26 @@
 PODS:
+  - AsyncStorage (3.1.1):
+    - hermes-engine
+    - RCTRequired
+    - RCTTypeSafety
+    - React-Core
+    - React-Core-prebuilt
+    - React-debug
+    - React-Fabric
+    - React-featureflags
+    - React-graphics
+    - React-ImageManager
+    - React-jsi
+    - React-NativeModulesApple
+    - React-RCTFabric
+    - React-renderercss
+    - React-rendererdebug
+    - React-utils
+    - ReactCodegen
+    - ReactCommon/turbomodule/bridging
+    - ReactCommon/turbomodule/core
+    - ReactNativeDependencies
+    - Yoga
   - BVLinearGradient (2.8.3):
     - React-Core
   - FBLazyVector (0.85.3)
@@ -10,9 +32,6 @@ PODS:
   - Firebase/Crashlytics (12.18.0):
     - Firebase/CoreOnly
     - FirebaseCrashlytics (~> 12.18.0)
-  - Firebase/Messaging (12.18.0):
-    - Firebase/CoreOnly
-    - FirebaseMessaging (~> 12.18.0)
   - FirebaseAnalytics/Core (12.18.0):
     - FirebaseCore (~> 12.18.0)
     - FirebaseInstallations (~> 12.18.0)
@@ -64,15 +83,6 @@ PODS:
     - GoogleUtilities/Environment (~> 8.1)
     - GoogleUtilities/UserDefaults (~> 8.1)
     - PromisesObjC (~> 2.4)
-  - FirebaseMessaging (12.18.0):
-    - FirebaseCore (~> 12.18.0)
-    - FirebaseInstallations (~> 12.18.0)
-    - GoogleDataTransport (~> 10.1)
-    - GoogleUtilities/AppDelegateSwizzler (~> 8.1)
-    - GoogleUtilities/Environment (~> 8.1)
-    - GoogleUtilities/Reachability (~> 8.1)
-    - GoogleUtilities/UserDefaults (~> 8.1)
-    - nanopb (~> 3.30910.0)
   - FirebaseRemoteConfigInterop (12.18.0)
   - FirebaseSessions (12.18.0):
     - FirebaseCore (~> 12.18.0)
@@ -1603,7 +1613,7 @@ PODS:
     - ReactCommon/turbomodule/core
     - ReactNativeDependencies
     - Yoga
-  - react-native-netinfo (11.5.2):
+  - react-native-netinfo (12.0.1):
     - hermes-engine
     - RCTRequired
     - RCTTypeSafety
@@ -1625,8 +1635,28 @@ PODS:
     - ReactCommon/turbomodule/core
     - ReactNativeDependencies
     - Yoga
-  - react-native-restart (0.0.27):
+  - react-native-restart (0.0.29):
+    - hermes-engine
+    - RCTRequired
+    - RCTTypeSafety
     - React-Core
+    - React-Core-prebuilt
+    - React-debug
+    - React-Fabric
+    - React-featureflags
+    - React-graphics
+    - React-ImageManager
+    - React-jsi
+    - React-NativeModulesApple
+    - React-RCTFabric
+    - React-renderercss
+    - React-rendererdebug
+    - React-utils
+    - ReactCodegen
+    - ReactCommon/turbomodule/bridging
+    - ReactCommon/turbomodule/core
+    - ReactNativeDependencies
+    - Yoga
   - react-native-safe-area-context (5.10.1):
     - hermes-engine
     - RCTRequired
@@ -1696,7 +1726,7 @@ PODS:
     - ReactCommon/turbomodule/core
     - ReactNativeDependencies
     - Yoga
-  - react-native-view-shot (5.1.1):
+  - react-native-view-shot (6.1.0):
     - hermes-engine
     - RCTRequired
     - RCTTypeSafety
@@ -2104,29 +2134,7 @@ PODS:
     - ReactNativeDependencies
   - ReactNativeDependencies (0.85.3)
   - RecaptchaInterop (101.0.0)
-  - RNBootSplash (5.5.3):
-    - hermes-engine
-    - RCTRequired
-    - RCTTypeSafety
-    - React-Core
-    - React-Core-prebuilt
-    - React-debug
-    - React-Fabric
-    - React-featureflags
-    - React-graphics
-    - React-ImageManager
-    - React-jsi
-    - React-NativeModulesApple
-    - React-RCTFabric
-    - React-renderercss
-    - React-rendererdebug
-    - React-utils
-    - ReactCodegen
-    - ReactCommon/turbomodule/bridging
-    - ReactCommon/turbomodule/core
-    - ReactNativeDependencies
-    - Yoga
-  - RNCAsyncStorage (2.2.0):
+  - RNBootSplash (7.3.4):
     - hermes-engine
     - RCTRequired
     - RCTTypeSafety
@@ -2267,32 +2275,7 @@ PODS:
     - ReactNativeDependencies
     - RNFBApp
     - Yoga
-  - RNFBMessaging (26.4.0):
-    - Firebase/Messaging (= 12.18.0)
-    - FirebaseCoreExtension (= 12.18.0)
-    - hermes-engine
-    - RCTRequired
-    - RCTTypeSafety
-    - React-Core
-    - React-Core-prebuilt
-    - React-debug
-    - React-Fabric
-    - React-featureflags
-    - React-graphics
-    - React-ImageManager
-    - React-jsi
-    - React-NativeModulesApple
-    - React-RCTFabric
-    - React-renderercss
-    - React-rendererdebug
-    - React-utils
-    - ReactCodegen
-    - ReactCommon/turbomodule/bridging
-    - ReactCommon/turbomodule/core
-    - ReactNativeDependencies
-    - RNFBApp
-    - Yoga
-  - RNGestureHandler (2.33.0):
+  - RNGestureHandler (3.3.0):
     - hermes-engine
     - RCTRequired
     - RCTTypeSafety
@@ -2314,6 +2297,7 @@ PODS:
     - ReactCommon/turbomodule/bridging
     - ReactCommon/turbomodule/core
     - ReactNativeDependencies
+    - RNWorklets (>= 0.8.0)
     - Yoga
   - RNInAppBrowser (3.7.1):
     - React-Core
@@ -2344,7 +2328,7 @@ PODS:
     - RNNotifee/NotifeeCore (= 9.1.8)
   - RNNotifee/NotifeeCore (9.1.8):
     - React-Core
-  - RNReanimated (4.5.0):
+  - RNReanimated (4.6.0):
     - hermes-engine
     - RCTRequired
     - RCTTypeSafety
@@ -2366,36 +2350,12 @@ PODS:
     - ReactCommon/turbomodule/bridging
     - ReactCommon/turbomodule/core
     - ReactNativeDependencies
-    - RNReanimated/apple (= 4.5.0)
-    - RNReanimated/common (= 4.5.0)
-    - RNReanimated/view (= 4.5.0)
+    - RNReanimated/apple (= 4.6.0)
+    - RNReanimated/common (= 4.6.0)
+    - RNReanimated/view (= 4.6.0)
     - RNWorklets
     - Yoga
-  - RNReanimated/apple (4.5.0):
-    - hermes-engine
-    - RCTRequired
-    - RCTTypeSafety
-    - React-Core
-    - React-Core-prebuilt
-    - React-debug
-    - React-Fabric
-    - React-featureflags
-    - React-graphics
-    - React-hermes
-    - React-ImageManager
-    - React-jsi
-    - React-NativeModulesApple
-    - React-RCTFabric
-    - React-renderercss
-    - React-rendererdebug
-    - React-utils
-    - ReactCodegen
-    - ReactCommon/turbomodule/bridging
-    - ReactCommon/turbomodule/core
-    - ReactNativeDependencies
-    - RNWorklets
-    - Yoga
-  - RNReanimated/common (4.5.0):
+  - RNReanimated/apple (4.6.0):
     - hermes-engine
     - RCTRequired
     - RCTTypeSafety
@@ -2419,7 +2379,31 @@ PODS:
     - ReactNativeDependencies
     - RNWorklets
     - Yoga
-  - RNReanimated/view (4.5.0):
+  - RNReanimated/common (4.6.0):
+    - hermes-engine
+    - RCTRequired
+    - RCTTypeSafety
+    - React-Core
+    - React-Core-prebuilt
+    - React-debug
+    - React-Fabric
+    - React-featureflags
+    - React-graphics
+    - React-hermes
+    - React-ImageManager
+    - React-jsi
+    - React-NativeModulesApple
+    - React-RCTFabric
+    - React-renderercss
+    - React-rendererdebug
+    - React-utils
+    - ReactCodegen
+    - ReactCommon/turbomodule/bridging
+    - ReactCommon/turbomodule/core
+    - ReactNativeDependencies
+    - RNWorklets
+    - Yoga
+  - RNReanimated/view (4.6.0):
     - hermes-engine
     - RCTRequired
     - RCTTypeSafety
@@ -2535,7 +2519,7 @@ PODS:
     - ReactCommon/turbomodule/core
     - ReactNativeDependencies
     - Yoga
-  - RNWorklets (0.10.4):
+  - RNWorklets (0.12.2):
     - hermes-engine
     - RCTRequired
     - RCTTypeSafety
@@ -2557,10 +2541,10 @@ PODS:
     - ReactCommon/turbomodule/bridging
     - ReactCommon/turbomodule/core
     - ReactNativeDependencies
-    - RNWorklets/apple (= 0.10.4)
-    - RNWorklets/common (= 0.10.4)
+    - RNWorklets/apple (= 0.12.2)
+    - RNWorklets/common (= 0.12.2)
     - Yoga
-  - RNWorklets/apple (0.10.4):
+  - RNWorklets/apple (0.12.2):
     - hermes-engine
     - RCTRequired
     - RCTTypeSafety
@@ -2583,7 +2567,7 @@ PODS:
     - ReactCommon/turbomodule/core
     - ReactNativeDependencies
     - Yoga
-  - RNWorklets/common (0.10.4):
+  - RNWorklets/common (0.12.2):
     - hermes-engine
     - RCTRequired
     - RCTTypeSafety
@@ -2615,6 +2599,7 @@ PODS:
   - Yoga (0.0.0)
 
 DEPENDENCIES:
+  - "AsyncStorage (from `../node_modules/@react-native-async-storage/async-storage`)"
   - BVLinearGradient (from `../node_modules/react-native-linear-gradient`)
   - FBLazyVector (from `../node_modules/react-native/Libraries/FBLazyVector`)
   - hermes-engine (from `../node_modules/react-native/sdks/hermes-engine/hermes-engine.podspec`)
@@ -2698,13 +2683,11 @@ DEPENDENCIES:
   - ReactCommon/turbomodule/core (from `../node_modules/react-native/ReactCommon`)
   - ReactNativeDependencies (from `../node_modules/react-native/third-party-podspecs/ReactNativeDependencies.podspec`)
   - RNBootSplash (from `../node_modules/react-native-bootsplash`)
-  - "RNCAsyncStorage (from `../node_modules/@react-native-async-storage/async-storage`)"
   - "RNDateTimePicker (from `../node_modules/@react-native-community/datetimepicker`)"
   - "RNFBAnalytics (from `../node_modules/@react-native-firebase/analytics`)"
   - "RNFBApp (from `../node_modules/@react-native-firebase/app`)"
   - "RNFBAuth (from `../node_modules/@react-native-firebase/auth`)"
   - "RNFBCrashlytics (from `../node_modules/@react-native-firebase/crashlytics`)"
-  - "RNFBMessaging (from `../node_modules/@react-native-firebase/messaging`)"
   - RNGestureHandler (from `../node_modules/react-native-gesture-handler`)
   - RNInAppBrowser (from `../node_modules/react-native-inappbrowser-reborn`)
   - RNLocalize (from `../node_modules/react-native-localize`)
@@ -2728,7 +2711,6 @@ SPEC REPOS:
     - FirebaseCoreInternal
     - FirebaseCrashlytics
     - FirebaseInstallations
-    - FirebaseMessaging
     - FirebaseRemoteConfigInterop
     - FirebaseSessions
     - GoogleAppMeasurement
@@ -2741,6 +2723,8 @@ SPEC REPOS:
     - RecaptchaInterop
 
 EXTERNAL SOURCES:
+  AsyncStorage:
+    :path: "../node_modules/@react-native-async-storage/async-storage"
   BVLinearGradient:
     :path: "../node_modules/react-native-linear-gradient"
   FBLazyVector:
@@ -2906,8 +2890,6 @@ EXTERNAL SOURCES:
     :podspec: "../node_modules/react-native/third-party-podspecs/ReactNativeDependencies.podspec"
   RNBootSplash:
     :path: "../node_modules/react-native-bootsplash"
-  RNCAsyncStorage:
-    :path: "../node_modules/@react-native-async-storage/async-storage"
   RNDateTimePicker:
     :path: "../node_modules/@react-native-community/datetimepicker"
   RNFBAnalytics:
@@ -2918,8 +2900,6 @@ EXTERNAL SOURCES:
     :path: "../node_modules/@react-native-firebase/auth"
   RNFBCrashlytics:
     :path: "../node_modules/@react-native-firebase/crashlytics"
-  RNFBMessaging:
-    :path: "../node_modules/@react-native-firebase/messaging"
   RNGestureHandler:
     :path: "../node_modules/react-native-gesture-handler"
   RNInAppBrowser:
@@ -2942,6 +2922,7 @@ EXTERNAL SOURCES:
     :path: "../node_modules/react-native/ReactCommon/yoga"
 
 SPEC CHECKSUMS:
+  AsyncStorage: 6542eca355b04f9078bb0d7c6d87ad3d352c9ac6
   BVLinearGradient: 880f91a7854faff2df62518f0281afb1c60d49a3
   FBLazyVector: 24e62c765683b8d89006a88a2c8f5cf019f0074d
   Firebase: 5523dd53ebe603451b4e1befcd99fa20a5c015cd
@@ -2954,7 +2935,6 @@ SPEC CHECKSUMS:
   FirebaseCoreInternal: 93b2d5f9e184c6818a04433891c358b0720a6a38
   FirebaseCrashlytics: bd160cfa074ad21ed708a466e15d1928ded1642a
   FirebaseInstallations: 933b2747e8594084c9117b65e8358fce29d7ced7
-  FirebaseMessaging: 422bb80cbf8ff83e69e50bea4d4984fc4704f665
   FirebaseRemoteConfigInterop: 3cbd659033c3129ea81a756a52e4bf1cfc20c3a7
   FirebaseSessions: 3eaac5fd8077513b95f9723efd940438e3e35fb2
   GoogleAppMeasurement: d70df385587c4175fc0836c11e413d5cbcaa3c7b
@@ -3005,10 +2985,10 @@ SPEC CHECKSUMS:
   react-native-blur: dd21695992f88cc3816925e521cfbde18518976d
   react-native-cameraroll: 1c0f8715640b02327b0276833dd076cbfca41d98
   react-native-geolocation: 33894c821abbf67380755e5c888cb3cf38c5b11f
-  react-native-netinfo: ff33ddd6397d5e18c85a0efd4dd6491845470ea7
-  react-native-restart: 7595693413fe3ca15893702f2c8306c62a708162
+  react-native-netinfo: 10fc5ca4331d893efc2b90adb43869a85d66654e
+  react-native-restart: 76088c1fe32e3c191eeec8aba4411e58f3702041
   react-native-safe-area-context: 265b71d32d442018c24265b4d88acee5d148813c
-  react-native-view-shot: 50a82881435dfcb7013ff600739033d6f72c01f8
+  react-native-view-shot: 8daf3e33d62ca9f849b880f48ffd9eed456e9931
   React-NativeModulesApple: cc6ec4767844d610e92cc358bd3ea34937438d56
   React-networking: 352c0aab2b520439ae8126455ad15f3f17e3820e
   React-oscompat: 64a0c7ef5441855dc6e2a6afe8ba8f92aa05075e
@@ -3044,22 +3024,20 @@ SPEC CHECKSUMS:
   ReactCommon: 3ec2a55999d296af90c24beb66c8a77dc660d3ef
   ReactNativeDependencies: acdd501ba3519eea8b8c5ed54ef7dc6428f7f1f9
   RecaptchaInterop: 11e0b637842dfb48308d242afc3f448062325aba
-  RNBootSplash: 77203bd3427b7c6a0ec989a81c2f8a294f6436c0
-  RNCAsyncStorage: f864c28c20501d04d32f609229816d53f15064e9
+  RNBootSplash: 5656d4e29c6eee0cec2420dc54e6894dc356c4af
   RNDateTimePicker: f2b39d776f11cfb90d2469b019f7d6e92231dc1e
   RNFBAnalytics: 072ccfdcaf8c54fe1acbed3826439aaf62ed1c6a
   RNFBApp: bb9206e26c2f91ec71011ec1a9390e9e1c32ac5d
   RNFBAuth: 17b1dae4d89f97d3ab0e154821e98f198a676393
   RNFBCrashlytics: 3bb968377cb6fb16b931eaee6fe6693a385b81a2
-  RNFBMessaging: 74ff05cffd5b9f5ed6c1d230221be0d5d341fe4e
-  RNGestureHandler: 8869dd7f7736232b3bd0bbf9a5e923db09bfc984
+  RNGestureHandler: 039ba86b591a7b93fb9256304736b9f236fe7ac5
   RNInAppBrowser: b53e6f6072c931115bc22ac9dc9510ac2cbea62d
   RNLocalize: 2a07dd25f01d28e607a28475f6f65fb394a5bd27
   RNNotifee: 4a6ee5c7deaf00e005050052d73ee6315dff7ec9
-  RNReanimated: 14f333e2230dc364d557d0f4c76f38f32e2db348
+  RNReanimated: 0c93d90acdd8b5341f8ef5d08ab13e321ef374ca
   RNScreens: 676d5f2445f2160f1baacf90f3906e4b68b3943f
   RNSVG: cfce5e3faaa7c5048df8d0e317ba9d50a9d26453
-  RNWorklets: fc74797912ca2dfb9592799d7adf0a07fb4f2a66
+  RNWorklets: 5793a617e7cc6e47a8ba79f2db881176b137cbc9
   VisionCamera: 3ea10c46a5c612f5f89fb46a54bef4a0de8b58a7
   Yoga: e768f2b83369b04a4d54ca4a9027b3e488ad52e6
 

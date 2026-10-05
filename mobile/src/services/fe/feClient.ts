@@ -20,7 +20,10 @@ export const FE_BASE_URL: string =
   FE_API_BASE_URL || `http://${FALLBACK_HOST}:6000/api/v1/fe`;
 
 // Auth endpoints use /api/v1/auth/* (unified, not /api/v1/fe/auth/*)
-export const AUTH_BASE_URL: string = FE_BASE_URL.replace('/api/v1/fe', '/api/v1');
+export const AUTH_BASE_URL: string = FE_BASE_URL.replace(
+  '/api/v1/fe',
+  '/api/v1',
+);
 
 const ACCESS_KEY = 'fe.accessToken';
 const REFRESH_KEY = 'fe.refreshToken';
@@ -41,7 +44,7 @@ export const feTokens = {
   },
   async clear(): Promise<void> {
     accessToken = null;
-    await AsyncStorage.multiRemove([ACCESS_KEY, REFRESH_KEY]);
+    await AsyncStorage.removeMany([ACCESS_KEY, REFRESH_KEY]);
   },
 };
 
@@ -52,9 +55,14 @@ export interface FeRequestOptions {
 }
 
 /** Core request. Returns the `data` field of the `{ success, data }` envelope. */
-export async function feRequest<T>(path: string, opts: FeRequestOptions = {}): Promise<T> {
+export async function feRequest<T>(
+  path: string,
+  opts: FeRequestOptions = {},
+): Promise<T> {
   const { method = 'GET', body, auth = false } = opts;
-  const headers: Record<string, string> = { 'Content-Type': 'application/json' };
+  const headers: Record<string, string> = {
+    'Content-Type': 'application/json',
+  };
   if (auth && accessToken) headers.Authorization = `Bearer ${accessToken}`;
 
   const res = await fetch(`${FE_BASE_URL}${path}`, {
@@ -65,7 +73,8 @@ export async function feRequest<T>(path: string, opts: FeRequestOptions = {}): P
 
   const json = await res.json().catch(() => ({}));
   if (!res.ok || json?.success === false) {
-    const message = json?.message || json?.error || `Request failed (${res.status})`;
+    const message =
+      json?.message || json?.error || `Request failed (${res.status})`;
     throw new FeApiError(message, res.status);
   }
   return json.data as T;

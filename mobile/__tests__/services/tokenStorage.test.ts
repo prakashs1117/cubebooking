@@ -7,8 +7,8 @@ import { tokenStorage } from '@services/storage/tokenStorage';
 
 const mockGet = AsyncStorage.getItem as jest.Mock;
 const mockSet = AsyncStorage.setItem as jest.Mock;
-const mockMultiSet = AsyncStorage.multiSet as jest.Mock;
-const mockMultiRemove = AsyncStorage.multiRemove as jest.Mock;
+const mockMultiSet = AsyncStorage.setMany as jest.Mock;
+const mockMultiRemove = AsyncStorage.removeMany as jest.Mock;
 
 beforeEach(() => {
   jest.clearAllMocks();
@@ -18,10 +18,10 @@ describe('saveTokens', () => {
   it('calls multiSet with access and refresh tokens', async () => {
     mockMultiSet.mockResolvedValue(undefined);
     await tokenStorage.saveTokens('access-123', 'refresh-456');
-    expect(mockMultiSet).toHaveBeenCalledWith([
-      ['@event_app_access_token', 'access-123'],
-      ['@event_app_refresh_token', 'refresh-456'],
-    ]);
+    expect(mockMultiSet).toHaveBeenCalledWith({
+      '@event_app_access_token': 'access-123',
+      '@event_app_refresh_token': 'refresh-456',
+    });
   });
 
   it('throws when multiSet fails', async () => {

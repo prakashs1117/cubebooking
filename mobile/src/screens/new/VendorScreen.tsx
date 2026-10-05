@@ -14,7 +14,12 @@ import {
   Platform,
 } from 'react-native';
 import Svg, { Path, Rect, Circle } from 'react-native-svg';
-import { Camera, useCameraPermission, useCameraDevice, useCodeScanner } from 'react-native-vision-camera';
+import {
+  Camera,
+  useCameraPermission,
+  useCameraDevice,
+  useCodeScanner,
+} from 'react-native-vision-camera';
 import { MERCK_TOKENS, useMerckTokens } from '@theme/merckTokens';
 import NotificationBell from '@components/notifications/NotificationBell';
 import { FontSize, FontWeight } from '@theme/typography';
@@ -36,7 +41,11 @@ import {
 } from '@hooks/useFood';
 import { useFeAuthStore } from '@stores/feAuthStore';
 import foodApi from '@services/api/food.service';
-import type { ApiMeal, ApiPickupPass, CreateMealPayload } from '@services/api/food.service';
+import type {
+  ApiMeal,
+  ApiPickupPass,
+  CreateMealPayload,
+} from '@services/api/food.service';
 import type { MealType } from '@data/mockFood';
 
 function toDateKey(date: Date): string {
@@ -47,7 +56,11 @@ function toDateKey(date: Date): string {
 }
 
 function formatDateLabel(date: Date): string {
-  return date.toLocaleDateString('en-IN', { weekday: 'long', day: 'numeric', month: 'short' });
+  return date.toLocaleDateString('en-IN', {
+    weekday: 'long',
+    day: 'numeric',
+    month: 'short',
+  });
 }
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
@@ -57,14 +70,18 @@ function base64urlToUtf8(token: string): string {
   const b64 = token.replace(/-/g, '+').replace(/_/g, '/');
   const padded = b64 + '=='.slice(0, (4 - (b64.length % 4)) % 4);
   // Decode base64 char-by-char to binary string
-  const binaryStr = padded.replace(/[A-Za-z0-9+/=]/g, (c) => {
-    const idx = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/='.indexOf(c);
+  const binaryStr = padded.replace(/[A-Za-z0-9+/=]/g, c => {
+    const idx =
+      'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/='.indexOf(
+        c,
+      );
     return String.fromCharCode(idx);
   });
   // Properly decode using decodeURIComponent escape trick
-  const encoded = binaryStr.split('').map(c =>
-    '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2)
-  ).join('');
+  const encoded = binaryStr
+    .split('')
+    .map(c => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2))
+    .join('');
   return decodeURIComponent(encoded);
 }
 
@@ -80,45 +97,101 @@ function decodeQrToken(token: string): string | null {
 
 // ── Icons ─────────────────────────────────────────────────────────────────────
 
-const CheckCircleIcon = ({ color, size = 56 }: { color: string; size?: number }) => (
+const CheckCircleIcon = ({
+  color,
+  size = 56,
+}: {
+  color: string;
+  size?: number;
+}) => (
   <Svg width={size} height={size} viewBox="0 0 24 24" fill="none">
-    <Circle cx="12" cy="12" r="10" fill={color + '22'} stroke={color} strokeWidth="2" />
-    <Path d="m8 12 3 3 5-5" stroke={color} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
+    <Circle
+      cx="12"
+      cy="12"
+      r="10"
+      fill={color + '22'}
+      stroke={color}
+      strokeWidth="2"
+    />
+    <Path
+      d="m8 12 3 3 5-5"
+      stroke={color}
+      strokeWidth="2.5"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
   </Svg>
 );
 
 const ScanIcon = ({ color }: { color: string }) => (
   <Svg width={24} height={24} viewBox="0 0 24 24" fill="none">
-    <Path d="M4 7V4h3M17 4h3v3M4 17v3h3M17 20h3v-3" stroke={color} strokeWidth="2" strokeLinecap="round" />
-    <Rect x="7" y="7" width="10" height="10" rx="1" stroke={color} strokeWidth="1.8" />
+    <Path
+      d="M4 7V4h3M17 4h3v3M4 17v3h3M17 20h3v-3"
+      stroke={color}
+      strokeWidth="2"
+      strokeLinecap="round"
+    />
+    <Rect
+      x="7"
+      y="7"
+      width="10"
+      height="10"
+      rx="1"
+      stroke={color}
+      strokeWidth="1.8"
+    />
   </Svg>
 );
 
 const AlertIcon = ({ color }: { color: string }) => (
   <Svg width={24} height={24} viewBox="0 0 24 24" fill="none">
-    <Path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"
-      stroke={color} strokeWidth="1.8" strokeLinejoin="round" />
-    <Path d="M12 9v4M12 17h.01" stroke={color} strokeWidth="2" strokeLinecap="round" />
+    <Path
+      d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"
+      stroke={color}
+      strokeWidth="1.8"
+      strokeLinejoin="round"
+    />
+    <Path
+      d="M12 9v4M12 17h.01"
+      stroke={color}
+      strokeWidth="2"
+      strokeLinecap="round"
+    />
   </Svg>
 );
 
 const CameraOffIcon = ({ color }: { color: string }) => (
   <Svg width={48} height={48} viewBox="0 0 24 24" fill="none">
-    <Path d="M1 1l22 22M21 21H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h3m3-3h6l2 3h4a2 2 0 0 1 2 2v9.34"
-      stroke={color} strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" />
+    <Path
+      d="M1 1l22 22M21 21H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h3m3-3h6l2 3h4a2 2 0 0 1 2 2v9.34"
+      stroke={color}
+      strokeWidth="1.7"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
     <Circle cx="12" cy="13" r="3" stroke={color} strokeWidth="1.7" />
   </Svg>
 );
 
 const PlusIcon = ({ color }: { color: string }) => (
   <Svg width={24} height={24} viewBox="0 0 24 24" fill="none">
-    <Path d="M12 5v14M5 12h14" stroke={color} strokeWidth="2.5" strokeLinecap="round" />
+    <Path
+      d="M12 5v14M5 12h14"
+      stroke={color}
+      strokeWidth="2.5"
+      strokeLinecap="round"
+    />
   </Svg>
 );
 
 const CloseIcon = ({ color }: { color: string }) => (
   <Svg width={18} height={18} viewBox="0 0 24 24" fill="none">
-    <Path d="M6 6l12 12M18 6 6 18" stroke={color} strokeWidth="2.2" strokeLinecap="round" />
+    <Path
+      d="M6 6l12 12M18 6 6 18"
+      stroke={color}
+      strokeWidth="2.2"
+      strokeLinecap="round"
+    />
   </Svg>
 );
 
@@ -134,7 +207,14 @@ function VegDot({ isNonVeg }: { isNonVeg: boolean }) {
   );
 }
 const vd = StyleSheet.create({
-  outer: { width: 14, height: 14, borderRadius: 2, borderWidth: 1.5, alignItems: 'center', justifyContent: 'center' },
+  outer: {
+    width: 14,
+    height: 14,
+    borderRadius: 2,
+    borderWidth: 1.5,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
   inner: { width: 7, height: 7, borderRadius: 3.5 },
 });
 
@@ -142,10 +222,21 @@ const vd = StyleSheet.create({
 
 type VendorTab = 'scan' | 'menu';
 
-function SegmentControl({ active, onChange }: { active: VendorTab; onChange: (v: VendorTab) => void }) {
+function SegmentControl({
+  active,
+  onChange,
+}: {
+  active: VendorTab;
+  onChange: (v: VendorTab) => void;
+}) {
   const T = useMerckTokens();
   return (
-    <View style={[seg.wrap, { backgroundColor: T.bgSurface, borderColor: T.borderDefault }]}>
+    <View
+      style={[
+        seg.wrap,
+        { backgroundColor: T.bgSurface, borderColor: T.borderDefault },
+      ]}
+    >
       {(['scan', 'menu'] as VendorTab[]).map(v => (
         <TouchableOpacity
           key={v}
@@ -153,7 +244,13 @@ function SegmentControl({ active, onChange }: { active: VendorTab; onChange: (v:
           style={[seg.btn, active === v && { backgroundColor: T.green }]}
           activeOpacity={0.8}
         >
-          <AppText style={[seg.label, { color: T.tabInactive }, active === v && { color: T.bgApp }]}>
+          <AppText
+            style={[
+              seg.label,
+              { color: T.tabInactive },
+              active === v && { color: T.bgApp },
+            ]}
+          >
             {v === 'scan' ? 'Scan Pass' : 'Manage Menu'}
           </AppText>
         </TouchableOpacity>
@@ -203,7 +300,10 @@ function ScanTab() {
 
     const orderId = decodeQrToken(token);
     if (!orderId) {
-      setPhase({ tag: 'error', message: 'Invalid QR code — not a meal pickup pass.' });
+      setPhase({
+        tag: 'error',
+        message: 'Invalid QR code — not a meal pickup pass.',
+      });
       processingRef.current = false;
       return;
     }
@@ -216,14 +316,17 @@ function ScanTab() {
         setPhase({ tag: 'preview', pass });
       }
     } catch (err: any) {
-      setPhase({ tag: 'error', message: err?.message ?? 'Failed to fetch order details.' });
+      setPhase({
+        tag: 'error',
+        message: err?.message ?? 'Failed to fetch order details.',
+      });
     }
     processingRef.current = false;
   }, []);
 
   const codeScanner = useCodeScanner({
     codeTypes: ['qr'],
-    onCodeScanned: (codes) => {
+    onCodeScanned: codes => {
       if (phase.tag !== 'scanning' || codes.length === 0) return;
       const value = codes[0].value;
       if (!value) return;
@@ -239,7 +342,10 @@ function ScanTab() {
       await checkInMutation.mutateAsync(pass.orderId);
       setPhase({ tag: 'success', pass });
     } catch (err: any) {
-      setPhase({ tag: 'error', message: err?.message ?? 'Check-in failed. Try again.' });
+      setPhase({
+        tag: 'error',
+        message: err?.message ?? 'Check-in failed. Try again.',
+      });
     }
   }, [phase, checkInMutation]);
 
@@ -253,10 +359,19 @@ function ScanTab() {
     return (
       <View style={[scan.center, { backgroundColor: T.bgApp }]}>
         <CameraOffIcon color={T.tabInactive} />
-        <AppText style={[scan.permTitle, { color: T.headerText }]}>Camera access needed</AppText>
-        <AppText style={[scan.permSub, { color: T.tabInactive }]}>Grant permission to scan employee pickup passes</AppText>
-        <TouchableOpacity onPress={requestPermission} style={[scan.permBtn, { backgroundColor: T.green }]}>
-          <AppText style={[scan.permBtnText, { color: T.bgApp }]}>Allow Camera</AppText>
+        <AppText style={[scan.permTitle, { color: T.headerText }]}>
+          Camera access needed
+        </AppText>
+        <AppText style={[scan.permSub, { color: T.tabInactive }]}>
+          Grant permission to scan employee pickup passes
+        </AppText>
+        <TouchableOpacity
+          onPress={requestPermission}
+          style={[scan.permBtn, { backgroundColor: T.green }]}
+        >
+          <AppText style={[scan.permBtnText, { color: T.bgApp }]}>
+            Allow Camera
+          </AppText>
         </TouchableOpacity>
       </View>
     );
@@ -267,8 +382,12 @@ function ScanTab() {
     return (
       <View style={[scan.center, { backgroundColor: T.bgApp }]}>
         <CameraOffIcon color={T.tabInactive} />
-        <AppText style={[scan.permTitle, { color: T.headerText }]}>No camera detected</AppText>
-        <AppText style={[scan.permSub, { color: T.tabInactive }]}>Use a real device to scan QR passes</AppText>
+        <AppText style={[scan.permTitle, { color: T.headerText }]}>
+          No camera detected
+        </AppText>
+        <AppText style={[scan.permSub, { color: T.tabInactive }]}>
+          Use a real device to scan QR passes
+        </AppText>
       </View>
     );
   }
@@ -284,7 +403,9 @@ function ScanTab() {
       />
 
       {/* Dark overlay when not actively scanning */}
-      {phase.tag !== 'scanning' && <View style={[StyleSheet.absoluteFill as any, scan.overlay]} />}
+      {phase.tag !== 'scanning' && (
+        <View style={[StyleSheet.absoluteFill as any, scan.overlay]} />
+      )}
 
       {/* Scanning frame */}
       {phase.tag === 'scanning' && (
@@ -295,110 +416,200 @@ function ScanTab() {
             <View style={[scan.corner, scan.bl, { borderColor: T.green }]} />
             <View style={[scan.corner, scan.br, { borderColor: T.green }]} />
           </View>
-          <AppText style={scan.hint}>Point at the employee's QR pickup pass</AppText>
+          <AppText style={scan.hint}>
+            Point at the employee's QR pickup pass
+          </AppText>
         </View>
       )}
 
       {/* Loading */}
       {phase.tag === 'loading' && (
-        <View style={[scan.card, { backgroundColor: T.bgCard, borderColor: T.borderDefault }]}>
+        <View
+          style={[
+            scan.card,
+            { backgroundColor: T.bgCard, borderColor: T.borderDefault },
+          ]}
+        >
           <ActivityIndicator color={T.green} size="large" />
-          <AppText style={[scan.cardTitle, { color: T.headerText }]}>Fetching order details…</AppText>
+          <AppText style={[scan.cardTitle, { color: T.headerText }]}>
+            Fetching order details…
+          </AppText>
         </View>
       )}
 
       {/* Preview — show order, confirm */}
       {(phase.tag === 'preview' || phase.tag === 'accepting') && (
-        <View style={[scan.card, { backgroundColor: T.bgCard, borderColor: T.borderDefault }]}>
+        <View
+          style={[
+            scan.card,
+            { backgroundColor: T.bgCard, borderColor: T.borderDefault },
+          ]}
+        >
           <View style={scan.passHeader}>
-            <View style={[scan.passAvatar, { backgroundColor: T.green + '30' }]}>
+            <View
+              style={[scan.passAvatar, { backgroundColor: T.green + '30' }]}
+            >
               <AppText style={[scan.passAvatarText, { color: T.green }]}>
-                {(phase.pass.employeeName ?? '?').split(' ').map(w => w[0]).join('').slice(0, 2).toUpperCase()}
+                {(phase.pass.employeeName ?? '?')
+                  .split(' ')
+                  .map(w => w[0])
+                  .join('')
+                  .slice(0, 2)
+                  .toUpperCase()}
               </AppText>
             </View>
             <View style={scan.passInfo}>
-              <AppText style={[scan.passName, { color: T.headerText }]}>{phase.pass.employeeName ?? 'Employee'}</AppText>
-              <AppText style={[scan.passSub, { color: T.tabInactive }]}>{phase.pass.mealType} · {phase.pass.office}</AppText>
+              <AppText style={[scan.passName, { color: T.headerText }]}>
+                {phase.pass.employeeName ?? 'Employee'}
+              </AppText>
+              <AppText style={[scan.passSub, { color: T.tabInactive }]}>
+                {phase.pass.mealType} · {phase.pass.office}
+              </AppText>
             </View>
           </View>
 
           <View style={[scan.passDetails, { backgroundColor: T.bgSurface }]}>
             <View style={scan.detailRow}>
-              <AppText style={[scan.detailLabel, { color: T.tabInactive }]}>Meal</AppText>
-              <AppText style={[scan.detailValue, { color: T.headerText }]}>{phase.pass.mealName}</AppText>
+              <AppText style={[scan.detailLabel, { color: T.tabInactive }]}>
+                Meal
+              </AppText>
+              <AppText style={[scan.detailValue, { color: T.headerText }]}>
+                {phase.pass.mealName}
+              </AppText>
             </View>
             <View style={scan.detailRow}>
-              <AppText style={[scan.detailLabel, { color: T.tabInactive }]}>Date</AppText>
-              <AppText style={[scan.detailValue, { color: T.headerText }]}>{phase.pass.dateKey}</AppText>
+              <AppText style={[scan.detailLabel, { color: T.tabInactive }]}>
+                Date
+              </AppText>
+              <AppText style={[scan.detailValue, { color: T.headerText }]}>
+                {phase.pass.dateKey}
+              </AppText>
             </View>
             <View style={scan.detailRow}>
-              <AppText style={[scan.detailLabel, { color: T.tabInactive }]}>Office</AppText>
-              <AppText style={[scan.detailValue, { color: T.headerText }]}>{phase.pass.office}</AppText>
+              <AppText style={[scan.detailLabel, { color: T.tabInactive }]}>
+                Office
+              </AppText>
+              <AppText style={[scan.detailValue, { color: T.headerText }]}>
+                {phase.pass.office}
+              </AppText>
             </View>
           </View>
 
           <TouchableOpacity
-            style={[scan.acceptBtn, { backgroundColor: T.green }, phase.tag === 'accepting' && { opacity: 0.7 }]}
+            style={[
+              scan.acceptBtn,
+              { backgroundColor: T.green },
+              phase.tag === 'accepting' && { opacity: 0.7 },
+            ]}
             onPress={handleAccept}
             disabled={phase.tag === 'accepting'}
             activeOpacity={0.85}
           >
-            {phase.tag === 'accepting'
-              ? <ActivityIndicator color={T.bgApp} />
-              : <AppText style={[scan.acceptBtnText, { color: T.bgApp }]}>Accept & Mark Collected</AppText>
-            }
+            {phase.tag === 'accepting' ? (
+              <ActivityIndicator color={T.bgApp} />
+            ) : (
+              <AppText style={[scan.acceptBtnText, { color: T.bgApp }]}>
+                Accept & Mark Collected
+              </AppText>
+            )}
           </TouchableOpacity>
 
           <TouchableOpacity onPress={reset} style={scan.cancelLink}>
-            <AppText style={[scan.cancelLinkText, { color: T.tabInactive }]}>Cancel</AppText>
+            <AppText style={[scan.cancelLinkText, { color: T.tabInactive }]}>
+              Cancel
+            </AppText>
           </TouchableOpacity>
         </View>
       )}
 
       {/* Success */}
       {phase.tag === 'success' && (
-        <View style={[scan.card, { backgroundColor: T.bgCard, borderColor: T.borderDefault }]}>
+        <View
+          style={[
+            scan.card,
+            { backgroundColor: T.bgCard, borderColor: T.borderDefault },
+          ]}
+        >
           <CheckCircleIcon color={T.green} />
-          <AppText style={[scan.successTitle, { color: T.green }]}>Collected!</AppText>
-          <AppText style={[scan.successSub, { color: T.tabInactive }]}>
-            {phase.pass.mealName} marked as collected for {phase.pass.employeeName ?? 'the employee'}.
-            {'\n'}They'll see the confirmation in their app within 30 seconds.
+          <AppText style={[scan.successTitle, { color: T.green }]}>
+            Collected!
           </AppText>
-          <TouchableOpacity style={[scan.scanAgainBtn, { backgroundColor: T.green }]} onPress={reset} activeOpacity={0.85}>
+          <AppText style={[scan.successSub, { color: T.tabInactive }]}>
+            {phase.pass.mealName} marked as collected for{' '}
+            {phase.pass.employeeName ?? 'the employee'}.{'\n'}They'll see the
+            confirmation in their app within 30 seconds.
+          </AppText>
+          <TouchableOpacity
+            style={[scan.scanAgainBtn, { backgroundColor: T.green }]}
+            onPress={reset}
+            activeOpacity={0.85}
+          >
             <ScanIcon color={T.bgApp} />
-            <AppText style={[scan.scanAgainText, { color: T.bgApp }]}>Scan Next Pass</AppText>
+            <AppText style={[scan.scanAgainText, { color: T.bgApp }]}>
+              Scan Next Pass
+            </AppText>
           </TouchableOpacity>
         </View>
       )}
 
       {/* Already collected */}
       {phase.tag === 'already_collected' && (
-        <View style={[scan.card, { backgroundColor: T.bgCard, borderColor: T.borderDefault }]}>
+        <View
+          style={[
+            scan.card,
+            { backgroundColor: T.bgCard, borderColor: T.borderDefault },
+          ]}
+        >
           <View style={scan.alreadyIcon}>
             <AlertIcon color={T.accentAmber} />
           </View>
-          <AppText style={[scan.alreadyTitle, { color: T.accentAmber }]}>Already Collected</AppText>
-          <AppText style={[scan.alreadySub, { color: T.tabInactive }]}>
-            {phase.pass.mealName} for {phase.pass.employeeName ?? 'this employee'} was already marked as collected.
+          <AppText style={[scan.alreadyTitle, { color: T.accentAmber }]}>
+            Already Collected
           </AppText>
-          <TouchableOpacity style={[scan.scanAgainBtn, { backgroundColor: T.green }]} onPress={reset} activeOpacity={0.85}>
+          <AppText style={[scan.alreadySub, { color: T.tabInactive }]}>
+            {phase.pass.mealName} for{' '}
+            {phase.pass.employeeName ?? 'this employee'} was already marked as
+            collected.
+          </AppText>
+          <TouchableOpacity
+            style={[scan.scanAgainBtn, { backgroundColor: T.green }]}
+            onPress={reset}
+            activeOpacity={0.85}
+          >
             <ScanIcon color={T.bgApp} />
-            <AppText style={[scan.scanAgainText, { color: T.bgApp }]}>Scan Another</AppText>
+            <AppText style={[scan.scanAgainText, { color: T.bgApp }]}>
+              Scan Another
+            </AppText>
           </TouchableOpacity>
         </View>
       )}
 
       {/* Error */}
       {phase.tag === 'error' && (
-        <View style={[scan.card, { backgroundColor: T.bgCard, borderColor: T.borderDefault }]}>
+        <View
+          style={[
+            scan.card,
+            { backgroundColor: T.bgCard, borderColor: T.borderDefault },
+          ]}
+        >
           <View style={scan.errorIcon}>
             <AlertIcon color={T.error} />
           </View>
-          <AppText style={[scan.errorTitle, { color: T.error }]}>Something went wrong</AppText>
-          <AppText style={[scan.errorSub, { color: T.tabInactive }]}>{phase.message}</AppText>
-          <TouchableOpacity style={[scan.scanAgainBtn, { backgroundColor: T.green }]} onPress={reset} activeOpacity={0.85}>
+          <AppText style={[scan.errorTitle, { color: T.error }]}>
+            Something went wrong
+          </AppText>
+          <AppText style={[scan.errorSub, { color: T.tabInactive }]}>
+            {phase.message}
+          </AppText>
+          <TouchableOpacity
+            style={[scan.scanAgainBtn, { backgroundColor: T.green }]}
+            onPress={reset}
+            activeOpacity={0.85}
+          >
             <ScanIcon color={T.bgApp} />
-            <AppText style={[scan.scanAgainText, { color: T.bgApp }]}>Try Again</AppText>
+            <AppText style={[scan.scanAgainText, { color: T.bgApp }]}>
+              Try Again
+            </AppText>
           </TouchableOpacity>
         </View>
       )}
@@ -419,9 +630,18 @@ const scan = StyleSheet.create({
     padding: 32,
     gap: 12,
   },
-  permTitle: { fontSize: FontSize['2xl'], fontWeight: FontWeight.bold, textAlign: 'center' },
+  permTitle: {
+    fontSize: FontSize['2xl'],
+    fontWeight: FontWeight.bold,
+    textAlign: 'center',
+  },
   permSub: { fontSize: FontSize.md, textAlign: 'center', lineHeight: 20 },
-  permBtn: { marginTop: 8, borderRadius: 14, paddingHorizontal: 24, paddingVertical: 13 },
+  permBtn: {
+    marginTop: 8,
+    borderRadius: 14,
+    paddingHorizontal: 24,
+    paddingVertical: 13,
+  },
   permBtnText: { fontSize: FontSize.xl, fontWeight: FontWeight.bold },
 
   frameWrap: {
@@ -440,11 +660,40 @@ const scan = StyleSheet.create({
     width: CORNER_SIZE,
     height: CORNER_SIZE,
   },
-  tl: { top: 0, left: 0, borderTopWidth: CORNER_THICK, borderLeftWidth: CORNER_THICK, borderTopLeftRadius: 6 },
-  tr: { top: 0, right: 0, borderTopWidth: CORNER_THICK, borderRightWidth: CORNER_THICK, borderTopRightRadius: 6 },
-  bl: { bottom: 0, left: 0, borderBottomWidth: CORNER_THICK, borderLeftWidth: CORNER_THICK, borderBottomLeftRadius: 6 },
-  br: { bottom: 0, right: 0, borderBottomWidth: CORNER_THICK, borderRightWidth: CORNER_THICK, borderBottomRightRadius: 6 },
-  hint: { color: 'rgba(255,255,255,0.75)', fontSize: FontSize.md, fontWeight: FontWeight.semibold, textAlign: 'center' },
+  tl: {
+    top: 0,
+    left: 0,
+    borderTopWidth: CORNER_THICK,
+    borderLeftWidth: CORNER_THICK,
+    borderTopLeftRadius: 6,
+  },
+  tr: {
+    top: 0,
+    right: 0,
+    borderTopWidth: CORNER_THICK,
+    borderRightWidth: CORNER_THICK,
+    borderTopRightRadius: 6,
+  },
+  bl: {
+    bottom: 0,
+    left: 0,
+    borderBottomWidth: CORNER_THICK,
+    borderLeftWidth: CORNER_THICK,
+    borderBottomLeftRadius: 6,
+  },
+  br: {
+    bottom: 0,
+    right: 0,
+    borderBottomWidth: CORNER_THICK,
+    borderRightWidth: CORNER_THICK,
+    borderBottomRightRadius: 6,
+  },
+  hint: {
+    color: 'rgba(255,255,255,0.75)',
+    fontSize: FontSize.md,
+    fontWeight: FontWeight.semibold,
+    textAlign: 'center',
+  },
 
   card: {
     position: 'absolute',
@@ -458,9 +707,18 @@ const scan = StyleSheet.create({
     alignItems: 'center',
     gap: 12,
   },
-  cardTitle: { fontSize: FontSize.xl, fontWeight: FontWeight.semibold, marginTop: 12 },
+  cardTitle: {
+    fontSize: FontSize.xl,
+    fontWeight: FontWeight.semibold,
+    marginTop: 12,
+  },
 
-  passHeader: { flexDirection: 'row', alignItems: 'center', gap: 12, alignSelf: 'stretch' },
+  passHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12,
+    alignSelf: 'stretch',
+  },
   passAvatar: {
     width: 48,
     height: 48,
@@ -471,7 +729,11 @@ const scan = StyleSheet.create({
   passAvatarText: { fontSize: FontSize.xl, fontWeight: FontWeight.bold },
   passInfo: { flex: 1 },
   passName: { fontSize: FontSize.xl, fontWeight: FontWeight.bold },
-  passSub: { fontSize: FontSize.sm, fontWeight: FontWeight.semibold, marginTop: 2 },
+  passSub: {
+    fontSize: FontSize.sm,
+    fontWeight: FontWeight.semibold,
+    marginTop: 2,
+  },
 
   passDetails: {
     alignSelf: 'stretch',
@@ -519,9 +781,24 @@ const scan = StyleSheet.create({
 // ── Add Meal Sheet ─────────────────────────────────────────────────────────────
 
 const MEAL_TYPES: MealType[] = ['Breakfast', 'Lunch', 'Dinner'];
-const SUGGESTED_TAGS = ['Veg', 'Non-veg', 'Gluten-free', 'Contains dairy', 'Contains nuts', 'Contains egg'];
+const SUGGESTED_TAGS = [
+  'Veg',
+  'Non-veg',
+  'Gluten-free',
+  'Contains dairy',
+  'Contains nuts',
+  'Contains egg',
+];
 
-function AddMealSheet({ visible, onClose, dateKey }: { visible: boolean; onClose: () => void; dateKey: string }) {
+function AddMealSheet({
+  visible,
+  onClose,
+  dateKey,
+}: {
+  visible: boolean;
+  onClose: () => void;
+  dateKey: string;
+}) {
   const T = useMerckTokens();
   const createMeal = useCreateMeal();
   const createDish = useCreateDish();
@@ -552,20 +829,21 @@ function AddMealSheet({ visible, onClose, dateKey }: { visible: boolean; onClose
 
   // Dish library — re-query as user types
   const { data: dishSuggestions = [] } = useDishes(
-    dishSearchQuery.trim().length > 0 ? dishSearchQuery.trim() : undefined
+    dishSearchQuery.trim().length > 0 ? dishSearchQuery.trim() : undefined,
   );
 
   // Filter suggestions to exclude already-selected dishes
   const filteredDishSuggestions = useMemo(
     () => dishSuggestions.filter(d => !form.selectedDishes.includes(d.name)),
-    [dishSuggestions, form.selectedDishes]
+    [dishSuggestions, form.selectedDishes],
   );
 
   // "Add new" option — show when search text doesn't exactly match any suggestion
   const showAddNew = useMemo(() => {
     const q = dishSearchQuery.trim();
     if (!q) return false;
-    if (form.selectedDishes.map(d => d.toLowerCase()).includes(q.toLowerCase())) return false;
+    if (form.selectedDishes.map(d => d.toLowerCase()).includes(q.toLowerCase()))
+      return false;
     return !dishSuggestions.some(d => d.name.toLowerCase() === q.toLowerCase());
   }, [dishSearchQuery, dishSuggestions, form.selectedDishes]);
 
@@ -573,22 +851,39 @@ function AddMealSheet({ visible, onClose, dateKey }: { visible: boolean; onClose
   const mealSearchResults = useMemo(() => {
     if (!mealSearchQuery.trim()) return [];
     const q = mealSearchQuery.toLowerCase();
-    return allMeals.filter(m =>
-      m.name.toLowerCase().includes(q) || m.dishes.toLowerCase().includes(q)
-    ).slice(0, 5);
+    return allMeals
+      .filter(
+        m =>
+          m.name.toLowerCase().includes(q) ||
+          m.dishes.toLowerCase().includes(q),
+      )
+      .slice(0, 5);
   }, [mealSearchQuery, allMeals]);
 
   const resetForm = useCallback(() => {
-    setForm({ name: '', mealType: 'Lunch', selectedDishes: [], kcal: '', tags: [], isNonVeg: false });
+    setForm({
+      name: '',
+      mealType: 'Lunch',
+      selectedDishes: [],
+      kcal: '',
+      tags: [],
+      isNonVeg: false,
+    });
     setError('');
     setMealSearchQuery('');
     setDishSearchQuery('');
   }, []);
 
-  const handleClose = useCallback(() => { resetForm(); onClose(); }, [onClose, resetForm]);
+  const handleClose = useCallback(() => {
+    resetForm();
+    onClose();
+  }, [onClose, resetForm]);
 
   const prefillFromMeal = useCallback((meal: ApiMeal) => {
-    const dishes = meal.dishes.split(',').map(d => d.trim()).filter(Boolean);
+    const dishes = meal.dishes
+      .split(',')
+      .map(d => d.trim())
+      .filter(Boolean);
     setForm({
       name: meal.name,
       mealType: meal.mealType,
@@ -600,12 +895,21 @@ function AddMealSheet({ visible, onClose, dateKey }: { visible: boolean; onClose
     setMealSearchQuery('');
   }, []);
 
-  const addDish = useCallback((name: string) => {
-    const trimmed = name.trim();
-    if (!trimmed || form.selectedDishes.map(d => d.toLowerCase()).includes(trimmed.toLowerCase())) return;
-    setForm(f => ({ ...f, selectedDishes: [...f.selectedDishes, trimmed] }));
-    setDishSearchQuery('');
-  }, [form.selectedDishes]);
+  const addDish = useCallback(
+    (name: string) => {
+      const trimmed = name.trim();
+      if (
+        !trimmed ||
+        form.selectedDishes
+          .map(d => d.toLowerCase())
+          .includes(trimmed.toLowerCase())
+      )
+        return;
+      setForm(f => ({ ...f, selectedDishes: [...f.selectedDishes, trimmed] }));
+      setDishSearchQuery('');
+    },
+    [form.selectedDishes],
+  );
 
   const addNewDish = useCallback(async () => {
     const name = dishSearchQuery.trim();
@@ -619,23 +923,37 @@ function AddMealSheet({ visible, onClose, dateKey }: { visible: boolean; onClose
   }, [dishSearchQuery, createDish, addDish]);
 
   const removeDish = useCallback((name: string) => {
-    setForm(f => ({ ...f, selectedDishes: f.selectedDishes.filter(d => d !== name) }));
+    setForm(f => ({
+      ...f,
+      selectedDishes: f.selectedDishes.filter(d => d !== name),
+    }));
   }, []);
 
   const toggleTag = useCallback((tag: string) => {
     setForm(f => ({
       ...f,
-      tags: f.tags.includes(tag) ? f.tags.filter(t => t !== tag) : [...f.tags, tag],
+      tags: f.tags.includes(tag)
+        ? f.tags.filter(t => t !== tag)
+        : [...f.tags, tag],
     }));
   }, []);
 
   const handleSubmit = useCallback(async () => {
     setError('');
-    if (!form.name.trim()) { setError('Meal name is required'); return; }
-    if (form.selectedDishes.length === 0) { setError('Add at least one dish'); return; }
+    if (!form.name.trim()) {
+      setError('Meal name is required');
+      return;
+    }
+    if (form.selectedDishes.length === 0) {
+      setError('Add at least one dish');
+      return;
+    }
     const kcalRaw = form.kcal.trim();
     const kcal = kcalRaw ? parseInt(kcalRaw, 10) : null;
-    if (kcal !== null && (isNaN(kcal) || kcal < 0)) { setError('Enter a valid calorie count'); return; }
+    if (kcal !== null && (isNaN(kcal) || kcal < 0)) {
+      setError('Enter a valid calorie count');
+      return;
+    }
 
     const payload: CreateMealPayload = {
       name: form.name.trim(),
@@ -656,45 +974,92 @@ function AddMealSheet({ visible, onClose, dateKey }: { visible: boolean; onClose
   }, [form, dateKey, createMeal, handleClose]);
 
   return (
-    <Modal visible={visible} animationType="slide" transparent onRequestClose={handleClose}>
+    <Modal
+      visible={visible}
+      animationType="slide"
+      transparent
+      onRequestClose={handleClose}
+    >
       <Pressable style={am.backdrop} onPress={handleClose} />
-      <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : undefined} style={am.kav}>
-        <View style={[am.sheet, { backgroundColor: T.bgCard, borderColor: T.borderDefault }]}>
+      <KeyboardAvoidingView
+        behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+        style={am.kav}
+      >
+        <View
+          style={[
+            am.sheet,
+            { backgroundColor: T.bgCard, borderColor: T.borderDefault },
+          ]}
+        >
           <View style={[am.handle, { backgroundColor: T.borderMuted }]} />
 
           <View style={am.headerRow}>
-            <AppText style={[am.title, { color: T.headerText }]}>Add Meal</AppText>
-            <TouchableOpacity onPress={handleClose} style={[am.closeBtn, { backgroundColor: T.bgSurface }]}>
+            <AppText style={[am.title, { color: T.headerText }]}>
+              Add Meal
+            </AppText>
+            <TouchableOpacity
+              onPress={handleClose}
+              style={[am.closeBtn, { backgroundColor: T.bgSurface }]}
+            >
               <CloseIcon color={T.tabInactive} />
             </TouchableOpacity>
           </View>
 
-          <ScrollView style={am.body} showsVerticalScrollIndicator={false} keyboardShouldPersistTaps="handled">
-
+          <ScrollView
+            style={am.body}
+            showsVerticalScrollIndicator={false}
+            keyboardShouldPersistTaps="handled"
+          >
             {/* ── Copy from existing meal ── */}
-            <AppText style={[am.label, { color: T.tabInactive }]}>Copy from Existing Meal</AppText>
+            <AppText style={[am.label, { color: T.tabInactive }]}>
+              Copy from Existing Meal
+            </AppText>
             <TextInput
-              style={[am.input, { backgroundColor: T.bgSurface, borderColor: T.borderDefault, color: T.headerText }]}
+              style={[
+                am.input,
+                {
+                  backgroundColor: T.bgSurface,
+                  borderColor: T.borderDefault,
+                  color: T.headerText,
+                },
+              ]}
               placeholder="Search meals to copy…"
               placeholderTextColor={T.tabInactive}
               value={mealSearchQuery}
               onChangeText={setMealSearchQuery}
             />
             {mealSearchResults.length > 0 && (
-              <View style={[am.searchResults, { borderColor: T.borderDefault }]}>
+              <View
+                style={[am.searchResults, { borderColor: T.borderDefault }]}
+              >
                 {mealSearchResults.map(m => (
                   <TouchableOpacity
                     key={m._id}
-                    style={[am.searchRow, { borderBottomColor: T.borderDefault, backgroundColor: T.bgSurface }]}
+                    style={[
+                      am.searchRow,
+                      {
+                        borderBottomColor: T.borderDefault,
+                        backgroundColor: T.bgSurface,
+                      },
+                    ]}
                     onPress={() => prefillFromMeal(m)}
                     activeOpacity={0.75}
                   >
                     <VegDot isNonVeg={m.isNonVeg} />
                     <View style={{ flex: 1, marginLeft: 8 }}>
-                      <AppText style={[am.searchName, { color: T.headerText }]}>{m.name}</AppText>
-                      <AppText style={[am.searchDishes, { color: T.tabInactive }]} numberOfLines={1}>{m.dishes}</AppText>
+                      <AppText style={[am.searchName, { color: T.headerText }]}>
+                        {m.name}
+                      </AppText>
+                      <AppText
+                        style={[am.searchDishes, { color: T.tabInactive }]}
+                        numberOfLines={1}
+                      >
+                        {m.dishes}
+                      </AppText>
                     </View>
-                    <AppText style={[am.searchCopy, { color: T.green }]}>Copy</AppText>
+                    <AppText style={[am.searchCopy, { color: T.green }]}>
+                      Copy
+                    </AppText>
                   </TouchableOpacity>
                 ))}
               </View>
@@ -703,9 +1068,18 @@ function AddMealSheet({ visible, onClose, dateKey }: { visible: boolean; onClose
             <View style={[am.divider, { backgroundColor: T.borderDefault }]} />
 
             {/* ── Meal Name ── */}
-            <AppText style={[am.label, { color: T.tabInactive }]}>Meal Name *</AppText>
+            <AppText style={[am.label, { color: T.tabInactive }]}>
+              Meal Name *
+            </AppText>
             <TextInput
-              style={[am.input, { backgroundColor: T.bgSurface, borderColor: T.borderDefault, color: T.headerText }]}
+              style={[
+                am.input,
+                {
+                  backgroundColor: T.bgSurface,
+                  borderColor: T.borderDefault,
+                  color: T.headerText,
+                },
+              ]}
               placeholder="e.g. South Indian Veg"
               placeholderTextColor={T.tabInactive}
               value={form.name}
@@ -713,7 +1087,9 @@ function AddMealSheet({ visible, onClose, dateKey }: { visible: boolean; onClose
             />
 
             {/* ── Meal type ── */}
-            <AppText style={[am.label, { color: T.tabInactive }]}>Meal Type *</AppText>
+            <AppText style={[am.label, { color: T.tabInactive }]}>
+              Meal Type *
+            </AppText>
             <View style={am.pillRow}>
               {MEAL_TYPES.map(mt => (
                 <TouchableOpacity
@@ -721,26 +1097,55 @@ function AddMealSheet({ visible, onClose, dateKey }: { visible: boolean; onClose
                   onPress={() => setForm(f => ({ ...f, mealType: mt }))}
                   style={[
                     am.pill,
-                    { backgroundColor: T.bgSurface, borderColor: T.borderDefault },
-                    form.mealType === mt && { backgroundColor: T.green, borderColor: T.green },
+                    {
+                      backgroundColor: T.bgSurface,
+                      borderColor: T.borderDefault,
+                    },
+                    form.mealType === mt && {
+                      backgroundColor: T.green,
+                      borderColor: T.green,
+                    },
                   ]}
                 >
-                  <AppText style={[am.pillText, { color: T.tabInactive }, form.mealType === mt && { color: T.bgApp }]}>{mt}</AppText>
+                  <AppText
+                    style={[
+                      am.pillText,
+                      { color: T.tabInactive },
+                      form.mealType === mt && { color: T.bgApp },
+                    ]}
+                  >
+                    {mt}
+                  </AppText>
                 </TouchableOpacity>
               ))}
             </View>
 
             {/* ── Dish picker ── */}
-            <AppText style={[am.label, { color: T.tabInactive }]}>Dishes *</AppText>
+            <AppText style={[am.label, { color: T.tabInactive }]}>
+              Dishes *
+            </AppText>
 
             {/* Selected dishes as removable chips */}
             {form.selectedDishes.length > 0 && (
               <View style={am.selectedDishRow}>
                 {form.selectedDishes.map(name => (
-                  <View key={name} style={[am.dishChip, { backgroundColor: T.green + '22', borderColor: T.green }]}>
-                    <AppText style={[am.dishChipText, { color: T.green }]}>{name}</AppText>
-                    <TouchableOpacity onPress={() => removeDish(name)} hitSlop={{ top: 6, bottom: 6, left: 6, right: 6 }}>
-                      <AppText style={[am.dishChipRemove, { color: T.green }]}>✕</AppText>
+                  <View
+                    key={name}
+                    style={[
+                      am.dishChip,
+                      { backgroundColor: T.green + '22', borderColor: T.green },
+                    ]}
+                  >
+                    <AppText style={[am.dishChipText, { color: T.green }]}>
+                      {name}
+                    </AppText>
+                    <TouchableOpacity
+                      onPress={() => removeDish(name)}
+                      hitSlop={{ top: 6, bottom: 6, left: 6, right: 6 }}
+                    >
+                      <AppText style={[am.dishChipRemove, { color: T.green }]}>
+                        ✕
+                      </AppText>
                     </TouchableOpacity>
                   </View>
                 ))}
@@ -749,7 +1154,14 @@ function AddMealSheet({ visible, onClose, dateKey }: { visible: boolean; onClose
 
             {/* Search box */}
             <TextInput
-              style={[am.input, { backgroundColor: T.bgSurface, borderColor: T.borderDefault, color: T.headerText }]}
+              style={[
+                am.input,
+                {
+                  backgroundColor: T.bgSurface,
+                  borderColor: T.borderDefault,
+                  color: T.headerText,
+                },
+              ]}
               placeholder="Search or type a dish name…"
               placeholderTextColor={T.tabInactive}
               value={dishSearchQuery}
@@ -758,32 +1170,57 @@ function AddMealSheet({ visible, onClose, dateKey }: { visible: boolean; onClose
 
             {/* Suggestions from dish library */}
             {(filteredDishSuggestions.length > 0 || showAddNew) && (
-              <View style={[am.searchResults, { borderColor: T.borderDefault }]}>
+              <View
+                style={[am.searchResults, { borderColor: T.borderDefault }]}
+              >
                 {filteredDishSuggestions.slice(0, 6).map(d => (
                   <TouchableOpacity
                     key={d._id}
-                    style={[am.searchRow, { borderBottomColor: T.borderDefault, backgroundColor: T.bgSurface }]}
+                    style={[
+                      am.searchRow,
+                      {
+                        borderBottomColor: T.borderDefault,
+                        backgroundColor: T.bgSurface,
+                      },
+                    ]}
                     onPress={() => addDish(d.name)}
                     activeOpacity={0.75}
                   >
-                    <AppText style={[am.searchName, { color: T.headerText }]}>{d.name}</AppText>
-                    <AppText style={[am.searchCopy, { color: T.green }]}>+ Add</AppText>
+                    <AppText style={[am.searchName, { color: T.headerText }]}>
+                      {d.name}
+                    </AppText>
+                    <AppText style={[am.searchCopy, { color: T.green }]}>
+                      + Add
+                    </AppText>
                   </TouchableOpacity>
                 ))}
                 {showAddNew && (
                   <TouchableOpacity
-                    style={[am.searchRow, { borderBottomColor: T.borderDefault, backgroundColor: T.green + '12' }]}
+                    style={[
+                      am.searchRow,
+                      {
+                        borderBottomColor: T.borderDefault,
+                        backgroundColor: T.green + '12',
+                      },
+                    ]}
                     onPress={addNewDish}
                     disabled={createDish.isPending}
                     activeOpacity={0.75}
                   >
-                    {createDish.isPending
-                      ? <ActivityIndicator size="small" color={T.green} />
-                      : <AppText style={[am.searchName, { color: T.headerText }]}>
-                          Add "<AppText style={{ color: T.green }}>{dishSearchQuery.trim()}</AppText>"
+                    {createDish.isPending ? (
+                      <ActivityIndicator size="small" color={T.green} />
+                    ) : (
+                      <AppText style={[am.searchName, { color: T.headerText }]}>
+                        Add "
+                        <AppText style={{ color: T.green }}>
+                          {dishSearchQuery.trim()}
                         </AppText>
-                    }
-                    <AppText style={[am.searchCopy, { color: T.green }]}>New</AppText>
+                        "
+                      </AppText>
+                    )}
+                    <AppText style={[am.searchCopy, { color: T.green }]}>
+                      New
+                    </AppText>
                   </TouchableOpacity>
                 )}
               </View>
@@ -792,9 +1229,18 @@ function AddMealSheet({ visible, onClose, dateKey }: { visible: boolean; onClose
             {/* ── Calories (optional) + Standard Price (read-only) ── */}
             <View style={[am.twoCol, { marginTop: 14 }]}>
               <View style={am.col}>
-                <AppText style={[am.label, { color: T.tabInactive }]}>Calories (optional)</AppText>
+                <AppText style={[am.label, { color: T.tabInactive }]}>
+                  Calories (optional)
+                </AppText>
                 <TextInput
-                  style={[am.input, { backgroundColor: T.bgSurface, borderColor: T.borderDefault, color: T.headerText }]}
+                  style={[
+                    am.input,
+                    {
+                      backgroundColor: T.bgSurface,
+                      borderColor: T.borderDefault,
+                      color: T.headerText,
+                    },
+                  ]}
                   placeholder="e.g. 420"
                   placeholderTextColor={T.tabInactive}
                   value={form.kcal}
@@ -803,18 +1249,37 @@ function AddMealSheet({ visible, onClose, dateKey }: { visible: boolean; onClose
                 />
               </View>
               <View style={am.col}>
-                <AppText style={[am.label, { color: T.tabInactive }]}>Standard Price</AppText>
-                <View style={[am.priceReadOnly, { backgroundColor: T.bgSurface, borderColor: T.borderDefault }]}>
-                  {resolvedPrice !== null
-                    ? <AppText style={[am.priceReadOnlyText, { color: T.green }]}>₹{resolvedPrice}</AppText>
-                    : <AppText style={[am.priceReadOnlyMuted, { color: T.tabInactive }]}>Not set</AppText>
-                  }
+                <AppText style={[am.label, { color: T.tabInactive }]}>
+                  Standard Price
+                </AppText>
+                <View
+                  style={[
+                    am.priceReadOnly,
+                    {
+                      backgroundColor: T.bgSurface,
+                      borderColor: T.borderDefault,
+                    },
+                  ]}
+                >
+                  {resolvedPrice !== null ? (
+                    <AppText style={[am.priceReadOnlyText, { color: T.green }]}>
+                      ₹{resolvedPrice}
+                    </AppText>
+                  ) : (
+                    <AppText
+                      style={[am.priceReadOnlyMuted, { color: T.tabInactive }]}
+                    >
+                      Not set
+                    </AppText>
+                  )}
                 </View>
               </View>
             </View>
 
             {/* ── Dietary Tags ── */}
-            <AppText style={[am.label, { color: T.tabInactive }]}>Dietary Tags</AppText>
+            <AppText style={[am.label, { color: T.tabInactive }]}>
+              Dietary Tags
+            </AppText>
             <View style={am.tagGrid}>
               {SUGGESTED_TAGS.map(tag => {
                 const selected = form.tags.includes(tag);
@@ -824,11 +1289,25 @@ function AddMealSheet({ visible, onClose, dateKey }: { visible: boolean; onClose
                     onPress={() => toggleTag(tag)}
                     style={[
                       am.tagChip,
-                      { backgroundColor: T.bgSurface, borderColor: T.borderDefault },
-                      selected && { backgroundColor: T.green + '22', borderColor: T.green },
+                      {
+                        backgroundColor: T.bgSurface,
+                        borderColor: T.borderDefault,
+                      },
+                      selected && {
+                        backgroundColor: T.green + '22',
+                        borderColor: T.green,
+                      },
                     ]}
                   >
-                    <AppText style={[am.tagChipText, { color: T.tabInactive }, selected && { color: T.green }]}>{tag}</AppText>
+                    <AppText
+                      style={[
+                        am.tagChipText,
+                        { color: T.tabInactive },
+                        selected && { color: T.green },
+                      ]}
+                    >
+                      {tag}
+                    </AppText>
                   </TouchableOpacity>
                 );
               })}
@@ -836,7 +1315,9 @@ function AddMealSheet({ visible, onClose, dateKey }: { visible: boolean; onClose
 
             {/* ── Non-Veg toggle ── */}
             <View style={am.switchRow}>
-              <AppText style={[am.switchLabel, { color: T.headerText }]}>Non-Veg</AppText>
+              <AppText style={[am.switchLabel, { color: T.headerText }]}>
+                Non-Veg
+              </AppText>
               <Switch
                 value={form.isNonVeg}
                 onValueChange={v => setForm(f => ({ ...f, isNonVeg: v }))}
@@ -845,21 +1326,30 @@ function AddMealSheet({ visible, onClose, dateKey }: { visible: boolean; onClose
               />
             </View>
 
-            {!!error && <AppText style={[am.error, { color: T.error }]}>{error}</AppText>}
+            {!!error && (
+              <AppText style={[am.error, { color: T.error }]}>{error}</AppText>
+            )}
             <View style={{ height: 16 }} />
           </ScrollView>
 
           <View style={[am.footer, { borderTopColor: T.borderDefault }]}>
             <TouchableOpacity
-              style={[am.submitBtn, { backgroundColor: T.green }, createMeal.isPending && { opacity: 0.7 }]}
+              style={[
+                am.submitBtn,
+                { backgroundColor: T.green },
+                createMeal.isPending && { opacity: 0.7 },
+              ]}
               onPress={handleSubmit}
               disabled={createMeal.isPending}
               activeOpacity={0.88}
             >
-              {createMeal.isPending
-                ? <ActivityIndicator color={T.bgApp} />
-                : <AppText style={[am.submitText, { color: T.bgApp }]}>Add Meal</AppText>
-              }
+              {createMeal.isPending ? (
+                <ActivityIndicator color={T.bgApp} />
+              ) : (
+                <AppText style={[am.submitText, { color: T.bgApp }]}>
+                  Add Meal
+                </AppText>
+              )}
             </TouchableOpacity>
           </View>
         </View>
@@ -974,7 +1464,11 @@ const am = StyleSheet.create({
   },
   searchName: { fontSize: FontSize.sm, fontWeight: FontWeight.bold, flex: 1 },
   searchDishes: { fontSize: FontSize['2xs'], marginTop: 2 },
-  searchCopy: { fontSize: FontSize.sm, fontWeight: FontWeight.bold, marginLeft: 8 },
+  searchCopy: {
+    fontSize: FontSize.sm,
+    fontWeight: FontWeight.bold,
+    marginLeft: 8,
+  },
   divider: { height: 1, marginVertical: 16 },
   selectedDishRow: {
     flexDirection: 'row',
@@ -1006,7 +1500,15 @@ const am = StyleSheet.create({
 
 // ── Manage Menu Tab ────────────────────────────────────────────────────────────
 
-function EditMealSheet({ meal, dateKey, onClose }: { meal: ApiMeal | null; dateKey: string; onClose: () => void }) {
+function EditMealSheet({
+  meal,
+  dateKey,
+  onClose,
+}: {
+  meal: ApiMeal | null;
+  dateKey: string;
+  onClose: () => void;
+}) {
   const T = useMerckTokens();
   const updateMeal = useUpdateMeal(dateKey);
   const { data: mealRates } = useMealRates();
@@ -1030,7 +1532,10 @@ function EditMealSheet({ meal, dateKey, onClose }: { meal: ApiMeal | null; dateK
       setForm({
         name: meal.name,
         mealType: meal.mealType,
-        selectedDishes: meal.dishes.split(',').map(d => d.trim()).filter(Boolean),
+        selectedDishes: meal.dishes
+          .split(',')
+          .map(d => d.trim())
+          .filter(Boolean),
         kcal: meal.kcal != null ? String(meal.kcal) : '',
         tags: [...meal.tags],
         isNonVeg: meal.isNonVeg,
@@ -1046,46 +1551,85 @@ function EditMealSheet({ meal, dateKey, onClose }: { meal: ApiMeal | null; dateK
     if (!dishSearchQuery.trim()) return [];
     const q = dishSearchQuery.toLowerCase();
     return allDishSuggestions
-      .filter(d => d.name.toLowerCase().includes(q) && !form.selectedDishes.includes(d.name))
+      .filter(
+        d =>
+          d.name.toLowerCase().includes(q) &&
+          !form.selectedDishes.includes(d.name),
+      )
       .slice(0, 6);
   }, [dishSearchQuery, allDishSuggestions, form.selectedDishes]);
 
   const showAddNew = useMemo(() => {
     const q = dishSearchQuery.trim();
     if (!q) return false;
-    if (form.selectedDishes.map(d => d.toLowerCase()).includes(q.toLowerCase())) return false;
-    return !allDishSuggestions.some(d => d.name.toLowerCase() === q.toLowerCase());
+    if (form.selectedDishes.map(d => d.toLowerCase()).includes(q.toLowerCase()))
+      return false;
+    return !allDishSuggestions.some(
+      d => d.name.toLowerCase() === q.toLowerCase(),
+    );
   }, [dishSearchQuery, allDishSuggestions, form.selectedDishes]);
 
-  const addDish = useCallback((name: string) => {
-    const trimmed = name.trim();
-    if (!trimmed || form.selectedDishes.map(d => d.toLowerCase()).includes(trimmed.toLowerCase())) return;
-    setForm(f => ({ ...f, selectedDishes: [...f.selectedDishes, trimmed] }));
-    setDishSearchQuery('');
-  }, [form.selectedDishes]);
+  const addDish = useCallback(
+    (name: string) => {
+      const trimmed = name.trim();
+      if (
+        !trimmed ||
+        form.selectedDishes
+          .map(d => d.toLowerCase())
+          .includes(trimmed.toLowerCase())
+      )
+        return;
+      setForm(f => ({ ...f, selectedDishes: [...f.selectedDishes, trimmed] }));
+      setDishSearchQuery('');
+    },
+    [form.selectedDishes],
+  );
 
   const addNewDish = useCallback(async () => {
     const name = dishSearchQuery.trim();
     if (!name) return;
-    try { await createDish.mutateAsync(name); } catch {}
+    try {
+      await createDish.mutateAsync(name);
+    } catch {}
     addDish(name);
   }, [dishSearchQuery, createDish, addDish]);
 
   const toggleTag = useCallback((tag: string) => {
-    setForm(f => ({ ...f, tags: f.tags.includes(tag) ? f.tags.filter(t => t !== tag) : [...f.tags, tag] }));
+    setForm(f => ({
+      ...f,
+      tags: f.tags.includes(tag)
+        ? f.tags.filter(t => t !== tag)
+        : [...f.tags, tag],
+    }));
   }, []);
 
   const handleSave = useCallback(async () => {
     setError('');
-    if (!form.name.trim()) { setError('Meal name is required'); return; }
-    if (form.selectedDishes.length === 0) { setError('Add at least one dish'); return; }
+    if (!form.name.trim()) {
+      setError('Meal name is required');
+      return;
+    }
+    if (form.selectedDishes.length === 0) {
+      setError('Add at least one dish');
+      return;
+    }
     const kcalRaw = form.kcal.trim();
     const kcal = kcalRaw ? parseInt(kcalRaw, 10) : null;
-    if (kcal !== null && (isNaN(kcal) || kcal < 0)) { setError('Enter a valid calorie count'); return; }
+    if (kcal !== null && (isNaN(kcal) || kcal < 0)) {
+      setError('Enter a valid calorie count');
+      return;
+    }
     try {
       await updateMeal.mutateAsync({
         mealId: meal!._id,
-        payload: { name: form.name.trim(), dishes: form.selectedDishes.join(', '), kcal, mealType: form.mealType, tags: form.tags, isNonVeg: form.isNonVeg },
+        payload: {
+          name: form.name.trim(),
+          dishes: form.selectedDishes.join(', '),
+          kcal,
+          mealType: form.mealType,
+          tags: form.tags,
+          isNonVeg: form.isNonVeg,
+        },
       });
       onClose();
     } catch (err: any) {
@@ -1096,27 +1640,60 @@ function EditMealSheet({ meal, dateKey, onClose }: { meal: ApiMeal | null; dateK
   if (!meal) return null;
 
   return (
-    <Modal visible={!!meal} animationType="slide" transparent onRequestClose={onClose}>
+    <Modal
+      visible={!!meal}
+      animationType="slide"
+      transparent
+      onRequestClose={onClose}
+    >
       <Pressable style={am.backdrop} onPress={onClose} />
-      <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : undefined} style={am.kav}>
-        <View style={[am.sheet, { backgroundColor: T.bgCard, borderColor: T.borderDefault }]}>
+      <KeyboardAvoidingView
+        behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+        style={am.kav}
+      >
+        <View
+          style={[
+            am.sheet,
+            { backgroundColor: T.bgCard, borderColor: T.borderDefault },
+          ]}
+        >
           <View style={[am.handle, { backgroundColor: T.borderMuted }]} />
           <View style={am.headerRow}>
-            <AppText style={[am.title, { color: T.headerText }]}>Edit Meal</AppText>
-            <TouchableOpacity onPress={onClose} style={[am.closeBtn, { backgroundColor: T.bgSurface }]}>
+            <AppText style={[am.title, { color: T.headerText }]}>
+              Edit Meal
+            </AppText>
+            <TouchableOpacity
+              onPress={onClose}
+              style={[am.closeBtn, { backgroundColor: T.bgSurface }]}
+            >
               <CloseIcon color={T.tabInactive} />
             </TouchableOpacity>
           </View>
-          <ScrollView style={am.body} showsVerticalScrollIndicator={false} keyboardShouldPersistTaps="handled">
-            <AppText style={[am.label, { color: T.tabInactive }]}>Meal Name *</AppText>
+          <ScrollView
+            style={am.body}
+            showsVerticalScrollIndicator={false}
+            keyboardShouldPersistTaps="handled"
+          >
+            <AppText style={[am.label, { color: T.tabInactive }]}>
+              Meal Name *
+            </AppText>
             <TextInput
-              style={[am.input, { backgroundColor: T.bgSurface, borderColor: T.borderDefault, color: T.headerText }]}
+              style={[
+                am.input,
+                {
+                  backgroundColor: T.bgSurface,
+                  borderColor: T.borderDefault,
+                  color: T.headerText,
+                },
+              ]}
               value={form.name}
               onChangeText={v => setForm(f => ({ ...f, name: v }))}
               placeholderTextColor={T.tabInactive}
             />
 
-            <AppText style={[am.label, { color: T.tabInactive }]}>Meal Type *</AppText>
+            <AppText style={[am.label, { color: T.tabInactive }]}>
+              Meal Type *
+            </AppText>
             <View style={am.pillRow}>
               {MEAL_TYPES.map(mt => (
                 <TouchableOpacity
@@ -1124,57 +1701,126 @@ function EditMealSheet({ meal, dateKey, onClose }: { meal: ApiMeal | null; dateK
                   onPress={() => setForm(f => ({ ...f, mealType: mt }))}
                   style={[
                     am.pill,
-                    { backgroundColor: T.bgSurface, borderColor: T.borderDefault },
-                    form.mealType === mt && { backgroundColor: T.green, borderColor: T.green },
+                    {
+                      backgroundColor: T.bgSurface,
+                      borderColor: T.borderDefault,
+                    },
+                    form.mealType === mt && {
+                      backgroundColor: T.green,
+                      borderColor: T.green,
+                    },
                   ]}
                 >
-                  <AppText style={[am.pillText, { color: T.tabInactive }, form.mealType === mt && { color: T.bgApp }]}>{mt}</AppText>
+                  <AppText
+                    style={[
+                      am.pillText,
+                      { color: T.tabInactive },
+                      form.mealType === mt && { color: T.bgApp },
+                    ]}
+                  >
+                    {mt}
+                  </AppText>
                 </TouchableOpacity>
               ))}
             </View>
 
-            <AppText style={[am.label, { color: T.tabInactive }]}>Dishes *</AppText>
+            <AppText style={[am.label, { color: T.tabInactive }]}>
+              Dishes *
+            </AppText>
             {form.selectedDishes.length > 0 && (
               <View style={am.selectedDishRow}>
                 {form.selectedDishes.map(name => (
-                  <View key={name} style={[am.dishChip, { backgroundColor: T.green + '22', borderColor: T.green }]}>
-                    <AppText style={[am.dishChipText, { color: T.green }]}>{name}</AppText>
-                    <TouchableOpacity onPress={() => setForm(f => ({ ...f, selectedDishes: f.selectedDishes.filter(d => d !== name) }))} hitSlop={{ top: 6, bottom: 6, left: 6, right: 6 }}>
-                      <AppText style={[am.dishChipRemove, { color: T.green }]}>✕</AppText>
+                  <View
+                    key={name}
+                    style={[
+                      am.dishChip,
+                      { backgroundColor: T.green + '22', borderColor: T.green },
+                    ]}
+                  >
+                    <AppText style={[am.dishChipText, { color: T.green }]}>
+                      {name}
+                    </AppText>
+                    <TouchableOpacity
+                      onPress={() =>
+                        setForm(f => ({
+                          ...f,
+                          selectedDishes: f.selectedDishes.filter(
+                            d => d !== name,
+                          ),
+                        }))
+                      }
+                      hitSlop={{ top: 6, bottom: 6, left: 6, right: 6 }}
+                    >
+                      <AppText style={[am.dishChipRemove, { color: T.green }]}>
+                        ✕
+                      </AppText>
                     </TouchableOpacity>
                   </View>
                 ))}
               </View>
             )}
             <TextInput
-              style={[am.input, { backgroundColor: T.bgSurface, borderColor: T.borderDefault, color: T.headerText }]}
+              style={[
+                am.input,
+                {
+                  backgroundColor: T.bgSurface,
+                  borderColor: T.borderDefault,
+                  color: T.headerText,
+                },
+              ]}
               placeholder="Search or type a dish…"
               placeholderTextColor={T.tabInactive}
               value={dishSearchQuery}
               onChangeText={setDishSearchQuery}
             />
             {(filteredDishSuggestions.length > 0 || showAddNew) && (
-              <View style={[am.searchResults, { borderColor: T.borderDefault }]}>
+              <View
+                style={[am.searchResults, { borderColor: T.borderDefault }]}
+              >
                 {filteredDishSuggestions.map(d => (
                   <TouchableOpacity
                     key={d._id}
-                    style={[am.searchRow, { borderBottomColor: T.borderDefault, backgroundColor: T.bgSurface }]}
+                    style={[
+                      am.searchRow,
+                      {
+                        borderBottomColor: T.borderDefault,
+                        backgroundColor: T.bgSurface,
+                      },
+                    ]}
                     onPress={() => addDish(d.name)}
                     activeOpacity={0.75}
                   >
-                    <AppText style={[am.searchName, { color: T.headerText }]}>{d.name}</AppText>
-                    <AppText style={[am.searchCopy, { color: T.green }]}>+ Add</AppText>
+                    <AppText style={[am.searchName, { color: T.headerText }]}>
+                      {d.name}
+                    </AppText>
+                    <AppText style={[am.searchCopy, { color: T.green }]}>
+                      + Add
+                    </AppText>
                   </TouchableOpacity>
                 ))}
                 {showAddNew && (
                   <TouchableOpacity
-                    style={[am.searchRow, { borderBottomColor: T.borderDefault, backgroundColor: T.green + '12' }]}
+                    style={[
+                      am.searchRow,
+                      {
+                        borderBottomColor: T.borderDefault,
+                        backgroundColor: T.green + '12',
+                      },
+                    ]}
                     onPress={addNewDish}
                     disabled={createDish.isPending}
                     activeOpacity={0.75}
                   >
-                    <AppText style={[am.searchName, { color: T.headerText }]}>Add "<AppText style={{ color: T.green }}>{dishSearchQuery.trim()}</AppText>"</AppText>
-                    <AppText style={[am.searchCopy, { color: T.green }]}>New</AppText>
+                    <AppText style={[am.searchName, { color: T.headerText }]}>
+                      Add "
+                      <AppText style={{ color: T.green }}>
+                        {dishSearchQuery.trim()}
+                      </AppText>
+                      "
+                    </AppText>
+                    <AppText style={[am.searchCopy, { color: T.green }]}>
+                      New
+                    </AppText>
                   </TouchableOpacity>
                 )}
               </View>
@@ -1182,9 +1828,18 @@ function EditMealSheet({ meal, dateKey, onClose }: { meal: ApiMeal | null; dateK
 
             <View style={[am.twoCol, { marginTop: 14 }]}>
               <View style={am.col}>
-                <AppText style={[am.label, { color: T.tabInactive }]}>Calories (optional)</AppText>
+                <AppText style={[am.label, { color: T.tabInactive }]}>
+                  Calories (optional)
+                </AppText>
                 <TextInput
-                  style={[am.input, { backgroundColor: T.bgSurface, borderColor: T.borderDefault, color: T.headerText }]}
+                  style={[
+                    am.input,
+                    {
+                      backgroundColor: T.bgSurface,
+                      borderColor: T.borderDefault,
+                      color: T.headerText,
+                    },
+                  ]}
                   placeholder="e.g. 420"
                   placeholderTextColor={T.tabInactive}
                   value={form.kcal}
@@ -1193,17 +1848,36 @@ function EditMealSheet({ meal, dateKey, onClose }: { meal: ApiMeal | null; dateK
                 />
               </View>
               <View style={am.col}>
-                <AppText style={[am.label, { color: T.tabInactive }]}>Standard Price</AppText>
-                <View style={[am.priceReadOnly, { backgroundColor: T.bgSurface, borderColor: T.borderDefault }]}>
-                  {resolvedPrice !== null
-                    ? <AppText style={[am.priceReadOnlyText, { color: T.green }]}>₹{resolvedPrice}</AppText>
-                    : <AppText style={[am.priceReadOnlyMuted, { color: T.tabInactive }]}>Not set</AppText>
-                  }
+                <AppText style={[am.label, { color: T.tabInactive }]}>
+                  Standard Price
+                </AppText>
+                <View
+                  style={[
+                    am.priceReadOnly,
+                    {
+                      backgroundColor: T.bgSurface,
+                      borderColor: T.borderDefault,
+                    },
+                  ]}
+                >
+                  {resolvedPrice !== null ? (
+                    <AppText style={[am.priceReadOnlyText, { color: T.green }]}>
+                      ₹{resolvedPrice}
+                    </AppText>
+                  ) : (
+                    <AppText
+                      style={[am.priceReadOnlyMuted, { color: T.tabInactive }]}
+                    >
+                      Not set
+                    </AppText>
+                  )}
                 </View>
               </View>
             </View>
 
-            <AppText style={[am.label, { color: T.tabInactive }]}>Dietary Tags</AppText>
+            <AppText style={[am.label, { color: T.tabInactive }]}>
+              Dietary Tags
+            </AppText>
             <View style={am.tagGrid}>
               {SUGGESTED_TAGS.map(tag => {
                 const selected = form.tags.includes(tag);
@@ -1213,18 +1887,34 @@ function EditMealSheet({ meal, dateKey, onClose }: { meal: ApiMeal | null; dateK
                     onPress={() => toggleTag(tag)}
                     style={[
                       am.tagChip,
-                      { backgroundColor: T.bgSurface, borderColor: T.borderDefault },
-                      selected && { backgroundColor: T.green + '22', borderColor: T.green },
+                      {
+                        backgroundColor: T.bgSurface,
+                        borderColor: T.borderDefault,
+                      },
+                      selected && {
+                        backgroundColor: T.green + '22',
+                        borderColor: T.green,
+                      },
                     ]}
                   >
-                    <AppText style={[am.tagChipText, { color: T.tabInactive }, selected && { color: T.green }]}>{tag}</AppText>
+                    <AppText
+                      style={[
+                        am.tagChipText,
+                        { color: T.tabInactive },
+                        selected && { color: T.green },
+                      ]}
+                    >
+                      {tag}
+                    </AppText>
                   </TouchableOpacity>
                 );
               })}
             </View>
 
             <View style={am.switchRow}>
-              <AppText style={[am.switchLabel, { color: T.headerText }]}>Non-Veg</AppText>
+              <AppText style={[am.switchLabel, { color: T.headerText }]}>
+                Non-Veg
+              </AppText>
               <Switch
                 value={form.isNonVeg}
                 onValueChange={v => setForm(f => ({ ...f, isNonVeg: v }))}
@@ -1233,20 +1923,29 @@ function EditMealSheet({ meal, dateKey, onClose }: { meal: ApiMeal | null; dateK
               />
             </View>
 
-            {!!error && <AppText style={[am.error, { color: T.error }]}>{error}</AppText>}
+            {!!error && (
+              <AppText style={[am.error, { color: T.error }]}>{error}</AppText>
+            )}
             <View style={{ height: 16 }} />
           </ScrollView>
           <View style={[am.footer, { borderTopColor: T.borderDefault }]}>
             <TouchableOpacity
-              style={[am.submitBtn, { backgroundColor: T.green }, updateMeal.isPending && { opacity: 0.7 }]}
+              style={[
+                am.submitBtn,
+                { backgroundColor: T.green },
+                updateMeal.isPending && { opacity: 0.7 },
+              ]}
               onPress={handleSave}
               disabled={updateMeal.isPending}
               activeOpacity={0.88}
             >
-              {updateMeal.isPending
-                ? <ActivityIndicator color={T.bgApp} />
-                : <AppText style={[am.submitText, { color: T.bgApp }]}>Save Changes</AppText>
-              }
+              {updateMeal.isPending ? (
+                <ActivityIndicator color={T.bgApp} />
+              ) : (
+                <AppText style={[am.submitText, { color: T.bgApp }]}>
+                  Save Changes
+                </AppText>
+              )}
             </TouchableOpacity>
           </View>
         </View>
@@ -1255,40 +1954,86 @@ function EditMealSheet({ meal, dateKey, onClose }: { meal: ApiMeal | null; dateK
   );
 }
 
-function MealManageCard({ meal, dateKey, onEdit }: { meal: ApiMeal; dateKey: string; onEdit: (meal: ApiMeal) => void }) {
+function MealManageCard({
+  meal,
+  dateKey,
+  onEdit,
+}: {
+  meal: ApiMeal;
+  dateKey: string;
+  onEdit: (meal: ApiMeal) => void;
+}) {
   const T = useMerckTokens();
   const toggle = useToggleMealAvailability();
   const deleteMeal = useDeleteMeal(dateKey);
   const [confirmDelete, setConfirmDelete] = useState(false);
 
   const handleDelete = useCallback(() => {
-    if (!confirmDelete) { setConfirmDelete(true); return; }
+    if (!confirmDelete) {
+      setConfirmDelete(true);
+      return;
+    }
     deleteMeal.mutate(meal._id);
     setConfirmDelete(false);
   }, [confirmDelete, deleteMeal, meal._id]);
 
   return (
-    <View style={[mm.card, { backgroundColor: T.bgCard, borderColor: T.borderDefault }, !meal.isAvailable && mm.cardDisabled]}>
+    <View
+      style={[
+        mm.card,
+        { backgroundColor: T.bgCard, borderColor: T.borderDefault },
+        !meal.isAvailable && mm.cardDisabled,
+      ]}
+    >
       {/* Main row */}
       <View style={mm.row}>
         <VegDot isNonVeg={meal.isNonVeg} />
         <View style={mm.info}>
-          <AppText style={[mm.name, { color: T.headerText }]}>{meal.name}</AppText>
-          <AppText style={[mm.dishes, { color: T.tabInactive }]} numberOfLines={1}>{meal.dishes}</AppText>
+          <AppText style={[mm.name, { color: T.headerText }]}>
+            {meal.name}
+          </AppText>
+          <AppText
+            style={[mm.dishes, { color: T.tabInactive }]}
+            numberOfLines={1}
+          >
+            {meal.dishes}
+          </AppText>
           <View style={mm.badges}>
-            <View style={[mm.badge, { backgroundColor: T.bgSurface, borderColor: T.borderDefault }]}>
-              <AppText style={[mm.badgeText, { color: T.tabInactive }]}>₹{meal.price}</AppText>
+            <View
+              style={[
+                mm.badge,
+                { backgroundColor: T.bgSurface, borderColor: T.borderDefault },
+              ]}
+            >
+              <AppText style={[mm.badgeText, { color: T.tabInactive }]}>
+                ₹{meal.price}
+              </AppText>
             </View>
             {meal.kcal != null && (
-              <View style={[mm.badge, { backgroundColor: T.bgSurface, borderColor: T.borderDefault }]}>
-                <AppText style={[mm.badgeText, { color: T.tabInactive }]}>{meal.kcal} kcal</AppText>
+              <View
+                style={[
+                  mm.badge,
+                  {
+                    backgroundColor: T.bgSurface,
+                    borderColor: T.borderDefault,
+                  },
+                ]}
+              >
+                <AppText style={[mm.badgeText, { color: T.tabInactive }]}>
+                  {meal.kcal} kcal
+                </AppText>
               </View>
             )}
           </View>
         </View>
         {/* Enable/Disable toggle */}
         <View style={mm.toggleWrap}>
-          <AppText style={[mm.availLabel, { color: meal.isAvailable ? T.green : T.tabInactive }]}>
+          <AppText
+            style={[
+              mm.availLabel,
+              { color: meal.isAvailable ? T.green : T.tabInactive },
+            ]}
+          >
             {meal.isAvailable ? 'On' : 'Off'}
           </AppText>
           <Switch
@@ -1305,21 +2050,33 @@ function MealManageCard({ meal, dateKey, onEdit }: { meal: ApiMeal; dateKey: str
       <View style={[mm.actions, { borderTopColor: T.borderDefault }]}>
         <TouchableOpacity
           style={[mm.actionBtn, { backgroundColor: T.bgSurface }]}
-          onPress={() => { setConfirmDelete(false); onEdit(meal); }}
+          onPress={() => {
+            setConfirmDelete(false);
+            onEdit(meal);
+          }}
           activeOpacity={0.75}
         >
-          <AppText style={[mm.actionEdit, { color: T.accentBlue }]}>✎ Edit</AppText>
+          <AppText style={[mm.actionEdit, { color: T.accentBlue }]}>
+            ✎ Edit
+          </AppText>
         </TouchableOpacity>
         <TouchableOpacity
-          style={[mm.actionBtn, { backgroundColor: T.bgSurface }, confirmDelete && { backgroundColor: T.error + '15' }]}
+          style={[
+            mm.actionBtn,
+            { backgroundColor: T.bgSurface },
+            confirmDelete && { backgroundColor: T.error + '15' },
+          ]}
           onPress={handleDelete}
           disabled={deleteMeal.isPending}
           activeOpacity={0.75}
         >
-          {deleteMeal.isPending
-            ? <ActivityIndicator size="small" color={T.error} />
-            : <AppText style={[mm.actionDelete, { color: T.error }]}>{confirmDelete ? 'Tap again to confirm' : '⌫ Delete'}</AppText>
-          }
+          {deleteMeal.isPending ? (
+            <ActivityIndicator size="small" color={T.error} />
+          ) : (
+            <AppText style={[mm.actionDelete, { color: T.error }]}>
+              {confirmDelete ? 'Tap again to confirm' : '⌫ Delete'}
+            </AppText>
+          )}
         </TouchableOpacity>
       </View>
     </View>
@@ -1355,12 +2112,23 @@ const mm = StyleSheet.create({
     borderTopWidth: 1,
     gap: 8,
   },
-  actionBtn: { flex: 1, alignItems: 'center', paddingVertical: 6, borderRadius: 8 },
+  actionBtn: {
+    flex: 1,
+    alignItems: 'center',
+    paddingVertical: 6,
+    borderRadius: 8,
+  },
   actionEdit: { fontSize: FontSize.sm, fontWeight: FontWeight.bold },
   actionDelete: { fontSize: FontSize.sm, fontWeight: FontWeight.bold },
 });
 
-function MealRateSheet({ visible, onClose }: { visible: boolean; onClose: () => void }) {
+function MealRateSheet({
+  visible,
+  onClose,
+}: {
+  visible: boolean;
+  onClose: () => void;
+}) {
   const T = useMerckTokens();
   const { data: rates } = useMealRates();
   const setRates = useSetMealRates();
@@ -1395,17 +2163,39 @@ function MealRateSheet({ visible, onClose }: { visible: boolean; onClose: () => 
   }, [form, setRates, onClose]);
 
   return (
-    <Modal visible={visible} animationType="slide" transparent onRequestClose={onClose}>
+    <Modal
+      visible={visible}
+      animationType="slide"
+      transparent
+      onRequestClose={onClose}
+    >
       <Pressable style={am.backdrop} onPress={onClose} />
-      <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : undefined} style={am.kav}>
-        <View style={[am.sheet, { backgroundColor: T.bgCard, borderColor: T.borderDefault }]}>
+      <KeyboardAvoidingView
+        behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+        style={am.kav}
+      >
+        <View
+          style={[
+            am.sheet,
+            { backgroundColor: T.bgCard, borderColor: T.borderDefault },
+          ]}
+        >
           <View style={[am.handle, { backgroundColor: T.borderMuted }]} />
           <View style={am.headerRow}>
             <View>
-              <AppText style={[am.title, { color: T.headerText }]}>Standard Meal Rates</AppText>
-              <AppText style={[am.label, { marginTop: 2, color: T.tabInactive }]}>Set by Super Admin · Applied to all vendors</AppText>
+              <AppText style={[am.title, { color: T.headerText }]}>
+                Standard Meal Rates
+              </AppText>
+              <AppText
+                style={[am.label, { marginTop: 2, color: T.tabInactive }]}
+              >
+                Set by Super Admin · Applied to all vendors
+              </AppText>
             </View>
-            <TouchableOpacity onPress={onClose} style={[am.closeBtn, { backgroundColor: T.bgSurface }]}>
+            <TouchableOpacity
+              onPress={onClose}
+              style={[am.closeBtn, { backgroundColor: T.bgSurface }]}
+            >
               <CloseIcon color={T.tabInactive} />
             </TouchableOpacity>
           </View>
@@ -1413,10 +2203,18 @@ function MealRateSheet({ visible, onClose }: { visible: boolean; onClose: () => 
             {(['Breakfast', 'Lunch', 'Dinner'] as const).map(mt => (
               <View key={mt}>
                 <AppText style={[am.label, { color: T.tabInactive }]}>
-                  {mt === 'Breakfast' ? '☀️ ' : mt === 'Lunch' ? '🌤️ ' : '🌙 '}{mt} Price (₹)
+                  {mt === 'Breakfast' ? '☀️ ' : mt === 'Lunch' ? '🌤️ ' : '🌙 '}
+                  {mt} Price (₹)
                 </AppText>
                 <TextInput
-                  style={[am.input, { backgroundColor: T.bgSurface, borderColor: T.borderDefault, color: T.headerText }]}
+                  style={[
+                    am.input,
+                    {
+                      backgroundColor: T.bgSurface,
+                      borderColor: T.borderDefault,
+                      color: T.headerText,
+                    },
+                  ]}
                   placeholder="0"
                   placeholderTextColor={T.tabInactive}
                   value={form[mt]}
@@ -1425,19 +2223,28 @@ function MealRateSheet({ visible, onClose }: { visible: boolean; onClose: () => 
                 />
               </View>
             ))}
-            {!!error && <AppText style={[am.error, { color: T.error }]}>{error}</AppText>}
+            {!!error && (
+              <AppText style={[am.error, { color: T.error }]}>{error}</AppText>
+            )}
           </View>
           <View style={[am.footer, { borderTopColor: T.borderDefault }]}>
             <TouchableOpacity
-              style={[am.submitBtn, { backgroundColor: T.green }, setRates.isPending && { opacity: 0.7 }]}
+              style={[
+                am.submitBtn,
+                { backgroundColor: T.green },
+                setRates.isPending && { opacity: 0.7 },
+              ]}
               onPress={handleSave}
               disabled={setRates.isPending}
               activeOpacity={0.88}
             >
-              {setRates.isPending
-                ? <ActivityIndicator color={T.bgApp} />
-                : <AppText style={[am.submitText, { color: T.bgApp }]}>Save Rates</AppText>
-              }
+              {setRates.isPending ? (
+                <ActivityIndicator color={T.bgApp} />
+              ) : (
+                <AppText style={[am.submitText, { color: T.bgApp }]}>
+                  Save Rates
+                </AppText>
+              )}
             </TouchableOpacity>
           </View>
         </View>
@@ -1465,7 +2272,10 @@ function ManageMenuTab() {
   const userRole = useFeAuthStore(s => s.user?.role ?? '');
   const isSuperAdmin = userRole === 'super_admin';
 
-  const selectedDateKey = useMemo(() => toDateKey(selectedDate), [selectedDate]);
+  const selectedDateKey = useMemo(
+    () => toDateKey(selectedDate),
+    [selectedDate],
+  );
   const { data: meals = [], isLoading } = useMealsByDate(selectedDateKey);
 
   const grouped = useMemo(() => {
@@ -1481,16 +2291,31 @@ function ManageMenuTab() {
   return (
     <View style={{ flex: 1 }}>
       {/* Date picker strip */}
-      <View style={[menu.datePickerWrap, { backgroundColor: T.bgApp, borderBottomColor: T.borderDefault }]}>
+      <View
+        style={[
+          menu.datePickerWrap,
+          { backgroundColor: T.bgApp, borderBottomColor: T.borderDefault },
+        ]}
+      >
         <View style={menu.datePickerHeader}>
-          <AppText style={[menu.dateLabelText, { color: T.headerText }]}>{formatDateLabel(selectedDate)}</AppText>
+          <AppText style={[menu.dateLabelText, { color: T.headerText }]}>
+            {formatDateLabel(selectedDate)}
+          </AppText>
           {isSuperAdmin && (
             <TouchableOpacity
-              style={[menu.rateBtn, { backgroundColor: T.accentAmber + '22', borderColor: T.accentAmber + '60' }]}
+              style={[
+                menu.rateBtn,
+                {
+                  backgroundColor: T.accentAmber + '22',
+                  borderColor: T.accentAmber + '60',
+                },
+              ]}
               onPress={() => setRateVisible(true)}
               activeOpacity={0.8}
             >
-              <AppText style={[menu.rateBtnText, { color: T.accentAmber }]}>₹ Set Rates</AppText>
+              <AppText style={[menu.rateBtnText, { color: T.accentAmber }]}>
+                ₹ Set Rates
+              </AppText>
             </TouchableOpacity>
           )}
         </View>
@@ -1500,7 +2325,10 @@ function ManageMenuTab() {
           startDate={menuStart}
           daysToShow={30}
           showMonthLabel={true}
-          containerStyle={[menu.datePickerContainer, { backgroundColor: T.bgApp }]}
+          containerStyle={[
+            menu.datePickerContainer,
+            { backgroundColor: T.bgApp },
+          ]}
         />
       </View>
 
@@ -1509,29 +2337,59 @@ function ManageMenuTab() {
         showsVerticalScrollIndicator={false}
         contentContainerStyle={menu.scrollContent}
       >
-        {isLoading && <ActivityIndicator color={T.green} style={{ marginTop: 32 }} />}
+        {isLoading && (
+          <ActivityIndicator color={T.green} style={{ marginTop: 32 }} />
+        )}
 
-        {!isLoading && grouped.map(({ mealType, items }) => (
-          <View key={mealType}>
-            <View style={menu.sectionHeader}>
-              <AppText style={menu.sectionEmoji}>
-                {mealType === 'Breakfast' ? '☀️' : mealType === 'Lunch' ? '🌤️' : '🌙'}
-              </AppText>
-              <AppText style={[menu.sectionTitle, { color: T.headerText }]}>{mealType}</AppText>
-              <AppText style={[menu.sectionCount, { color: T.tabInactive, backgroundColor: T.bgSurface, borderColor: T.borderDefault }]}>
-                {items.length}
-              </AppText>
-            </View>
-            {items.length > 0
-              ? <View style={menu.group}>{items.map(m => <MealManageCard key={m._id} meal={m} dateKey={selectedDateKey} onEdit={setEditingMeal} />)}</View>
-              : (
-                <View style={menu.emptySection}>
-                  <AppText style={[menu.emptySectionText, { color: T.tabInactive }]}>No {mealType.toLowerCase()} added for this date</AppText>
+        {!isLoading &&
+          grouped.map(({ mealType, items }) => (
+            <View key={mealType}>
+              <View style={menu.sectionHeader}>
+                <AppText style={menu.sectionEmoji}>
+                  {mealType === 'Breakfast'
+                    ? '☀️'
+                    : mealType === 'Lunch'
+                      ? '🌤️'
+                      : '🌙'}
+                </AppText>
+                <AppText style={[menu.sectionTitle, { color: T.headerText }]}>
+                  {mealType}
+                </AppText>
+                <AppText
+                  style={[
+                    menu.sectionCount,
+                    {
+                      color: T.tabInactive,
+                      backgroundColor: T.bgSurface,
+                      borderColor: T.borderDefault,
+                    },
+                  ]}
+                >
+                  {items.length}
+                </AppText>
+              </View>
+              {items.length > 0 ? (
+                <View style={menu.group}>
+                  {items.map(m => (
+                    <MealManageCard
+                      key={m._id}
+                      meal={m}
+                      dateKey={selectedDateKey}
+                      onEdit={setEditingMeal}
+                    />
+                  ))}
                 </View>
-              )
-            }
-          </View>
-        ))}
+              ) : (
+                <View style={menu.emptySection}>
+                  <AppText
+                    style={[menu.emptySectionText, { color: T.tabInactive }]}
+                  >
+                    No {mealType.toLowerCase()} added for this date
+                  </AppText>
+                </View>
+              )}
+            </View>
+          ))}
 
         {/* Space for FAB */}
         <View style={{ height: 90 }} />
@@ -1547,9 +2405,20 @@ function ManageMenuTab() {
         <AppText style={[menu.fabText, { color: T.bgApp }]}>Add Meal</AppText>
       </TouchableOpacity>
 
-      <AddMealSheet visible={addVisible} onClose={() => setAddVisible(false)} dateKey={selectedDateKey} />
-      <EditMealSheet meal={editingMeal} dateKey={selectedDateKey} onClose={() => setEditingMeal(null)} />
-      <MealRateSheet visible={rateVisible} onClose={() => setRateVisible(false)} />
+      <AddMealSheet
+        visible={addVisible}
+        onClose={() => setAddVisible(false)}
+        dateKey={selectedDateKey}
+      />
+      <EditMealSheet
+        meal={editingMeal}
+        dateKey={selectedDateKey}
+        onClose={() => setEditingMeal(null)}
+      />
+      <MealRateSheet
+        visible={rateVisible}
+        onClose={() => setRateVisible(false)}
+      />
     </View>
   );
 }
@@ -1636,9 +2505,21 @@ export default function VendorScreen() {
         <View style={s.headerInner}>
           <View style={s.titleRow}>
             <AppText style={[s.title, { color: T.headerText }]}>Vendor</AppText>
-            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
-              <View style={[s.vendorBadge, { backgroundColor: T.accentAmber + '22', borderColor: T.accentAmber + '50' }]}>
-                <AppText style={[s.vendorBadgeText, { color: T.accentAmber }]}>Vendor</AppText>
+            <View
+              style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}
+            >
+              <View
+                style={[
+                  s.vendorBadge,
+                  {
+                    backgroundColor: T.accentAmber + '22',
+                    borderColor: T.accentAmber + '50',
+                  },
+                ]}
+              >
+                <AppText style={[s.vendorBadgeText, { color: T.accentAmber }]}>
+                  Vendor
+                </AppText>
               </View>
               <NotificationBell color={T.headerText} size={22} />
             </View>
@@ -1658,7 +2539,11 @@ const s = StyleSheet.create({
   root: { flex: 1 },
   header: {},
   headerInner: { paddingHorizontal: 16, paddingTop: 6, paddingBottom: 10 },
-  titleRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
+  titleRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+  },
   title: {
     fontSize: 22,
     fontWeight: FontWeight.bold,

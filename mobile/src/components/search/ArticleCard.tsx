@@ -1,12 +1,16 @@
 import React, { memo, useCallback, useEffect, useRef } from 'react';
-import { StyleSheet, TouchableOpacity, View, Text, Animated as RNAnimated } from 'react-native';
+import { StyleSheet, TouchableOpacity, View, Text } from 'react-native';
 import { useTranslation } from 'react-i18next';
 import Animated, {
   useSharedValue,
   useAnimatedStyle,
   withSpring,
+  interpolate,
+  Extrapolation,
+  type SharedValue,
 } from 'react-native-reanimated';
-import { Swipeable } from 'react-native-gesture-handler';
+import Swipeable from 'react-native-gesture-handler/ReanimatedSwipeable';
+import type { SwipeableMethods } from 'react-native-gesture-handler/ReanimatedSwipeable';
 import { useTheme } from '@theme/index';
 import { BaseColors } from '@theme/colors';
 import { useContextMenu } from '@components/common/ContextMenu';
@@ -30,20 +34,32 @@ interface ArticleCardProps {
   enableContextMenu?: boolean;
   enableSwipeFavourite?: boolean;
   cardBackground?: string;
-  swipeHintRef?: (ref: Swipeable | null) => void;
+  swipeHintRef?: (ref: SwipeableMethods | null) => void;
   isFavourited?: boolean;
 }
 
 const ArticleCard: React.FC<ArticleCardProps> = memo(
-  ({ article, onPress, enableContextMenu = false, enableSwipeFavourite = true, cardBackground, swipeHintRef, isFavourited = false }) => {
+  ({
+    article,
+    onPress,
+    enableContextMenu = false,
+    enableSwipeFavourite = true,
+    cardBackground,
+    swipeHintRef,
+    isFavourited = false,
+  }) => {
     const { t } = useTranslation();
     const { theme, isDark } = useTheme();
     const { openMenu } = useContextMenuState();
-    const swipeRef = useRef<Swipeable>(null);
-    const setRef = useCallback((ref: Swipeable | null) => {
-      (swipeRef as React.MutableRefObject<Swipeable | null>).current = ref;
-      swipeHintRef?.(ref);
-    }, [swipeHintRef]);
+    const swipeRef = useRef<SwipeableMethods>(null);
+    const setRef = useCallback(
+      (ref: SwipeableMethods | null) => {
+        (swipeRef as React.MutableRefObject<SwipeableMethods | null>).current =
+          ref;
+        swipeHintRef?.(ref);
+      },
+      [swipeHintRef],
+    );
     const bodyFontStyle = getFontStyle('caption');
 
     const { onPressIn, onPressOut, isPressed } = useContextMenu({
@@ -72,17 +88,24 @@ const ArticleCard: React.FC<ArticleCardProps> = memo(
     };
 
     const renderRightActions = (
-      _progress: RNAnimated.AnimatedInterpolation<number>,
-      dragX: RNAnimated.AnimatedInterpolation<number>,
+      _progress: SharedValue<number>,
+      translation: SharedValue<number>,
     ) => {
-      const scale = dragX.interpolate({
-        inputRange: [-80, 0],
-        outputRange: [1, 0.85],
-        extrapolate: 'clamp',
-      });
+      const actionStyle = useAnimatedStyle(() => ({
+        transform: [
+          {
+            scale: interpolate(
+              translation.value,
+              [-80, 0],
+              [1, 0.85],
+              Extrapolation.CLAMP,
+            ),
+          },
+        ],
+      }));
 
       return (
-        <RNAnimated.View style={{ transform: [{ scale }] }}>
+        <Animated.View style={actionStyle}>
           <TouchableOpacity
             style={[
               styles.favouriteAction,
@@ -106,7 +129,7 @@ const ArticleCard: React.FC<ArticleCardProps> = memo(
               {t('common.save')}
             </Text>
           </TouchableOpacity>
-        </RNAnimated.View>
+        </Animated.View>
       );
     };
 
@@ -116,7 +139,8 @@ const ArticleCard: React.FC<ArticleCardProps> = memo(
           style={[
             styles.card,
             {
-              backgroundColor: cardBackground ?? (isDark ? theme.background.card : '#EDE9F8'),
+              backgroundColor:
+                cardBackground ?? (isDark ? theme.background.card : '#EDE9F8'),
               borderBottomWidth: StyleSheet.hairlineWidth,
               borderBottomColor: isDark
                 ? 'rgba(255,255,255,0.08)'

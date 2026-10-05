@@ -92,7 +92,19 @@ const FirstLaunchCarousel: React.FC<FirstLaunchCarouselProps> = ({
       language || i18n.language?.split('-')[0]?.toLowerCase() || 'en';
 
     // Validate and return supported language
-    const supportedLang = ['en', 'fr', 'ar', 'de', 'es', 'it', 'ja', 'pt', 'zh'].includes(lang) ? lang : 'en';
+    const supportedLang = [
+      'en',
+      'fr',
+      'ar',
+      'de',
+      'es',
+      'it',
+      'ja',
+      'pt',
+      'zh',
+    ].includes(lang)
+      ? lang
+      : 'en';
     console.log('🌐 Using language for onboarding:', supportedLang);
 
     return supportedLang;
@@ -376,8 +388,8 @@ const FirstLaunchCarousel: React.FC<FirstLaunchCarouselProps> = ({
                           ? theme.button.primary.background
                           : '#FFFFFF'
                         : isDark
-                        ? theme.background.tertiary
-                        : 'rgba(255,255,255,0.4)',
+                          ? theme.background.tertiary
+                          : 'rgba(255,255,255,0.4)',
                   },
                 ]}
               />

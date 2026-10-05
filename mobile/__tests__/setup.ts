@@ -99,29 +99,6 @@ jest.mock('@react-native-firebase/app', () => ({
     initializeApp: jest.fn(() => ({})),
   },
 }));
-jest.mock('@react-native-firebase/messaging', () => {
-  const mockFn = jest.fn(() => ({
-    getToken: jest.fn().mockResolvedValue('mock-token'),
-    onMessage: jest.fn(() => jest.fn()),
-    onNotificationOpenedApp: jest.fn(() => jest.fn()),
-    onTokenRefresh: jest.fn(() => jest.fn()),
-    getInitialNotification: jest.fn().mockResolvedValue(null),
-    requestPermission: jest.fn().mockResolvedValue(1),
-    setBackgroundMessageHandler: jest.fn(),
-    subscribeToTopic: jest.fn().mockResolvedValue(undefined),
-    unsubscribeFromTopic: jest.fn().mockResolvedValue(undefined),
-    deleteToken: jest.fn().mockResolvedValue(undefined),
-    hasPermission: jest.fn().mockResolvedValue(1),
-  }));
-  mockFn.AuthorizationStatus = {
-    AUTHORIZED: 1,
-    PROVISIONAL: 2,
-    DENIED: 0,
-    NOT_DETERMINED: -1,
-  };
-  return mockFn;
-});
-
 // Mock @react-native-community/netinfo
 jest.mock('@react-native-community/netinfo', () => ({
   addEventListener: jest.fn(() => jest.fn()),

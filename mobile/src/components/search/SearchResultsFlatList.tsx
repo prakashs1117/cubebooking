@@ -9,7 +9,7 @@ import Icon from '@components/icons/Icon';
 import { useTranslation } from 'react-i18next';
 import { useSwipeHint } from '@hooks/useSwipeHint';
 import SwipeHintBubble from '@components/common/SwipeHintBubble';
-import type { Swipeable } from 'react-native-gesture-handler';
+import type { SwipeableMethods } from 'react-native-gesture-handler/ReanimatedSwipeable';
 import { useFavouritedMaterialNumbers } from '@hooks/useFavouritedMaterialNumbers';
 // SwipeHintOverlay intentionally NOT used here — wrapping FlatList renderItem causes duplicate key errors
 
@@ -55,7 +55,9 @@ const SearchResultsFlatList: React.FC<SearchResultsFlatListProps> = ({
   favouritedSetRef.current = favouritedSet;
 
   // Swipe hint — uses hook directly to avoid wrapping FlatList items (duplicate key bug)
-  const firstItemSwipeHintRef = useRef<(ref: Swipeable | null) => void>(() => {});
+  const firstItemSwipeHintRef = useRef<(ref: SwipeableMethods | null) => void>(
+    () => {},
+  );
   const { registerSwipeRef, tooltipVisible, dismiss } = useSwipeHint(
     'home',
     enableSwipeHint && results.length > 0,
@@ -73,9 +75,11 @@ const SearchResultsFlatList: React.FC<SearchResultsFlatListProps> = ({
           onPress={onArticlePress}
           enableContextMenu={true}
           isFavourited={favouritedSetRef.current.has(item.materialNumber)}
-          swipeHintRef={enableSwipeHint && index === 0
-            ? (ref) => firstItemSwipeHintRef.current(ref)
-            : undefined}
+          swipeHintRef={
+            enableSwipeHint && index === 0
+              ? ref => firstItemSwipeHintRef.current(ref)
+              : undefined
+          }
         />
       </View>
     ),
@@ -197,23 +201,23 @@ const SearchResultsFlatList: React.FC<SearchResultsFlatListProps> = ({
       <FlatList
         data={results}
         keyExtractor={item => item.materialNumber}
-      renderItem={renderItem}
-      ListHeaderComponent={renderHeader}
-      ListFooterComponent={renderFooter}
-      ListEmptyComponent={renderEmpty}
-      contentContainerStyle={{
-        paddingHorizontal: contentPaddingHorizontal,
-        paddingBottom: contentPaddingBottom,
-      }}
-      keyboardShouldPersistTaps="handled"
-      keyboardDismissMode="on-drag"
-      onEndReached={onLoadMore}
-      onEndReachedThreshold={0.3}
-      initialNumToRender={15}
-      maxToRenderPerBatch={10}
-      windowSize={21}
-      removeClippedSubviews={false}
-    />
+        renderItem={renderItem}
+        ListHeaderComponent={renderHeader}
+        ListFooterComponent={renderFooter}
+        ListEmptyComponent={renderEmpty}
+        contentContainerStyle={{
+          paddingHorizontal: contentPaddingHorizontal,
+          paddingBottom: contentPaddingBottom,
+        }}
+        keyboardShouldPersistTaps="handled"
+        keyboardDismissMode="on-drag"
+        onEndReached={onLoadMore}
+        onEndReachedThreshold={0.3}
+        initialNumToRender={15}
+        maxToRenderPerBatch={10}
+        windowSize={21}
+        removeClippedSubviews={false}
+      />
     </View>
   );
 };

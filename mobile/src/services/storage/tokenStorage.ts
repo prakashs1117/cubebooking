@@ -17,10 +17,10 @@ export const tokenStorage = {
    */
   async saveTokens(accessToken: string, refreshToken: string): Promise<void> {
     try {
-      await AsyncStorage.multiSet([
-        [ACCESS_TOKEN_KEY, accessToken],
-        [REFRESH_TOKEN_KEY, refreshToken],
-      ]);
+      await AsyncStorage.setMany({
+        [ACCESS_TOKEN_KEY]: accessToken,
+        [REFRESH_TOKEN_KEY]: refreshToken,
+      });
     } catch (error) {
       console.error('Error saving tokens:', error);
       throw error;
@@ -103,7 +103,7 @@ export const tokenStorage = {
    */
   async clearAuthData(): Promise<void> {
     try {
-      await AsyncStorage.multiRemove([
+      await AsyncStorage.removeMany([
         ACCESS_TOKEN_KEY,
         REFRESH_TOKEN_KEY,
         USER_KEY,

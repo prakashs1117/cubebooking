@@ -1,0 +1,19 @@
+{
+  "name": "@demand/shared",
+  "version": "0.1.0",
+  "private": true,
+  "main": "./index.ts",
+  "types": "./index.ts",
+  "exports": {
+    ".": "./index.ts",
+    "./fe": "./fe.ts",
+    "./design/*": "./design/*.ts",
+    "./services/*": "./services/*.ts",
+    "./types/*": "./types/*.ts",
+    "./utils/*": "./utils/*.ts",
+    "./schemas/*": "./schemas/*.ts"
+  },
+  "dependencies": {
+    "zod": "^4.4.3"
+  }
+}

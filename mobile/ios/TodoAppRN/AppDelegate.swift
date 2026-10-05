@@ -4,15 +4,10 @@ import React
 import React_RCTAppDelegate
 import ReactAppDependencyProvider
 import Firebase
-// import FirebaseMessaging
 import RNBootSplash
 
 @main
 class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterDelegate {
-  // Firebase disabled - MessagingDelegate removed
-  // class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterDelegate, MessagingDelegate {
-  var window: UIWindow?
-
   var reactNativeDelegate: ReactNativeDelegate?
   var reactNativeFactory: RCTReactNativeFactory?
 
@@ -22,56 +17,29 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
   ) -> Bool {
     FirebaseApp.configure()
 
-    // Set delegates for APNs + FCM
     UNUserNotificationCenter.current().delegate = self
-//    Messaging.messaging().delegate = self
-
-    // Register with APNs — required for FCM token generation on iOS
     application.registerForRemoteNotifications()
-
-    let delegate = ReactNativeDelegate()
-    let factory = RCTReactNativeFactory(delegate: delegate)
-    delegate.dependencyProvider = RCTAppDependencyProvider()
-
-    reactNativeDelegate = delegate
-    reactNativeFactory = factory
-
-    window = UIWindow(frame: UIScreen.main.bounds)
-
-    factory.startReactNative(
-      withModuleName: "TodoAppRN",
-      in: window,
-      launchOptions: launchOptions
-    )
-
-    // Initialize BootSplash — keeps splash visible until JS calls BootSplash.hide()
-    RNBootSplash.initWithStoryboard("BootSplash", rootView: window?.rootViewController?.view)
 
     return true
   }
 
+  func application(
+    _ application: UIApplication,
+    configurationForConnecting connectingSceneSession: UISceneSession,
+    options: UIScene.ConnectionOptions
+  ) -> UISceneConfiguration {
+    let config = UISceneConfiguration(name: nil, sessionRole: connectingSceneSession.role)
+    config.delegateClass = SceneDelegate.self
+    return config
+  }
+
   // MARK: - APNs token registration
 
-  func application(_ application: UIApplication, didRegisterForRemoteNotificationsWithDeviceToken deviceToken: Data) {
-    // Firebase disabled - no-op
-    // Forward the APNs token to Firebase so it can exchange it for an FCM token
-    // Messaging.messaging().apnsToken = deviceToken
-  }
+  func application(_ application: UIApplication, didRegisterForRemoteNotificationsWithDeviceToken deviceToken: Data) {}
 
   func application(_ application: UIApplication, didFailToRegisterForRemoteNotificationsWithError error: Error) {
     print("❌ APNs registration failed: \(error.localizedDescription)")
   }
-
-  // MARK: - FCM token refresh (MessagingDelegate)
-  // Firebase disabled - MessagingDelegate methods removed
-
-  /* Firebase disabled - uncomment when Firebase packages are reinstalled
-  func messaging(_ messaging: Messaging, didReceiveRegistrationToken fcmToken: String?) {
-    print("📱 FCM token refreshed: \(fcmToken ?? "nil")")
-    // The JS layer (pushNotificationService.ts) also listens via onTokenRefresh —
-    // no further action needed here unless you want to send it to your backend directly.
-  }
-  */
 
   // MARK: - UNUserNotificationCenterDelegate
 

@@ -212,7 +212,7 @@ export const clearLegalCache = async (
     if (type) {
       await AsyncStorage.removeItem(CACHE_KEYS[type]);
     } else {
-      await AsyncStorage.multiRemove([CACHE_KEYS.privacy, CACHE_KEYS.terms]);
+      await AsyncStorage.removeMany([CACHE_KEYS.privacy, CACHE_KEYS.terms]);
     }
     if (__DEV__) {
       console.log(`✅ Cleared legal cache for: ${type || 'all'}`);

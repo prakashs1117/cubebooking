@@ -10,6 +10,7 @@
 		13B07FBF1A68108700A75B9A /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 13B07FB51A68108700A75B9A /* Images.xcassets */; };
 		31827F53A3364EA8B668A915 /* Colors.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 193A5B91F8DF4BAF8DF4779B /* Colors.xcassets */; };
 		761780ED2CA45674006654EE /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 761780EC2CA45674006654EE /* AppDelegate.swift */; };
+		761780EF2CA45674006654EE /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 761780EE2CA45674006654EE /* SceneDelegate.swift */; };
 		81AB9BB82411601600AC10FF /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 81AB9BB72411601600AC10FF /* LaunchScreen.storyboard */; };
 		99A2657B091CEB40BABE33F0 /* Pods_TodoAppRN.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D7CD8482F6401F961D512231 /* Pods_TodoAppRN.framework */; };
 		C3FC4CA0306FC67600AACCFD /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = C3FC4C9F306FC67600AACCFD /* GoogleService-Info.plist */; };
@@ -34,6 +35,7 @@
 		13E51D656CFD20996FB7A1A1 /* Pods-TodoAppRN.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-TodoAppRN.debug.xcconfig"; path = "Target Support Files/Pods-TodoAppRN/Pods-TodoAppRN.debug.xcconfig"; sourceTree = "<group>"; };
 		193A5B91F8DF4BAF8DF4779B /* Colors.xcassets */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = folder.assetcatalog; name = Colors.xcassets; path = TodoAppRN/Colors.xcassets; sourceTree = "<group>"; };
 		761780EC2CA45674006654EE /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = AppDelegate.swift; path = TodoAppRN/AppDelegate.swift; sourceTree = "<group>"; };
+		761780EE2CA45674006654EE /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = SceneDelegate.swift; path = TodoAppRN/SceneDelegate.swift; sourceTree = "<group>"; };
 		81AB9BB72411601600AC10FF /* LaunchScreen.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; name = LaunchScreen.storyboard; path = TodoAppRN/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		C3FC4C9F306FC67600AACCFD /* GoogleService-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
 		C3FCFE1D305428F20044B39E /* Poppins-Medium.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Poppins-Medium.ttf"; sourceTree = "<group>"; };
@@ -67,6 +69,7 @@
 				C3FC4C9F306FC67600AACCFD /* GoogleService-Info.plist */,
 				13B07FB51A68108700A75B9A /* Images.xcassets */,
 				761780EC2CA45674006654EE /* AppDelegate.swift */,
+				761780EE2CA45674006654EE /* SceneDelegate.swift */,
 				13B07FB61A68108700A75B9A /* Info.plist */,
 				81AB9BB72411601600AC10FF /* LaunchScreen.storyboard */,
 				13B07FB81A68108700A75B9A /* PrivacyInfo.xcprivacy */,
@@ -329,6 +332,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				761780ED2CA45674006654EE /* AppDelegate.swift in Sources */,
+				761780EF2CA45674006654EE /* SceneDelegate.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

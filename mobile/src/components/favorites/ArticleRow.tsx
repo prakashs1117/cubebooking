@@ -1,6 +1,7 @@
 import React, { useCallback, useRef } from 'react';
 import { StyleSheet, TouchableOpacity, View } from 'react-native';
 import Swipeable from 'react-native-gesture-handler/ReanimatedSwipeable';
+import type { SwipeableMethods } from 'react-native-gesture-handler/ReanimatedSwipeable';
 import { useTranslation } from 'react-i18next';
 import { useTheme } from '@theme/index';
 import { BaseColors } from '@theme/colors';
@@ -17,7 +18,7 @@ export interface ArticleRowProps {
   onRemove: (materialNumber: string) => void;
   enableSwipeHint?: boolean;
   totalArticles?: number;
-  swipeHintRef?: (ref: Swipeable | null) => void;
+  swipeHintRef?: (ref: SwipeableMethods | null) => void;
   selectionMode?: boolean;
   isSelected?: boolean;
   onToggle?: () => void;
@@ -36,11 +37,15 @@ const ArticleRow: React.FC<ArticleRowProps> = ({
 }) => {
   const { t } = useTranslation();
   const { isDark } = useTheme();
-  const swipeRef = useRef<Swipeable>(null);
-  const setRef = useCallback((ref: Swipeable | null) => {
-    (swipeRef as React.MutableRefObject<Swipeable | null>).current = ref;
-    swipeHintRef?.(ref);
-  }, [swipeHintRef]);
+  const swipeRef = useRef<SwipeableMethods>(null);
+  const setRef = useCallback(
+    (ref: SwipeableMethods | null) => {
+      (swipeRef as React.MutableRefObject<SwipeableMethods | null>).current =
+        ref;
+      swipeHintRef?.(ref);
+    },
+    [swipeHintRef],
+  );
 
   const renderRightActions = useCallback(
     () => (
@@ -53,7 +58,9 @@ const ArticleRow: React.FC<ArticleRowProps> = ({
         activeOpacity={0.85}
       >
         <Icon name="trash" size={18} color="#FFFFFF" />
-        <CaptionText style={styles.removeActionText}>{t('favorites.remove')}</CaptionText>
+        <CaptionText style={styles.removeActionText}>
+          {t('favorites.remove')}
+        </CaptionText>
       </TouchableOpacity>
     ),
     [article.materialNumber, onRemove, t],
@@ -68,7 +75,12 @@ const ArticleRow: React.FC<ArticleRowProps> = ({
   }, [selectionMode, onToggle, onPress, article]);
 
   const content = (
-    <View style={[styles.articleRowWrapper, selectionMode && styles.selectionModeRow]}>
+    <View
+      style={[
+        styles.articleRowWrapper,
+        selectionMode && styles.selectionModeRow,
+      ]}
+    >
       {selectionMode && (
         <TouchableOpacity onPress={onToggle} style={styles.checkboxContainer}>
           <Icon
@@ -83,7 +95,12 @@ const ArticleRow: React.FC<ArticleRowProps> = ({
         onPress={handleRowPress}
         activeOpacity={0.7}
       >
-        <ArticleCard article={article} onPress={onPress} enableContextMenu={false} enableSwipeFavourite={false} />
+        <ArticleCard
+          article={article}
+          onPress={onPress}
+          enableContextMenu={false}
+          enableSwipeFavourite={false}
+        />
       </TouchableOpacity>
     </View>
   );
@@ -99,7 +116,8 @@ const ArticleRow: React.FC<ArticleRowProps> = ({
       friction={2}
       rightThreshold={40}
       overshootRight={false}
-      activeOffsetX={[-10, 10]}
+      dragOffsetFromLeft={10}
+      dragOffsetFromRight={-10}
     >
       {content}
     </Swipeable>

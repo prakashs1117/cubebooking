@@ -283,7 +283,8 @@ const SDSSectionSheet: React.FC<SDSSectionSheetProps> = ({
     visibleIndices.indexOf(initialSection),
   );
 
-  const [activeCarouselIndex, setActiveCarouselIndex] = useState(initialCarouselIndex);
+  const [activeCarouselIndex, setActiveCarouselIndex] =
+    useState(initialCarouselIndex);
   const [carouselHeight, setCarouselHeight] = useState(0);
 
   const carouselRef = useRef<ICarouselInstance>(null);
@@ -356,7 +357,10 @@ const SDSSectionSheet: React.FC<SDSSectionSheetProps> = ({
       <View
         style={[
           styles.sheet,
-          { backgroundColor: theme.background.primary, paddingBottom: insets.bottom },
+          {
+            backgroundColor: theme.background.primary,
+            paddingBottom: insets.bottom,
+          },
         ]}
       >
         {/* ── Handle ── */}
@@ -457,8 +461,8 @@ const SDSSectionSheet: React.FC<SDSSectionSheetProps> = ({
           <CustomText
             style={[styles.progressText, { color: theme.text.secondary }]}
           >
-            {t('sds.sectionN', { n: visibleIndices[activeCarouselIndex] + 1 })} /{' '}
-            {visibleIndices.length} —{' '}
+            {t('sds.sectionN', { n: visibleIndices[activeCarouselIndex] + 1 })}{' '}
+            / {visibleIndices.length} —{' '}
             {t(SECTION_I18N_KEYS[visibleIndices[activeCarouselIndex]])}
           </CustomText>
         </View>

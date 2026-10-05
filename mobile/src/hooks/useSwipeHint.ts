@@ -1,11 +1,14 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { hasSeenSwipeHint, markSwipeHintSeen } from '@services/onboardingService';
-import Swipeable from 'react-native-gesture-handler/ReanimatedSwipeable';
+import {
+  hasSeenSwipeHint,
+  markSwipeHintSeen,
+} from '@services/onboardingService';
+import type { SwipeableMethods } from 'react-native-gesture-handler/ReanimatedSwipeable';
 
 export type SwipeHintScreen = 'home' | 'history' | 'favourites';
 
 interface SwipeHintResult {
-  registerSwipeRef: (ref: Swipeable | null) => void;
+  registerSwipeRef: (ref: SwipeableMethods | null) => void;
   tooltipVisible: boolean;
   dismiss: () => void;
 }
@@ -16,7 +19,7 @@ export function useSwipeHint(
 ): SwipeHintResult {
   const [tooltipVisible, setTooltipVisible] = useState(false);
   const triggered = useRef(false);
-  const swipeRef = useRef<Swipeable | null>(null);
+  const swipeRef = useRef<SwipeableMethods | null>(null);
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const autoCloseRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const [notSeen, setNotSeen] = useState<boolean | null>(null);
@@ -26,7 +29,9 @@ export function useSwipeHint(
     hasSeenSwipeHint(screen).then(seen => {
       if (!cancelled) setNotSeen(!seen);
     });
-    return () => { cancelled = true; };
+    return () => {
+      cancelled = true;
+    };
   }, [screen]);
 
   useEffect(() => {
@@ -53,10 +58,10 @@ export function useSwipeHint(
       if (timerRef.current) clearTimeout(timerRef.current);
       if (autoCloseRef.current) clearTimeout(autoCloseRef.current);
     };
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [ready, notSeen]);
 
-  const registerSwipeRef = useCallback((ref: Swipeable | null) => {
+  const registerSwipeRef = useCallback((ref: SwipeableMethods | null) => {
     swipeRef.current = ref;
   }, []);
 
